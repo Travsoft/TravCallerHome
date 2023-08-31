@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="10dp"
+    app:cardMaxElevation="5dp"
+    app:contentPadding="5dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_marginBottom="5dp"
+        android:layout_height="match_parent">
+
+      <LinearLayout
+          android:id="@+id/profile_contact"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintBottom_toBottomOf="parent"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content">
+          <de.hdodenhof.circleimageview.CircleImageView
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/profile_image"
+              android:layout_width="60dp"
+              android:layout_height="60dp"
+              android:src="@drawable/ic_launcher_background"
+              app:civ_border_width="2dp"
+              app:civ_border_color="#FF000000"/>
+      </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_Contact_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-condensed-medium"
+            app:layout_constraintStart_toEndOf="@+id/profile_contact"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_Contact_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@+id/profile_contact"
+            app:layout_constraintTop_toBottomOf="@+id/txt_Contact_name" />
+
+        <ImageView
+            android:id="@+id/txt_Contact_type"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintStart_toEndOf="@+id/profile_contact"
+            app:layout_constraintTop_toBottomOf="@+id/txt_Contact_number" />
+
+        <TextView
+            android:id="@+id/txt_Contact_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintStart_toEndOf="@+id/txt_Contact_type"
+            app:layout_constraintTop_toBottomOf="@+id/txt_Contact_number" />
+
+        <TextView
+            android:id="@+id/txt_Contact_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txt_Contact_date"
+            app:layout_constraintTop_toBottomOf="@+id/txt_Contact_number" />
+        <TextView
+            android:id="@+id/txt_Contact_simtype"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txt_Contact_duration"
+            app:layout_constraintTop_toBottomOf="@+id/txt_Contact_number" />
+        <LinearLayout
+
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/layout_call"
+            android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="0dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:src="@android:drawable/ic_menu_call"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:tint="@color/black">
+
+            </ImageView>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
