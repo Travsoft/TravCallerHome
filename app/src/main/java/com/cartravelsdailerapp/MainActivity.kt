@@ -5,12 +5,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
-import android.os.Build
 import android.os.Bundle
 import android.provider.CallLog
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
@@ -22,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.lang.Long
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.Array
 import kotlin.Int
@@ -36,13 +33,10 @@ import kotlin.with
 
 
 class MainActivity : AppCompatActivity() {
-    @RequiresApi(Build.VERSION_CODES.O)
-    val inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     var REQUESTED_CODE_READ_PHONE_STATE = 1003
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
