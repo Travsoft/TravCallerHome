@@ -42,47 +42,7 @@ class CallHistoryFragment : Fragment() {
         // Creates a vertical Layout Manager
         binding.recyclerViewCallHistory.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewCallHistory.adapter = adapter
-        initScrollListener()
+        //initScrollListener()
         return binding.root
     }
-
-    private fun initScrollListener() {
-        binding.recyclerViewCallHistory.addOnScrollListener(object :
-            RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
-                if (!isLoading) {
-                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == listOfCallHistroy.size - 1) {
-                        //bottom of list!
-                        loadMore()
-                        isLoading = true
-                    }
-                }
-            }
-        })
-    }
-
-    private fun loadMore() {
-        adapter.notifyItemInserted(listOfCallHistroy.size - 1)
-        val handler = Handler()
-        handler.postDelayed(Runnable {
-            listOfCallHistroy.removeAt(listOfCallHistroy.size - 1)
-            val scrollPosition: Int = listOfCallHistroy.size
-            adapter.notifyItemRemoved(scrollPosition)
-            var currentSize = scrollPosition
-            val nextLimit = currentSize + 10
-            while (currentSize - 1 < nextLimit) {
-                listOfCallHistroy.add(listOfCallHistroy[nextLimit])
-                currentSize++
-            }
-            adapter.notifyDataSetChanged()
-            isLoading = false
-        }, 2000)
-    }
-
 }

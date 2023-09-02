@@ -8,7 +8,6 @@ data class CallHistory(
     var date: String,
     var duration: Long,
     var subscriberId: String,
-    var simCardPhoneNumber: String,
     var photouri: String,
     var SimName:String
 ) {

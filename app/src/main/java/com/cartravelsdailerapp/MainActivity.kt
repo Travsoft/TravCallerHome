@@ -1,11 +1,10 @@
 package com.cartravelsdailerapp
 
-import android.Manifest
 import android.Manifest.permission.*
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.icu.text.SimpleDateFormat
 import android.os.Build
 import android.os.Bundle
 import android.provider.CallLog
@@ -19,19 +18,31 @@ import androidx.navigation.fragment.NavHostFragment
 import com.cartravelsdailerapp.databinding.ActivityMainBinding
 import com.cartravelsdailerapp.models.CallHistory
 import com.qamar.curvedbottomnaviagtion.CurvedBottomNavigation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.lang.Long
+import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.Array
+import kotlin.Int
+import kotlin.IntArray
 import kotlin.String
-import kotlin.collections.ArrayList
+import kotlin.apply
+import kotlin.arrayOf
 import kotlin.let
 import kotlin.toString
+import kotlin.with
 
 
 class MainActivity : AppCompatActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    val inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     var REQUESTED_CODE_READ_PHONE_STATE = 1003
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -61,7 +72,11 @@ class MainActivity : AppCompatActivity() {
                 CALL_PHONE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            listData.addAll(getAllCallHistory())
+            runBlocking {
+                listData.addAll(withContext(Dispatchers.Default) {
+                    getAllCallHistory()
+                })
+            }
         } else {
             ActivityCompat.requestPermissions(
                 this,
@@ -91,11 +106,6 @@ class MainActivity : AppCompatActivity() {
                 READ_PHONE_STATE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(READ_PHONE_STATE),
@@ -113,12 +123,16 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("Range")
     fun getAllCallHistory(): MutableList<CallHistory> {
+
         this.contentResolver?.query(
             CallLog.Calls.CONTENT_URI, null, null,
             null, null
         )?.let {
             val callHistoryList = mutableListOf<CallHistory>()
             var dir: String? = null
+            var formatter: SimpleDateFormat = SimpleDateFormat(
+                "dd-MMM-yyyy"
+            )
 
             while (it.moveToNext()) {
                 when (it.getString(it.getColumnIndex(CallLog.Calls.TYPE)).toInt()) {
@@ -132,16 +146,14 @@ class MainActivity : AppCompatActivity() {
                         name = it.getString(it.getColumnIndex(CallLog.Calls.CACHED_NAME))
                             ?: null,
                         type = it.getString(it.getColumnIndex(CallLog.Calls.TYPE)).toInt(),
-                        date = "",
+                        date = formatter.format(
+                            Date(Long.valueOf(it.getString(it.getColumnIndex(CallLog.Calls.DATE))))
+                        ).toString(),
                         //date = Date(Long.valueOf(it.getString(it.getColumnIndex(CallLog.Calls.DATE)))).toString(),
                         duration = it.getString(it.getColumnIndex(CallLog.Calls.DURATION))
                             .toLong(),
                         subscriberId = it.getString(it.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                             ?: "",
-                        simCardPhoneNumber = getSimCardInfosBySubscriptionId(
-                            it.getString(it.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
-                                ?: "0",
-                        )?.number ?: "",
                         calType = dir.toString(),
                         photouri = it.getString(it.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI))
                             ?: "",
@@ -153,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             it.close()
-            return callHistoryList
+            return callHistoryList.reversed().distinctBy { i -> i.name }.toMutableList()
         }
 
         return mutableListOf()
@@ -237,8 +249,12 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUESTED_CODE_READ_PHONE_STATE -> {
-                if (grantResults.size>0 &&grantResults.all { it == 0 }) {
-                    listData.addAll(getAllCallHistory())
+                if (grantResults.size > 0 && grantResults.all { it == 0 }) {
+                    runBlocking {
+                        listData.addAll(withContext(Dispatchers.Default) {
+                            getAllCallHistory()
+                        })
+                    }
                 }
             }
         }
