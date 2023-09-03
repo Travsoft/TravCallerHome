@@ -3,11 +3,14 @@ package com.cartravelsdailerapp.ui.adapters
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +20,11 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.models.CallHistory
-import java.io.File
+
 
 class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var context: Context) :
     RecyclerView.Adapter<CallHistoryAdapter.CallHistoryVm>() {
@@ -60,7 +62,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         holder.simType.text = selectedData.SimName
         holder.duration.text = "${selectedData.duration} See"
 
-/*
+
         if (!TextUtils.isEmpty(selectedData.photouri)) {
             Glide.with(holder.itemView.context)
                 .load(
@@ -68,7 +70,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 )
                 .into(holder.profile_image)
         }
-*/
+
         when (selectedData.calType) {
             "OUTGOING" -> {
                 holder.calltype.setImageDrawable(
