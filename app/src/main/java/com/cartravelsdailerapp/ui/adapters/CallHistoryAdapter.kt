@@ -1,14 +1,10 @@
 package com.cartravelsdailerapp.ui.adapters
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.CallLog
-import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.text.TextUtils
@@ -19,29 +15,26 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatDrawableManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.models.CallHistory
+import java.io.File
 
 class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var context: Context) :
     RecyclerView.Adapter<CallHistoryAdapter.CallHistoryVm>() {
-    var REQUESTED_CODE_CALLPHONE: Int = 1002
-
     class CallHistoryVm(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var name: TextView = itemView.findViewById(R.id.txt_Contact_name)
-        var number: TextView = itemView.findViewById(R.id.txt_Contact_number)
-        var date: TextView = itemView.findViewById(R.id.txt_Contact_date)
-        var calltype: ImageView = itemView.findViewById(R.id.txt_Contact_type)
-        var profile_image: ImageView = itemView.findViewById(R.id.profile_image)
-        var simType: TextView = itemView.findViewById(R.id.txt_Contact_simtype)
-        var duration: TextView = itemView.findViewById(R.id.txt_Contact_duration)
-        var call: LinearLayout = itemView.findViewById(R.id.layout_call)
-
+        var name = itemView.findViewById<TextView>(R.id.txt_Contact_name)
+        var number = itemView.findViewById<TextView>(R.id.txt_Contact_number)
+        var date = itemView.findViewById<TextView>(R.id.txt_Contact_date)
+        var calltype = itemView.findViewById<ImageView>(R.id.txt_Contact_type)
+        var profile_image = itemView.findViewById<ImageView>(R.id.profile_image)
+        var simType = itemView.findViewById<TextView>(R.id.txt_Contact_simtype)
+        var duration = itemView.findViewById<TextView>(R.id.txt_Contact_duration)
+        var call = itemView.findViewById<LinearLayout>(R.id.layout_call)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CallHistoryVm {
@@ -55,7 +48,6 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         return this.listCallHistory.size
     }
 
-    @SuppressLint("MissingPermission")
     override fun onBindViewHolder(holder: CallHistoryVm, position: Int) {
         val selectedData = listCallHistory.get(position)
         if (selectedData.name.isNullOrBlank()) {
@@ -66,21 +58,22 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         holder.number.text = selectedData.number
         holder.date.text = selectedData.date
         holder.simType.text = selectedData.SimName
-        holder.duration.text = selectedData.duration.toString() + " Sec"
+        holder.duration.text = "${selectedData.duration} See"
 
+/*
         if (!TextUtils.isEmpty(selectedData.photouri)) {
-            Glide.with(context.applicationContext)
+            Glide.with(holder.itemView.context)
                 .load(
-                    Uri.parse(selectedData.photouri)
+                    selectedData.photouri
                 )
-                .error(android.R.mipmap.sym_def_app_icon)
                 .into(holder.profile_image)
         }
+*/
         when (selectedData.calType) {
             "OUTGOING" -> {
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(
-                        context,
+                        holder.itemView.context,
                         R.drawable.outgoing
                     )
                 )
@@ -88,7 +81,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             "INCOMING" -> {
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(
-                        context,
+                        holder.itemView.context,
                         R.drawable.incoming
                     )
                 )
@@ -96,7 +89,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             "MISSED" -> {
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(
-                        context,
+                        holder.itemView.context,
                         R.drawable.missed
                     )
                 )
@@ -104,7 +97,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         }
         holder.call.setOnClickListener {
             val uri = Uri.parse("tel:" + selectedData.number)
-            val telecomManager = context.getSystemService<TelecomManager>()
+            val telecomManager = holder.itemView.context.getSystemService<TelecomManager>()
             val callCapablePhoneAccounts = telecomManager?.callCapablePhoneAccounts
             val bundle = Bundle()
             if (callCapablePhoneAccounts != null) {
@@ -113,7 +106,13 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                         bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
                     }
             }
-            telecomManager?.placeCall(uri, bundle)
+            if (ActivityCompat.checkSelfPermission(
+                    holder.itemView.context,
+                    Manifest.permission.CALL_PHONE
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                telecomManager?.placeCall(uri, bundle)
+            }
         }
     }
 }

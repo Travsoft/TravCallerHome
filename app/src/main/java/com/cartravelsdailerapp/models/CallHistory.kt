@@ -6,7 +6,7 @@ data class CallHistory(
     var name: String?,
     var type: Int,
     var date: String,
-    var duration: Long,
+    var duration: String,
     var subscriberId: String,
     var photouri: String,
     var SimName:String
