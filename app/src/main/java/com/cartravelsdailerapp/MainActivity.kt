@@ -197,13 +197,15 @@ class MainActivity : AppCompatActivity() {
                             name = it.getString(it.getColumnIndex(CallLog.Calls.CACHED_NAME))
                                 ?: null,
                             type = it.getString(it.getColumnIndex(CallLog.Calls.TYPE)).toInt(),
-                            date =simpDate.format( Date(
-                                it.getLong(
-                                    it.getColumnIndex(
-                                        CallLog.Calls.DATE
+                            date = simpDate.format(
+                                Date(
+                                    it.getLong(
+                                        it.getColumnIndex(
+                                            CallLog.Calls.DATE
+                                        )
                                     )
                                 )
-                            )).toString(),
+                            ).toString(),
                             duration = it.getLong(it.getColumnIndex(CallLog.Calls.DURATION))
                                 .toString(),
                             subscriberId = it.getString(it.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
@@ -233,11 +235,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun getSimCardInfosBySubscriptionId(subscriptionId: String): SubscriptionInfo? {
         val subscriptionManager: SubscriptionManager =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                this.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-            } else {
-                TODO("VERSION.SDK_INT < LOLLIPOP_MR1")
-            }
+            this.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_PHONE_STATE
@@ -251,19 +249,14 @@ class MainActivity : AppCompatActivity() {
 
             return null
         } else {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                subscriptionManager.activeSubscriptionInfoList.find {
-                    try {
-                        it.subscriptionId == subscriptionId.toInt()
-                    } catch (e: Exception) {
-                        return null
-                    }
+           return subscriptionManager.activeSubscriptionInfoList.find {
+                try {
+                    it.subscriptionId == subscriptionId.toInt()
+                } catch (e: Exception) {
+                    return null
                 }
-            } else {
-                return null
             }
         }
-
     }
 
     private fun convertYourTime(time24: String?): String? {
