@@ -1,20 +1,18 @@
 package com.cartravelsdailerapp.ui.fragments
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
-import android.icu.text.DateFormat
-import android.os.Build
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.provider.CallLog
-import android.telephony.SubscriptionInfo
-import android.telephony.SubscriptionManager
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
+import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.text.isDigitsOnly
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -23,16 +21,9 @@ import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
-import com.cartravelsdailerapp.ui.adapters.PaginationScrollListener
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.util.*
 
-import android.os.Handler
-import android.os.Looper
-import kotlinx.coroutines.async
-import kotlin.collections.ArrayList
 
 class CallHistoryFragment : Fragment() {
     var listOfCallHistroy: ArrayList<CallHistory> = ArrayList()
@@ -49,7 +40,6 @@ class CallHistoryFragment : Fragment() {
     private var currentPage: Int = PAGE_START
 
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,11 +55,61 @@ class CallHistoryFragment : Fragment() {
             loadData()
 
         }
+        binding.searchContacts.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(msg: String): Boolean {
+                // inside on query text change method we are
+                // calling a method to filter our recycler view.
+                filter(msg)
+                return false
+            }
+        })
+
 
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    fun hideSoftKeyboard(view: View, context: Context) {
+        val imm =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as
+                    InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private fun filter(text: String) {
+        // creating a new array list to filter our data.
+        val filteredlist: ArrayList<CallHistory> = ArrayList()
+
+        // running a for loop to compare elements.
+        for (item in listOfCallHistroy) {
+            // checking if the entered string matched with any item of our recycler view.
+            if (text.isDigitsOnly()) {
+                if (item.number.contains(text.lowercase(Locale.getDefault())) == true
+                ) {
+                    // if the item is matched we are
+                    // adding it to our filtered list.
+                    filteredlist.add(item)
+                }
+
+            } else {
+                if (item.name?.lowercase(Locale.getDefault())
+                        ?.contains(text.lowercase(Locale.getDefault())) == true
+                ) {
+                    // if the item is matched we are
+                    // adding it to our filtered list.
+                    filteredlist.add(item)
+                }
+
+            }
+        }
+
+        adapter.filterList(filteredlist)
+    }
+
     suspend fun seedData() {
         runBlocking {
             listOfCallHistroy.addAll(MainActivity.listData)
@@ -89,11 +129,13 @@ class CallHistoryFragment : Fragment() {
         binding.txtNodataFound.isVisible = false
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        adapter = CallHistoryAdapter(pagingData as ArrayList<CallHistory>, requireContext())
+        adapter = CallHistoryAdapter(listOfCallHistroy, requireContext())
+        //  adapter = CallHistoryAdapter(pagingData as ArrayList<CallHistory>, requireContext())
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
         binding.recyclerViewCallHistory.adapter = adapter
 
+/*
         binding.recyclerViewCallHistory.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun isLastPage() = isLastPage
@@ -104,6 +146,7 @@ class CallHistoryFragment : Fragment() {
                 loadNextPage()
             }
         })
+*/
 
     }
 
@@ -123,7 +166,7 @@ class CallHistoryFragment : Fragment() {
             }, 2000)
 
 
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
 

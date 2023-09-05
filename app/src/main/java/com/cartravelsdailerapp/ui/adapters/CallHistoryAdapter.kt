@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
@@ -17,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
@@ -59,10 +61,15 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         }
         holder.number.text = selectedData.number
         holder.date.text = selectedData.date
-        holder.simType.text = selectedData.SimName
+        if (TextUtils.isEmpty(selectedData.SimName.replace("SIM",""))) {
+            holder.simType.text = selectedData.subscriberId
+        }else{
+            holder.simType.text = selectedData.SimName.replace("SIM","")
+
+        }
         holder.duration.text = "${selectedData.duration} See"
 
-
+/*
         if (!TextUtils.isEmpty(selectedData.photouri)) {
             Glide.with(holder.itemView.context)
                 .load(
@@ -70,13 +77,14 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 )
                 .into(holder.profile_image)
         }
+*/
 
         when (selectedData.calType) {
             "OUTGOING" -> {
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(
                         holder.itemView.context,
-                        R.drawable.outgoing
+                        R.drawable.arrow_blue
                     )
                 )
             }
@@ -84,7 +92,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(
                         holder.itemView.context,
-                        R.drawable.incoming
+                        R.drawable.arrow_green
                     )
                 )
             }
@@ -92,7 +100,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(
                         holder.itemView.context,
-                        R.drawable.missed
+                        R.drawable.arrow_red
                     )
                 )
             }
@@ -116,5 +124,13 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 telecomManager?.placeCall(uri, bundle)
             }
         }
+    }
+    fun filterList(filterlist: ArrayList<CallHistory>) {
+        // below line is to add our filtered
+        // list in our course array list.
+        listCallHistory = filterlist
+        // below line is to notify our adapter
+        // as change in recycler view data.
+        notifyDataSetChanged()
     }
 }

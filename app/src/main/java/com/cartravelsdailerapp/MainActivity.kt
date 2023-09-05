@@ -4,38 +4,41 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
 import android.os.Build
 import android.os.Bundle
 import android.provider.CallLog
+import android.provider.ContactsContract
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
+import android.text.style.TtsSpan.DateBuilder
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.cartravelsdailerapp.databinding.ActivityMainBinding
 import com.cartravelsdailerapp.models.CallHistory
-import com.cartravelsdailerapp.ui.fragments.CallHistoryFragment
 import com.qamar.curvedbottomnaviagtion.CurvedBottomNavigation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.text.DateFormat
+import java.text.ParseException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private var REQUESTED_CODE_READ_PHONE_STATE = 1003
-    @RequiresApi(Build.VERSION_CODES.N)
-    val dateTimeFormat: DateFormat =
-        DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+    var simpDate = SimpleDateFormat("dd/MM/yyyy kk:mm");
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         binding = ActivityMainBinding.inflate(layoutInflater)
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -61,9 +64,9 @@ class MainActivity : AppCompatActivity() {
                 setContentView(root)
                 initNavHost()
                 setUpBottomNavigation()
-                listData= getAllCallHistory() as ArrayList<CallHistory>
+                listData = getAllCallHistory() as ArrayList<CallHistory>
             }
-        }else{
+        } else {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
@@ -86,16 +89,16 @@ class MainActivity : AppCompatActivity() {
             CurvedBottomNavigation.Model(
                 CALL_HISTORY,
                 "",
-                R.drawable.histroy
+                R.drawable.history_svgrepo_com
             ),
             CurvedBottomNavigation.Model(
                 HOME_ITEM, "",
-                R.drawable.home
+                R.drawable.ic_home
             ),
             CurvedBottomNavigation.Model(
                 Chat_ITEM,
                 "",
-                R.drawable.histroy
+                R.drawable.ic_chat
             )
 
         )
@@ -149,8 +152,6 @@ class MainActivity : AppCompatActivity() {
         var listData = ArrayList<CallHistory>()
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
-    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -162,7 +163,11 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.size > 0 && grantResults.all { it == 0 }) {
                     runBlocking {
                         listData.addAll(withContext(Dispatchers.Default) {
-                            getAllCallHistory()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                getAllCallHistory()
+                            } else {
+                                TODO("VERSION.SDK_INT < N")
+                            }
                         })
                     }
 
@@ -171,9 +176,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     @SuppressLint("Range")
-     fun getAllCallHistory(): MutableList<CallHistory> {
+    fun getAllCallHistory(): MutableList<CallHistory> {
         this.contentResolver?.query(
             CallLog.Calls.CONTENT_URI, null, null,
             null, null
@@ -186,30 +190,38 @@ class MainActivity : AppCompatActivity() {
                     CallLog.Calls.INCOMING_TYPE -> dir = "INCOMING"
                     CallLog.Calls.MISSED_TYPE -> dir = "MISSED"
                 }
-                callHistoryList.add(
-                    CallHistory(
-                        number = it.getString(it.getColumnIndex(CallLog.Calls.NUMBER)),
-                        name = it.getString(it.getColumnIndex(CallLog.Calls.CACHED_NAME))
-                            ?: null,
-                        type = it.getString(it.getColumnIndex(CallLog.Calls.TYPE)).toInt(),
-                        date = dateTimeFormat.format(it.getLong(it.getColumnIndex(CallLog.Calls.DATE)))
-                            .toString(),
-                        duration = it.getLong(it.getColumnIndex(CallLog.Calls.DURATION)).toString(),
-                        subscriberId = it.getString(it.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
-                            ?: "",
-                        calType = dir.toString(),
-                        photouri = it.getString(it.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI))
-                            ?: "",
-                        SimName = getSimCardInfosBySubscriptionId(
-                            it.getString(it.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
-                                ?: "0",
-                        )?.displayName?.toString() ?: "",
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    callHistoryList.add(
+                        CallHistory(
+                            number = it.getString(it.getColumnIndex(CallLog.Calls.NUMBER)),
+                            name = it.getString(it.getColumnIndex(CallLog.Calls.CACHED_NAME))
+                                ?: null,
+                            type = it.getString(it.getColumnIndex(CallLog.Calls.TYPE)).toInt(),
+                            date =simpDate.format( Date(
+                                it.getLong(
+                                    it.getColumnIndex(
+                                        CallLog.Calls.DATE
+                                    )
+                                )
+                            )).toString(),
+                            duration = it.getLong(it.getColumnIndex(CallLog.Calls.DURATION))
+                                .toString(),
+                            subscriberId = it.getString(it.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
+                                ?: "",
+                            calType = dir.toString(),
+                            photouri = it.getString(it.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI))
+                                ?: "",
+                            SimName = getSimCardInfosBySubscriptionId(
+                                it.getString(it.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
+                                    ?: "0",
+                            )?.displayName?.toString() ?: "",
+                        )
                     )
-                )
+                }
 
             }
             it.close()
-            return callHistoryList.reversed().distinctBy { i -> i.name }.toMutableList()
+            return callHistoryList.asReversed().toMutableList()
         }
 
         return mutableListOf()
@@ -253,4 +265,23 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun convertYourTime(time24: String?): String? {
+        try {
+            //new SimpleDateFormat("dd MMM yyyy KK:mm:ss a").format(date)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val format24 = SimpleDateFormat("dd MMM yyyy KK:mm:ss a")
+                val time: Date = format24.parse(time24)
+                val format12 = SimpleDateFormat("dd MMM yyyy KK:mm:ss a")
+                return format12.format(time)
+            } else {
+                return Date(time24).toString()
+            }
+
+        } catch (e: ParseException) {
+            // Handle invalid input
+            return ""
+        }
+    }
+
 }
