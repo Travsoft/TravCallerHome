@@ -129,7 +129,8 @@ class CallHistoryFragment : Fragment() {
         binding.txtNodataFound.isVisible = false
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        adapter = CallHistoryAdapter(listOfCallHistroy, requireContext())
+        Collections.reverse(listOfCallHistroy)
+        adapter = CallHistoryAdapter( listOfCallHistroy, requireContext())
         //  adapter = CallHistoryAdapter(pagingData as ArrayList<CallHistory>, requireContext())
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager

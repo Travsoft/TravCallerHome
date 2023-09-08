@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUESTED_CODE_READ_PHONE_STATE -> {
-                if (grantResults.size > 0 && grantResults.all { it == 0 }) {
+                if (grantResults.isNotEmpty() && grantResults.all { it == 0 }) {
                     runBlocking {
                         listData.addAll(withContext(Dispatchers.Default) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -223,7 +223,7 @@ class MainActivity : AppCompatActivity() {
 
             }
             it.close()
-            return callHistoryList.asReversed().toMutableList()
+            return callHistoryList
         }
 
         return mutableListOf()
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
 
             return null
         } else {
-           return subscriptionManager.activeSubscriptionInfoList.find {
+            return subscriptionManager.activeSubscriptionInfoList.find {
                 try {
                     it.subscriptionId == subscriptionId.toInt()
                 } catch (e: Exception) {
