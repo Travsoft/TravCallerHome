@@ -14,4 +14,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="callerBt">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_height">70dp</item>
+        <item name="android:layout_margin">1dp</item>
+        <item name="android:textSize">@dimen/dialpad_btn_size</item>
+        <item name="android:background">@drawable/dialer_btn_ripple</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>
