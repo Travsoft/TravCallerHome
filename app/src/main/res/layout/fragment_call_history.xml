@@ -31,9 +31,10 @@
                 android:layout_weight="3"
                 android:background="@drawable/bg_shape_rect_orange"
                 android:padding="5dp"
+                android:textSize="20sp"
                 android:searchSuggestThreshold="2"
                 app:iconifiedByDefault="false"
-                app:queryHint="Search Your Name"
+                app:queryHint="@string/app_name"
                 app:searchHintIcon="@null" />
 
             <ImageView
@@ -59,11 +60,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp"
-                app:layout_constraintBottom_toTopOf="@+id/fab_button"
+                app:layout_constraintBottom_toTopOf="@+id/card_call_bt"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/fab_button"
+                android:id="@+id/card_call_bt"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentBottom="true"
@@ -86,8 +87,6 @@
             </androidx.cardview.widget.CardView>
 
         </RelativeLayout>
-        <!--        app:layout_constraintBottom_toTopOf="@+id/fab_button"-->
-
         <TextView
             android:id="@+id/txt_nodata_found"
             android:layout_width="wrap_content"
@@ -110,27 +109,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!--
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/fab_button"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:elevation="10dp"
-                    android:layout_marginBottom="40dp"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="70dp"
-                    app:cardElevation="10dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/recycler_view_call_history">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_dial_pad" />
-                </androidx.cardview.widget.CardView>
-        -->
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

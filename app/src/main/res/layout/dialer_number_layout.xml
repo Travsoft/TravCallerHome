@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="#fff"
+    android:gravity="bottom"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/dialerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/search_rel"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/img_sim"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_sim_card" />
+
+                <TextView
+                    android:id="@+id/txt_sim_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+            </RelativeLayout>
+
+            <EditText
+                android:id="@+id/edtInput"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="0dp"
+                android:layout_weight="3"
+                android:background="@android:color/transparent"
+                android:drawablePadding="4dp"
+                android:editable="true"
+                android:gravity="center"
+                android:inputType="none|phone"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:singleLine="true"
+                android:textSize="@dimen/dialpad_btn_size" />
+
+            <ImageView
+                android:id="@+id/clear_img"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:src="@drawable/backspace" />
+
+        </LinearLayout>
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:columnCount="3"
+            app:layout_gravity="center">
+
+            <Button
+                android:id="@+id/btnOne"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:onClick="buttonClickEvent"
+                android:text="1"
+                app:fontFamily="sans-serif-condensed"
+                app:layout_gravity="center" />
+
+            <Button
+                android:id="@+id/btnTwo"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:layout_row="0"
+                android:layout_column="1"
+                android:onClick="buttonClickEvent"
+                android:text="2"
+                android:textColor="@color/black"
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnThree"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:layout_row="0"
+                android:layout_column="2"
+                android:onClick="buttonClickEvent"
+                android:text="3"
+                app:fontFamily="sans-serif-condensed" />
+
+
+            <Button
+                android:id="@+id/btnFour"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="4"
+
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnFive"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="5"
+
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnSix"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="6"
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnSeven"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="7"
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnEight"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="8"
+
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnNine"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="9"
+
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnAterisk"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:background="@drawable/dialer_btn_ripple"
+                android:onClick="buttonClickEvent"
+                android:text="*"
+
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnZero"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="0"
+
+                app:fontFamily="sans-serif-condensed" />
+
+            <Button
+                android:id="@+id/btnHash"
+                style="@style/callerBt"
+                android:layout_width="wrap_content"
+                android:onClick="buttonClickEvent"
+                android:text="#"
+                app:fontFamily="sans-serif-condensed" />
+        </GridLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:gravity="bottom|center">
+        <ImageView
+            android:id="@+id/add_user"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_weight="1"
+            app:backgroundTint="@color/white"
+            android:padding="10dp"
+            app:fabSize="normal"
+            app:srcCompat="@drawable/useradd" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_weight="1"
+            app:backgroundTint="@color/white"
+            app:fabSize="normal"
+            app:srcCompat="@drawable/ic_call"
+            />
+
+        <ImageView
+            android:id="@+id/cancel_button"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_weight="1"
+            android:padding="10dp"
+            app:backgroundTint="@color/white"
+            app:fabSize="normal"
+            app:srcCompat="@drawable/ic_cancel" />
+
+    </LinearLayout>
+</LinearLayout>

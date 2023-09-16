@@ -2,6 +2,7 @@ package com.cartravelsdailerapp.ui.fragments
 
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -49,6 +51,11 @@ class CallHistoryFragment : Fragment() {
             calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH)
         // Inflate the layout for this fragment
         binding = FragmentCallHistoryBinding.inflate(layoutInflater)
+
+        binding.cardCallBt.setOnClickListener {
+            startActivity(Intent(requireContext(), Dialer::class.java))
+        }
+
         runBlocking {
             setupRV()
             seedData()
@@ -68,7 +75,6 @@ class CallHistoryFragment : Fragment() {
                 return false
             }
         })
-
 
         return binding.root
     }
@@ -130,7 +136,7 @@ class CallHistoryFragment : Fragment() {
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         Collections.reverse(listOfCallHistroy)
-        adapter = CallHistoryAdapter( listOfCallHistroy, requireContext())
+        adapter = CallHistoryAdapter(listOfCallHistroy, requireContext())
         //  adapter = CallHistoryAdapter(pagingData as ArrayList<CallHistory>, requireContext())
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager

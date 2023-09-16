@@ -18,6 +18,7 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.models.CallHistory
@@ -57,7 +58,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         holder.number.text = selectedData.number
         holder.date.text = selectedData.date
         if (TextUtils.isEmpty(selectedData.SimName.replace("SIM",""))) {
-            holder.simType.text = selectedData.subscriberId
+            holder.simType.isVisible=false
         }else{
             holder.simType.text = selectedData.SimName.replace("SIM","")
 
