@@ -225,17 +225,11 @@ class InCallActivity : AppCompatActivity() {
 
     private fun getCreditsCalculation(diff: Long): Long {
         val check: Long
-        if (false) {
-            check = TimeUnit.MILLISECONDS.toMinutes(diff)
-        } else {
-            check = TimeUnit.MILLISECONDS.toSeconds(diff)
-        }
+        check = TimeUnit.MILLISECONDS.toSeconds(diff)
         return check
     }
 
     private fun stopTimer() {
-
-
         timerDisposable.dispose()
     }
 

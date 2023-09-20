@@ -1,8 +1,10 @@
 package com.cartravelsdailerapp.ui.fragments
 
+import android.Manifest
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,10 +14,12 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.text.isDigitsOnly
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.MainActivity
@@ -23,6 +27,8 @@ import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
+import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
+import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -34,14 +40,6 @@ class CallHistoryFragment : Fragment() {
     private var REQUESTED_CODE_READ_PHONE_STATE = 1003
     lateinit var calendar: Calendar
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private val PAGE_START = 0
-    private var isLoading = false
-    private var isLastPage = false
-    private var bigDataChunk = listOf<List<CallHistory>>()
-    private var pagingData = mutableListOf<CallHistory>()
-    private var currentPage: Int = PAGE_START
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,12 +54,6 @@ class CallHistoryFragment : Fragment() {
             startActivity(Intent(requireContext(), Dialer::class.java))
         }
 
-        runBlocking {
-            setupRV()
-            seedData()
-            loadData()
-
-        }
         binding.searchContacts.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -75,8 +67,12 @@ class CallHistoryFragment : Fragment() {
                 return false
             }
         })
-
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadData()
     }
 
     fun hideSoftKeyboard(view: View, context: Context) {
@@ -116,19 +112,52 @@ class CallHistoryFragment : Fragment() {
         adapter.filterList(filteredlist)
     }
 
-    suspend fun seedData() {
-        runBlocking {
-            listOfCallHistroy.addAll(MainActivity.listData)
-
-        }
-
-        bigDataChunk = listOfCallHistroy.chunked(10)
-        adapter.notifyDataSetChanged()
-    }
 
     private fun loadData() {
-        pagingData.addAll(bigDataChunk[PAGE_START])
-        adapter.notifyDataSetChanged()
+        if (context?.let {
+                ActivityCompat.checkSelfPermission(
+                    it.applicationContext,
+                    Manifest.permission.READ_PHONE_STATE
+                )
+            } == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.READ_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.READ_CALL_LOG
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.WRITE_CALL_LOG
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.READ_PHONE_STATE
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.CALL_PHONE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            (activity as MainActivity).vm.callLogs.observe(
+                this.viewLifecycleOwner,
+                androidx.lifecycle.Observer<List<CallHistory>> {
+                    listOfCallHistroy = it as ArrayList<CallHistory>
+                    setupRV()
+                })
+        } else {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.READ_PHONE_NUMBERS,
+                    Manifest.permission.WRITE_CALL_LOG,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.CALL_PHONE
+                ),
+                REQUESTED_CODE_READ_PHONE_STATE
+            )
+
+        }
     }
 
     private fun setupRV() {
@@ -137,44 +166,9 @@ class CallHistoryFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         Collections.reverse(listOfCallHistroy)
         adapter = CallHistoryAdapter(listOfCallHistroy, requireContext())
-        //  adapter = CallHistoryAdapter(pagingData as ArrayList<CallHistory>, requireContext())
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
         binding.recyclerViewCallHistory.adapter = adapter
 
-/*
-        binding.recyclerViewCallHistory.addOnScrollListener(object :
-            PaginationScrollListener(linearLayoutManager) {
-            override fun isLastPage() = isLastPage
-            override fun isLoading() = isLoading
-            override fun loadMoreItems() {
-                isLoading = true
-                currentPage += 1
-                loadNextPage()
-            }
-        })
-*/
-
     }
-
-    private fun loadNextPage() {
-        binding.loading.visibility = View.VISIBLE
-        try {
-            // delay 2sec
-            Handler(Looper.getMainLooper()).postDelayed({
-                bigDataChunk[currentPage].map {
-                    pagingData.add(it)
-                    binding.recyclerViewCallHistory.post {
-                        adapter.notifyItemInserted(pagingData.size - 1)
-                    }
-                }
-                isLoading = false
-                binding.loading.visibility = View.GONE
-            }, 2000)
-
-
-        } catch (_: Exception) {
-        }
-    }
-
 }

@@ -103,12 +103,10 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
         }
 
         if (Build.VERSION.SDK_INT > 22) {
-
             subscriptionManager =
                 this.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
         } else {
-            val tManager = baseContext
-                .getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+            val tManager = this.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
 
         }
         if (ActivityCompat.checkSelfPermission(

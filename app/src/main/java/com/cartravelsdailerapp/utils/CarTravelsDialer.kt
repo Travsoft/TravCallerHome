@@ -9,8 +9,6 @@ object CarTravelsDialer {
     const val TelegramAppPackage = "org.telegram.messenger"
     const val GOOGLE_PAY_PACKAGE_NAME = "com.google.android.apps.nbu.paisa.user"
     var GOOGLE_PAY_REQUEST_CODE = 123
-
-
 }
 
 fun Context.isPackageInstalled(context: Context, packageName: String): Boolean {
