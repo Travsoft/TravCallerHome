@@ -17,7 +17,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private var REQUESTED_CODE_READ_PHONE_STATE = 1003
-    var simpDate = SimpleDateFormat("dd/MM/yyyy kk:mm");
     lateinit var vm: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

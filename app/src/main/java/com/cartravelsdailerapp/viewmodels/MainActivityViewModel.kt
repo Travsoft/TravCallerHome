@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.models.CallHistory
 import kotlinx.coroutines.launch
+import java.util.*
 
 class MainActivityViewModel(
     context: Application,
@@ -15,7 +16,6 @@ class MainActivityViewModel(
     val callLogs: LiveData<List<CallHistory>>
         get() = _callLogs
 
-
     init {
         getCallLogs()
     }
@@ -23,6 +23,8 @@ class MainActivityViewModel(
     private fun getCallLogs() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs()
+            callLogs.value?.let { Collections.reverse(it) }
+
         }
     }
 

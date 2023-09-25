@@ -70,44 +70,45 @@
 
         </LinearLayout>
 
-        <GridLayout
+        <androidx.gridlayout.widget.GridLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:columnCount="3"
+            app:alignmentMode="alignMargins"
+            app:columnCount="3"
             app:layout_gravity="center">
 
             <Button
                 android:id="@+id/btnOne"
                 style="@style/callerBt"
                 android:layout_width="wrap_content"
-                android:layout_row="0"
-                android:layout_column="0"
                 android:onClick="buttonClickEvent"
                 android:text="1"
                 app:fontFamily="sans-serif-condensed"
-                app:layout_gravity="center" />
+                app:layout_column="0"
+                app:layout_gravity="center"
+                app:layout_row="0" />
 
             <Button
                 android:id="@+id/btnTwo"
                 style="@style/callerBt"
                 android:layout_width="wrap_content"
-                android:layout_row="0"
-                android:layout_column="1"
                 android:onClick="buttonClickEvent"
                 android:text="2"
                 android:textColor="@color/black"
-                app:fontFamily="sans-serif-condensed" />
+                app:fontFamily="sans-serif-condensed"
+                app:layout_column="1"
+                app:layout_row="0" />
 
             <Button
                 android:id="@+id/btnThree"
                 style="@style/callerBt"
                 android:layout_width="wrap_content"
-                android:layout_row="0"
-                android:layout_column="2"
                 android:onClick="buttonClickEvent"
                 android:text="3"
-                app:fontFamily="sans-serif-condensed" />
+                app:fontFamily="sans-serif-condensed"
+                app:layout_column="2"
+                app:layout_row="0" />
 
 
             <Button
@@ -188,7 +189,7 @@
                 android:onClick="buttonClickEvent"
                 android:text="#"
                 app:fontFamily="sans-serif-condensed" />
-        </GridLayout>
+        </androidx.gridlayout.widget.GridLayout>
 
     </LinearLayout>
 
@@ -197,14 +198,15 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
         android:gravity="bottom|center">
+
         <ImageView
             android:id="@+id/add_user"
             android:layout_width="24dp"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/fab_margin"
             android:layout_weight="1"
-            app:backgroundTint="@color/white"
             android:padding="10dp"
+            app:backgroundTint="@color/white"
             app:fabSize="normal"
             app:srcCompat="@drawable/useradd" />
 
@@ -216,8 +218,7 @@
             android:layout_weight="1"
             app:backgroundTint="@color/white"
             app:fabSize="normal"
-            app:srcCompat="@drawable/ic_call"
-            />
+            app:srcCompat="@drawable/ic_call" />
 
         <ImageView
             android:id="@+id/cancel_button"

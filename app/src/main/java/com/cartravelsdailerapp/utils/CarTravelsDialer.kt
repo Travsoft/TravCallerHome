@@ -5,6 +5,9 @@ import android.content.pm.PackageManager
 
 
 object CarTravelsDialer {
+    const val ContactName = "contactName"
+    const val ContactNumber = "contactNumber"
+    const val ContactUri = "contactUri"
     const val WhatsAppPackage = "com.whatsapp"
     const val TelegramAppPackage = "org.telegram.messenger"
     const val GOOGLE_PAY_PACKAGE_NAME = "com.google.android.apps.nbu.paisa.user"

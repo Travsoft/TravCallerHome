@@ -9,9 +9,9 @@ data class CallHistory(
     var duration: String,
     var subscriberId: String,
     var photouri: String,
-    var SimName:String
+    var SimName: String
 ) {
-
+    var IsExpand: Boolean = false
     val cachedName: String  // Separate property for cachedName
         get() {
             return if (name == null) number else name as String

@@ -28,6 +28,9 @@
         android:theme="@style/Theme.CarTravelsDailerApp"
         tools:targetApi="31">
         <activity
+            android:name=".ui.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.InCallActivity"
             android:exported="false" />
         <activity
@@ -35,14 +38,14 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <receiver
             android:name=".broadcastreceivers.CallEndReceiver"
             android:enabled="true"
@@ -50,7 +53,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
-
         </receiver>
     </application>
 
