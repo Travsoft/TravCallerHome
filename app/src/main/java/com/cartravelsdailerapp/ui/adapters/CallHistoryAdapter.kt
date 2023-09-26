@@ -1,34 +1,44 @@
 package com.cartravelsdailerapp.ui.adapters
 
 import android.Manifest
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.graphics.BitmapFactory
+import android.graphics.Point
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.text.TextUtils
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.cartravelsdailerapp.R
+import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+
 
 class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var context: Context) :
     RecyclerView.Adapter<CallHistoryAdapter.CallHistoryVm>() {
@@ -61,6 +71,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
 
     override fun onBindViewHolder(holder: CallHistoryVm, position: Int) {
         val selectedData = listCallHistory.get(position)
+
         if (selectedData.name.isNullOrBlank()) {
             holder.name.text = selectedData.number
         } else {
@@ -88,17 +99,12 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         }
         // Set the visibility based on state
         // Set the visibility based on state
-        holder.layout_sub_item.setVisibility(if (selectedData.IsExpand) View.VISIBLE else View.GONE)
+        holder.layout_sub_item.visibility = if (selectedData.IsExpand) View.VISIBLE else View.GONE
 
-/*
-        if (!TextUtils.isEmpty(selectedData.photouri)) {
-            Glide.with(holder.itemView.context)
-                .load(
-                    selectedData.photouri
-                )
-                .into(holder.profile_image)
-        }
-*/
+        Glide.with(holder.itemView.context)
+            .load(BitmapFactory.decodeStream(openPhoto(selectedData.subscriberId.toLong())))
+            .into(holder.profile_image)
+
 
         when (selectedData.calType) {
             "OUTGOING" -> {
@@ -165,7 +171,17 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             context.startActivity(intent)
         }
         holder.card_whatsapp.setOnClickListener {
-            openWhatsAppByNumber(selectedData.number)
+
+            if (isAppInstalled("com.whatsapp.w4b")) {
+                val location = IntArray(2)
+                holder.itemView.getLocationOnScreen(location)
+                val point = Point()
+                point.x = location[0]
+                point.y = location[1]
+                showPopup(context, point, selectedData.number)
+            } else {
+                openWhatsAppByNumber(selectedData.number)
+            }
         }
         holder.card_telegram.setOnClickListener {
             openTelegramAppByNumber(selectedData.number)
@@ -195,14 +211,98 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
     private fun openTelegramAppByNumber(toNumber: String) {
         val intent =
             Intent(Intent.ACTION_VIEW, Uri.parse("tg://openmessage?user_id=" + toNumber))
-        intent.setPackage("org.telegram.messenger");
+        intent.setPackage("org.telegram.messenger")
         context.startActivity(intent)
     }
 
     private fun openDefaultSmsAppByNumber(toNumber: String) {
         val intent =
             Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + toNumber))
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.addCategory(Intent.CATEGORY_DEFAULT)
         context.startActivity(intent)
+    }
+
+    fun launchWhatsAppBusinessApp(toNumber: String) {
+        val pm: PackageManager = context.packageManager
+        try {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("http://api.whatsapp.com/send?phone=" + toNumber)
+            )
+            intent.setPackage("com.whatsapp.w4b")
+            // pm.getLaunchIntentForPackage("com.whatsapp.w4b")
+            context.startActivity(intent)
+        } catch (e: PackageManager.NameNotFoundException) {
+            Toast.makeText(context, "Please install WA Business App", Toast.LENGTH_SHORT).show()
+        } catch (exception: NullPointerException) {
+        }
+    }
+
+    fun isAppInstalled(packageName: String?): Boolean {
+        val pm = context.packageManager
+        try {
+            pm.getPackageInfo(packageName!!, PackageManager.GET_ACTIVITIES)
+            return true
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e("isAppInstalled", "error :${e.message}")
+        }
+        return false
+    }
+
+    private fun showPopup(context: Context, p: Point, number: String) {
+
+        val layoutInflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val binding = PopupLayoutBinding.inflate(layoutInflater)
+        val popUp = PopupWindow(context)
+        popUp.contentView = binding.root
+        popUp.width = LinearLayout.LayoutParams.WRAP_CONTENT
+        popUp.height = LinearLayout.LayoutParams.WRAP_CONTENT
+        popUp.isFocusable = true
+
+        val x = 200
+        val y = 60
+        popUp.setBackgroundDrawable(ColorDrawable())
+        popUp.animationStyle = R.style.popup_window_animation
+        popUp.showAtLocation(binding.root, Gravity.NO_GRAVITY, p.x + x, p.y + y)
+
+        binding.imageClose.setOnClickListener {
+            popUp.dismiss()
+        }
+        binding.imageWhatsappBussiness.setOnClickListener {
+            launchWhatsAppBusinessApp(number)
+        }
+        binding.imageWhatsapp.setOnClickListener {
+            openWhatsAppByNumber(number)
+        }
+
+    }
+
+    private fun openPhoto(contactId: Long): InputStream? {
+        val contactUri =
+            ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
+        val photoUri =
+            Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+        Log.d("contactId" + contactId, photoUri.toString())
+        val cursor: Cursor = context.getContentResolver().query(
+            photoUri,
+            arrayOf<String>(ContactsContract.Contacts.Photo.PHOTO),
+            null,
+            null,
+            null
+        )
+            ?: return null
+        try {
+            if (cursor.moveToFirst()) {
+                val data: ByteArray = cursor.getBlob(0)
+                if (data != null) {
+                    return ByteArrayInputStream(data)
+                }
+            }
+        } finally {
+            cursor.close()
+        }
+        return null
     }
 }

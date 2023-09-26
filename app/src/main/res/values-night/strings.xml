@@ -2,4 +2,5 @@
 <resources>
     <string name="call_1">Call 1</string>
     <string name="call_2">Call 2</string>
+    <string name="go_to">Go To</string>
 </resources>
