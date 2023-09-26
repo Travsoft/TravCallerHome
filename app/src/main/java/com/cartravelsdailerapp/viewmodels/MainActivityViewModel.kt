@@ -23,8 +23,6 @@ class MainActivityViewModel(
     private fun getCallLogs() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs()
-            callLogs.value?.let { Collections.reverse(it) }
-
         }
     }
 

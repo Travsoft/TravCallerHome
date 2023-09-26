@@ -100,11 +100,13 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         // Set the visibility based on state
         // Set the visibility based on state
         holder.layout_sub_item.visibility = if (selectedData.IsExpand) View.VISIBLE else View.GONE
+/*
 
         Glide.with(holder.itemView.context)
             .load(BitmapFactory.decodeStream(openPhoto(selectedData.subscriberId.toLong())))
             .into(holder.profile_image)
 
+*/
 
         when (selectedData.calType) {
             "OUTGOING" -> {
