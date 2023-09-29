@@ -12,6 +12,7 @@ data class CallHistory(
     var SimName: String
 ) {
     var IsExpand: Boolean = false
+    var Count: Int = 0
     val cachedName: String  // Separate property for cachedName
         get() {
             return if (name == null) number else name as String

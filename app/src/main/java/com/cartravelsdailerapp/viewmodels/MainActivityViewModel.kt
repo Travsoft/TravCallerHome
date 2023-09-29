@@ -22,7 +22,11 @@ class MainActivityViewModel(
 
     private fun getCallLogs() {
         viewModelScope.launch {
-            _callLogs.value = callLogsRepository.fetchCallLogs()
+            _callLogs.value = callLogsRepository.fetchCallLogs().distinctBy { i ->
+                {
+                    i.number
+                }
+            }
         }
     }
 

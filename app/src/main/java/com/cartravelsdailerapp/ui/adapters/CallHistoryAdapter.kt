@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
@@ -13,6 +14,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.MediaStore
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.text.TextUtils
@@ -36,7 +38,9 @@ import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
+import com.squareup.picasso.Picasso
 import java.io.ByteArrayInputStream
+import java.io.IOException
 import java.io.InputStream
 
 
@@ -56,6 +60,8 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         var card_whatsapp = itemView.findViewById<CardView>(R.id.card_whatsapp)
         var card_telegram = itemView.findViewById<CardView>(R.id.card_telegram)
         var cardSms = itemView.findViewById<CardView>(R.id.card_sms)
+        var txt_Contact_number_count =
+            itemView.findViewById<TextView>(R.id.txt_Contact_number_count)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CallHistoryVm {
@@ -107,7 +113,29 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             .into(holder.profile_image)
 
 */
-
+/*
+        if (TextUtils.isEmpty(selectedData.photouri)) {
+            //Image not found then load any random image (whatever you like)
+            Picasso.get().load(R.drawable.userprofile).fit().into(holder.profile_image)
+        } else {
+            //Here it will load contact image in the imageview.
+            val bp: Bitmap
+            try {
+                bp = MediaStore.Images.Media
+                    .getBitmap(
+                        context.contentResolver,
+                        Uri.parse(getPhotoFromContacts(selectedData.number, ""))
+                    )
+                Glide.with(context)
+                    .load(BitmapFactory.decodeStream(openPhoto(selectedData.subscriberId.toLong())))
+                    .centerInside()
+                    .into(holder.profile_image)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Picasso.get().load(R.drawable.userprofile).fit().into(holder.profile_image)
+            }
+        }
+*/
         when (selectedData.calType) {
             "OUTGOING" -> {
                 holder.calltype.setImageDrawable(
@@ -306,5 +334,26 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             cursor.close()
         }
         return null
+    }
+
+    private fun getPhotoFromContacts(num: String, phone_uri: String): String {
+        var uri =
+            Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
+        //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
+        val cursor: Cursor? = context.getContentResolver().query(uri, null, null, null, null)
+
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                val id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
+                val name =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                var image_uri =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
+                Log.d("image_uri-->", "name $name id $id image_uri $image_uri")
+                return image_uri
+            }
+            cursor.close()
+        }
+        return ""
     }
 }
