@@ -3,35 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
-    app:cardCornerRadius="20dp"
+    android:background="@color/orange"
     app:contentPadding="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="150dp">
 
         <ImageView
             android:id="@+id/image_close"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:layout_margin="10dp"
             android:src="@drawable/ic_cancel"
             app:layout_constraintStart_toStartOf="parent"
 
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/txt_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginRight="20dp"
             android:text="@string/go_to"
+            android:textAlignment="center"
             android:textColor="@color/black"
-
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/image_close"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
@@ -46,15 +47,14 @@
             <ImageView
                 android:id="@+id/image_whatsapp"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
+                android:layout_height="50dp"
                 android:layout_weight="2"
                 android:src="@drawable/ic_whatsapp" />
 
             <ImageView
                 android:id="@+id/image_whatsapp_bussiness"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="50dp"
                 android:layout_weight="2"
                 android:src="@drawable/whatsapp_business" />
 
@@ -64,7 +64,6 @@
             android:id="@+id/layout2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,8 +74,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
+                android:fontFamily="sans-serif-black"
                 android:text="@string/personal"
-
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
@@ -87,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:gravity="center"
-
+                android:fontFamily="sans-serif-black"
                 android:text="@string/bussiness"
                 android:textColor="@color/black"
                 android:textSize="18sp" />

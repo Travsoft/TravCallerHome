@@ -24,13 +24,16 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
+import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class CallHistoryFragment : Fragment() {
@@ -161,10 +164,11 @@ class CallHistoryFragment : Fragment() {
     }
 
     private fun setupRV() {
+       // val data= DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll()
         binding.txtNodataFound.isVisible = false
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        adapter = CallHistoryAdapter(listOfCallHistroy, requireContext())
+        adapter = CallHistoryAdapter(listOfCallHistroy as ArrayList<CallHistory>, requireContext())
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
         binding.recyclerViewCallHistory.adapter = adapter

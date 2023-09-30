@@ -1,20 +1,18 @@
 package com.cartravelsdailerapp.ui.adapters
 
 import android.Manifest
+import android.accessibilityservice.GestureDescription
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.provider.MediaStore
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.text.TextUtils
@@ -24,13 +22,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.models.CallHistory
@@ -38,9 +36,7 @@ import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
-import com.squareup.picasso.Picasso
 import java.io.ByteArrayInputStream
-import java.io.IOException
 import java.io.InputStream
 
 
@@ -208,7 +204,8 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 val point = Point()
                 point.x = location[0]
                 point.y = location[1]
-                showPopup(context, point, selectedData.number)
+               // showPopup(context, point, selectedData.number)
+                AlertDialogOpenWhatsApp(selectedData.number)
             } else {
                 openWhatsAppByNumber(selectedData.number)
             }
@@ -290,12 +287,9 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         popUp.width = LinearLayout.LayoutParams.WRAP_CONTENT
         popUp.height = LinearLayout.LayoutParams.WRAP_CONTENT
         popUp.isFocusable = true
-
-        val x = 200
-        val y = 60
         popUp.setBackgroundDrawable(ColorDrawable())
         popUp.animationStyle = R.style.popup_window_animation
-        popUp.showAtLocation(binding.root, Gravity.NO_GRAVITY, p.x + x, p.y + y)
+        popUp.showAtLocation(binding.root, Gravity.CENTER, 0, 0)
 
         binding.imageClose.setOnClickListener {
             popUp.dismiss()
@@ -355,5 +349,26 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             cursor.close()
         }
         return ""
+    }
+
+    private fun AlertDialogOpenWhatsApp(number: String) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val layoutInflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val binding = PopupLayoutBinding.inflate(layoutInflater)
+        builder.setView(binding.root)
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+        binding.imageClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        binding.imageWhatsappBussiness.setOnClickListener {
+            launchWhatsAppBusinessApp(number)
+        }
+        binding.imageWhatsapp.setOnClickListener {
+            openWhatsAppByNumber(number)
+        }
+
     }
 }

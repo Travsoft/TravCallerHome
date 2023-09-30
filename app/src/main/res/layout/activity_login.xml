@@ -8,7 +8,19 @@
     tools:context=".ui.LoginActivity">
 
     <TextView
+        android:id="@+id/txt_skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="10dp"
+        android:text="@string/skip"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
         android:id="@+id/txt_version_no"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,10 +95,11 @@
                 app:boxCornerRadiusTopStart="10dp">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/email"
                     android:fontFamily="sans-serif-medium"
+                    android:hint="@string/email"
                     android:inputType="textWebEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -104,20 +117,50 @@
                 app:boxCornerRadiusTopStart="10dp">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_mobile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
                     android:hint="@string/mobile_number"
                     android:inputType="phone"
-                    android:fontFamily="sans-serif-medium"
                     android:maxEms="10" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txt_signUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/signup"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txt_forgotpassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/forgot_password"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
             <Button
                 android:id="@+id/bt_login"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="20dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/login"
@@ -129,15 +172,15 @@
         android:id="@+id/check_termandcondition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
         android:layout_margin="10dp"
-        android:textAlignment="center"
-        android:lines="1"
         android:fontFamily="sans-serif-medium"
-        android:textColor="@color/black"
+        android:lines="1"
         android:text="@string/by_continuing_i_agree_to_cartravals_com_t_amp_c"
-        app:layout_constraintTop_toBottomOf="@+id/card_login"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/card_login" />
 </androidx.constraintlayout.widget.ConstraintLayout>
