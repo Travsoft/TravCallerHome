@@ -14,6 +14,8 @@ interface CallHistoryDao {
 
     @Insert
     fun insertAll(Courses: List<CallHistory>)
+    @Insert
+    fun insertCallHistory(Courses: CallHistory)
 
     @Delete
     fun delete(Course: CallHistory)

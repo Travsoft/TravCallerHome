@@ -5,6 +5,8 @@ import android.preference.PreferenceManager
 
 
 object PrefUtils {
+    const val CallTravelsSharedPref = "CallTravelsSharedPref"
+    const val IsLogin = "IsLogin"
     fun getBoolean(contect1: Context?, string1: String?, bool1: Boolean): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(contect1).getBoolean(string1, bool1)
     }

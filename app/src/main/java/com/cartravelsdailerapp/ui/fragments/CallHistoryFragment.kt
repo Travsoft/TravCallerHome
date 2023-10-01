@@ -35,7 +35,6 @@ import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class CallHistoryFragment : Fragment() {
     var listOfCallHistroy: ArrayList<CallHistory> = ArrayList()
     lateinit var binding: FragmentCallHistoryBinding
@@ -50,13 +49,10 @@ class CallHistoryFragment : Fragment() {
         calendar = Calendar.getInstance()
         val dayOfWeekString =
             calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH)
-        // Inflate the layout for this fragment
         binding = FragmentCallHistoryBinding.inflate(layoutInflater)
-
         binding.cardCallBt.setOnClickListener {
             startActivity(Intent(requireContext(), Dialer::class.java))
         }
-
         binding.searchContacts.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -64,8 +60,6 @@ class CallHistoryFragment : Fragment() {
             }
 
             override fun onQueryTextChange(msg: String): Boolean {
-                // inside on query text change method we are
-                // calling a method to filter our recycler view.
                 filter(msg)
                 return false
             }
@@ -139,12 +133,9 @@ class CallHistoryFragment : Fragment() {
                 Manifest.permission.CALL_PHONE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            (activity as MainActivity).vm.callLogs.observe(
-                this.viewLifecycleOwner,
-                androidx.lifecycle.Observer<List<CallHistory>> {
-                    listOfCallHistroy = it as ArrayList<CallHistory>
-                    setupRV()
-                })
+            listOfCallHistroy =
+                (activity as MainActivity).vm.getAllCallLogsHistory() as ArrayList<CallHistory>
+            setupRV()
         } else {
             ActivityCompat.requestPermissions(
                 requireActivity(),
@@ -164,11 +155,10 @@ class CallHistoryFragment : Fragment() {
     }
 
     private fun setupRV() {
-       // val data= DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll()
         binding.txtNodataFound.isVisible = false
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        adapter = CallHistoryAdapter(listOfCallHistroy as ArrayList<CallHistory>, requireContext())
+        adapter = CallHistoryAdapter(listOfCallHistroy, requireContext())
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
         binding.recyclerViewCallHistory.adapter = adapter

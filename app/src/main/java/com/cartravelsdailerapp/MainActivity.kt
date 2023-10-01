@@ -2,6 +2,7 @@ package com.cartravelsdailerapp
 
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.window.OnBackInvokedDispatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -34,7 +35,10 @@ class MainActivity : AppCompatActivity() {
             initNavHost()
             setUpBottomNavigation()
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
     }
 
     private fun setUpBottomNavigation() {
@@ -78,6 +82,8 @@ class MainActivity : AppCompatActivity() {
         const val CALL_HISTORY = R.id.CallHistoryFragment
     }
 
+    override fun onBackPressed() {
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

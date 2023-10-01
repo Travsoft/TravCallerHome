@@ -14,8 +14,11 @@
     <string name="login">Login</string>
     <string name="by_continuing_i_agree_to_cartravals_com_t_amp_c"><![CDATA[By Continuing,I agree to cartravals.com T & C]]></string>
     <string name="personal">Personal</string>
-    <string name="bussiness">Bussiness</string>
+    <string name="bussiness">Business</string>
     <string name="signup">Sign Up</string>
     <string name="forgot_password">Forgot Password</string>
     <string name="skip">Skip</string>
+    <string name="EnterEmailid">Enter Email id</string>
+    <string name="EnterMobileNumber">Enter Mobile Number</string>
+    <string name="CheckTermsAndConditions">Check Terms and Conditions</string>
 </resources>
