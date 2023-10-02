@@ -1,16 +1,20 @@
 package com.cartravelsdailerapp.ui
 
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLoginBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
+import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.snackbar.Snackbar
@@ -21,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     var email: String? = null
     var mobileNo: String? = null
+    private var REQUESTED_CODE_READ_PHONE_STATE = 1003
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +40,6 @@ class LoginActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
         if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
-            vm.getCallLogsHistory()
             startActivity(
                 Intent(
                     this,
@@ -45,6 +49,7 @@ class LoginActivity : AppCompatActivity() {
 
                 )
         }
+
 
         binding.btLogin.setOnClickListener {
             email = binding.etEmail.text.toString()
@@ -112,7 +117,62 @@ class LoginActivity : AppCompatActivity() {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
             )
         }
+        if (this.let {
+                ActivityCompat.checkSelfPermission(
+                    it.applicationContext,
+                    Manifest.permission.READ_PHONE_STATE
+                )
+            } == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_CALL_LOG
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_CALL_LOG
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_PHONE_STATE
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CALL_PHONE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.READ_PHONE_NUMBERS,
+                    Manifest.permission.WRITE_CALL_LOG,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.CALL_PHONE
+                ),
+                REQUESTED_CODE_READ_PHONE_STATE
+            )
+
+        }
 
 
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUESTED_CODE_READ_PHONE_STATE -> {
+                if (grantResults.isNotEmpty() && grantResults.all { it == 0 }) {
+                    vm.getCallLogsHistory()
+                }
+            }
+        }
+    }
+
 }

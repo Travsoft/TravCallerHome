@@ -23,7 +23,6 @@ import com.qamar.curvedbottomnaviagtion.CurvedBottomNavigation
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private var REQUESTED_CODE_READ_PHONE_STATE = 1003
     lateinit var vm: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,23 +88,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-    }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUESTED_CODE_READ_PHONE_STATE -> {
-                if (grantResults.isNotEmpty() && grantResults.all { it == 0 }) {
-                    vm.callLogs.observe(this) {
-                        initNavHost()
-                    }
-
-                }
-            }
-        }
     }
 
 

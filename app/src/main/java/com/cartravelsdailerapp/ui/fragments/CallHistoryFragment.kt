@@ -49,14 +49,14 @@ class CallHistoryFragment : Fragment() {
     lateinit var calendar: Calendar
     private lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var viewModel: MainActivityViewModel
+    lateinit var newCallHistory: CallHistory
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            viewModel.getNewCallLogsHistory()
-            listOfCallHistroy = viewModel.getAllCallLogsHistory() as ArrayList<CallHistory>
+            newCallHistory = viewModel.getNewCallLogsHistory()
+            listOfCallHistroy.add(newCallHistory)
             adapter.notifyDataSetChanged()
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -132,47 +132,10 @@ class CallHistoryFragment : Fragment() {
 
 
     private fun loadData() {
-        if (context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it.applicationContext,
-                    Manifest.permission.READ_PHONE_STATE
-                )
-            } == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.READ_CONTACTS
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.READ_CALL_LOG
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.WRITE_CALL_LOG
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.READ_PHONE_STATE
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.CALL_PHONE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            listOfCallHistroy =
-                viewModel.getAllCallLogsHistory() as ArrayList<CallHistory>
-            setupRV()
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(
-                    Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.READ_CALL_LOG,
-                    Manifest.permission.READ_PHONE_NUMBERS,
-                    Manifest.permission.WRITE_CALL_LOG,
-                    Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.CALL_PHONE
-                ),
-                REQUESTED_CODE_READ_PHONE_STATE
-            )
-
-        }
+        listOfCallHistroy.clear()
+        listOfCallHistroy =
+            viewModel.getAllCallLogsHistory() as ArrayList<CallHistory>
+        setupRV()
     }
 
     private fun setupRV() {
