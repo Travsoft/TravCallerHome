@@ -52,9 +52,7 @@ class CallHistoryFragment : Fragment() {
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             viewModel.getNewCallLogsHistory()
-            listOfCallHistroy = (viewModel.getAllCallLogsHistory()
-                    as ArrayList<CallHistory>).sortedBy { i -> i.date }
-                .toList() as ArrayList<CallHistory>
+            listOfCallHistroy = viewModel.getAllCallLogsHistory() as ArrayList<CallHistory>
             adapter.notifyDataSetChanged()
         }
     }
@@ -196,6 +194,4 @@ class CallHistoryFragment : Fragment() {
             )
         }
     }
-
-
 }

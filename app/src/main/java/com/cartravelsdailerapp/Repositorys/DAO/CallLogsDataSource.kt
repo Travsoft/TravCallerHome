@@ -43,7 +43,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                 CallLog.Calls.CACHED_PHOTO_URI
             ),
             null,
-            null, null
+            null, CallLog.Calls.DATE + " DESC"
         )
         while (cursor?.moveToNext() == true) {
             when (cursor.getColumnIndex(CallLog.Calls.TYPE).let { cursor.getString(it).toInt() }) {
