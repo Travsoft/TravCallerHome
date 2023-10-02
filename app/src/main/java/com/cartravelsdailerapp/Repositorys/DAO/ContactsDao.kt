@@ -9,15 +9,15 @@ import com.cartravelsdailerapp.models.CallHistory
 @Dao
 interface CallHistoryDao {
 
-    @Query("SELECT * FROM CallHistory")
+    @Query("SELECT * FROM CallHistory  ORDER BY date DESC")
     fun getAll(): List<CallHistory>
 
     @Insert
-    fun insertAll(Courses: List<CallHistory>)
+    fun insertAll(listofCallHistory: List<CallHistory>)
     @Insert
-    fun insertCallHistory(Courses: CallHistory)
+    fun insertCallHistory(callHistory: CallHistory)
 
     @Delete
-    fun delete(Course: CallHistory)
+    fun delete(callHistory: CallHistory)
 
 }

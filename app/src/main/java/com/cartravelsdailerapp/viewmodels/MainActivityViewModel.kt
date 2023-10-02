@@ -15,20 +15,31 @@ class MainActivityViewModel(
     private val _callLogs = MutableLiveData<List<CallHistory>>()
     val callLogs: LiveData<List<CallHistory>>
         get() = _callLogs
-
-     fun getCallLogsHistory() {
+    private val _newCallLogs = MutableLiveData<CallHistory>()
+    val newCallLogs: LiveData<CallHistory>
+        get() = _newCallLogs
+    var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
+    fun getCallLogsHistory() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs().distinctBy { i ->
                 {
                     i.number
                 }
             }
-            DatabaseBuilder.getInstance(context).CallHistoryDao().insertAll(_callLogs.value!!)
+            db.insertAll(_callLogs.value!!)
         }
     }
 
     fun getAllCallLogsHistory(): List<CallHistory> {
         return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll()
+    }
+
+    fun getNewCallLogsHistory() {
+        viewModelScope.launch {
+            _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
+            db.insertCallHistory(_newCallLogs.value!!)
+            getAllCallLogsHistory()
+        }
     }
 }
 

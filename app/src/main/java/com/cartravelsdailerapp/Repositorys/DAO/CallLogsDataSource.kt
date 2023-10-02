@@ -27,6 +27,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
     private lateinit var callHistory: CallHistory
     var dir: String? = null
 
+    /*CallLog.Calls.DATE + " DESC"*/
     @RequiresApi(Build.VERSION_CODES.M)
     fun fetchCallLogsList(): List<CallHistory> {
         val cursor = contentResolver.query(
@@ -42,7 +43,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                 CallLog.Calls.CACHED_PHOTO_URI
             ),
             null,
-            null, CallLog.Calls.DATE + " DESC"
+            null, null
         )
         while (cursor?.moveToNext() == true) {
             when (cursor.getColumnIndex(CallLog.Calls.TYPE).let { cursor.getString(it).toInt() }) {

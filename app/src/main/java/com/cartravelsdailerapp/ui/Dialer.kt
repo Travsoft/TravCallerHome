@@ -2,9 +2,7 @@ package com.cartravelsdailerapp.ui
 
 import android.Manifest
 import android.Manifest.permission.CALL_PHONE
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -20,14 +18,13 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.Menu
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.dialerstates.CallManager
 import com.cartravelsdailerapp.dialerstates.GsmCall
@@ -84,6 +81,7 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
 
                 if (edtInput.length() > 0) {
                     callTheEnteredNumber()
+                    finish()
                 }
             }
 
@@ -145,7 +143,6 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
-
 
     }
 

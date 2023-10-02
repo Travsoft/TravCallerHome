@@ -1,9 +1,11 @@
 package com.cartravelsdailerapp.ui.fragments
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -13,6 +15,7 @@ import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -20,9 +23,12 @@ import androidx.core.text.isDigitsOnly
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.MainActivity
+import com.cartravelsdailerapp.PrefUtils
+import com.cartravelsdailerapp.PrefUtils.LOCAL_BROADCAST_KEY
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
@@ -42,6 +48,18 @@ class CallHistoryFragment : Fragment() {
     private var REQUESTED_CODE_READ_PHONE_STATE = 1003
     lateinit var calendar: Calendar
     private lateinit var linearLayoutManager: LinearLayoutManager
+    lateinit var viewModel: MainActivityViewModel
+    private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            viewModel.getNewCallLogsHistory()
+            listOfCallHistroy = (viewModel.getAllCallLogsHistory()
+                    as ArrayList<CallHistory>).sortedBy { i -> i.date }
+                .toList() as ArrayList<CallHistory>
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,7 +69,10 @@ class CallHistoryFragment : Fragment() {
             calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH)
         binding = FragmentCallHistoryBinding.inflate(layoutInflater)
         binding.cardCallBt.setOnClickListener {
-            startActivity(Intent(requireContext(), Dialer::class.java))
+            startActivity(
+                Intent(requireContext(), Dialer::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            )
         }
         binding.searchContacts.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             android.widget.SearchView.OnQueryTextListener {
@@ -64,6 +85,8 @@ class CallHistoryFragment : Fragment() {
                 return false
             }
         })
+        viewModel = (activity as MainActivity).vm
+        registerBroadCastReceiver()
         return binding.root
     }
 
@@ -134,7 +157,7 @@ class CallHistoryFragment : Fragment() {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             listOfCallHistroy =
-                (activity as MainActivity).vm.getAllCallLogsHistory() as ArrayList<CallHistory>
+                viewModel.getAllCallLogsHistory() as ArrayList<CallHistory>
             setupRV()
         } else {
             ActivityCompat.requestPermissions(
@@ -164,4 +187,15 @@ class CallHistoryFragment : Fragment() {
         binding.recyclerViewCallHistory.adapter = adapter
 
     }
+
+    private fun registerBroadCastReceiver() {
+        context?.let {
+            LocalBroadcastManager.getInstance(it).registerReceiver(
+                receiver,
+                IntentFilter(PrefUtils.LOCAL_BROADCAST_KEY)
+            )
+        }
+    }
+
+
 }
