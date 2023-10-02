@@ -38,7 +38,6 @@ class MainActivityViewModel(
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
             db.insertCallHistory(_newCallLogs.value!!)
-            getAllCallLogsHistory()
         }
     }
 }
