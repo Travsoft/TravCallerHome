@@ -53,8 +53,6 @@ class CallHistoryFragment : Fragment() {
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             newCallHistory = viewModel.getNewCallLogsHistory()
-            listOfCallHistroy.add(newCallHistory)
-            adapter.notifyDataSetChanged()
         }
     }
 
@@ -91,6 +89,10 @@ class CallHistoryFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         loadData()
+        viewModel.newCallLogs.observe(this) {
+            listOfCallHistroy.add(0, it)
+            adapter.notifyDataSetChanged()
+        }
     }
 
     fun hideSoftKeyboard(view: View, context: Context) {
@@ -132,7 +134,6 @@ class CallHistoryFragment : Fragment() {
 
 
     private fun loadData() {
-        listOfCallHistroy.clear()
         listOfCallHistroy =
             viewModel.getAllCallLogsHistory() as ArrayList<CallHistory>
         setupRV()

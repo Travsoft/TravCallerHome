@@ -42,10 +42,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     private fun setUpBottomNavigation() {
         val bottomNavigationItems = mutableListOf(
             CurvedBottomNavigation.Model(

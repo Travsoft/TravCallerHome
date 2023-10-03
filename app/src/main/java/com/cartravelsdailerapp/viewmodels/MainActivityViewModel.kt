@@ -34,12 +34,12 @@ class MainActivityViewModel(
         return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll()
     }
 
-    fun getNewCallLogsHistory():CallHistory {
+    fun getNewCallLogsHistory(): CallHistory {
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
             db.insertCallHistory(_newCallLogs.value!!)
         }
-        return  _newCallLogs.value as CallHistory
+        return callLogsRepository.fetchCallLogSignle()
     }
 }
 
