@@ -1,11 +1,16 @@
 package com.cartravelsdailerapp.ui
 
 import android.Manifest
+import android.accounts.AccountManager
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.telephony.SubscriptionManager
 import android.text.TextUtils
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
@@ -140,6 +145,14 @@ class LoginActivity : AppCompatActivity() {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
 
+            getPhoneNumbers().forEach {
+                val phoneNumber = it
+                Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                binding.etMobile.setText(phoneNumber)
+            }
+
+            binding.etEmail.setText(GetEmailId())
+            vm.getCallLogsHistory()
         } else {
             ActivityCompat.requestPermissions(
                 this,
@@ -150,7 +163,8 @@ class LoginActivity : AppCompatActivity() {
                     Manifest.permission.READ_PHONE_NUMBERS,
                     Manifest.permission.WRITE_CALL_LOG,
                     Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.CALL_PHONE
+                    Manifest.permission.CALL_PHONE,
+                    Manifest.permission.GET_ACCOUNTS
                 ),
                 REQUESTED_CODE_READ_PHONE_STATE
             )
@@ -169,10 +183,46 @@ class LoginActivity : AppCompatActivity() {
         when (requestCode) {
             REQUESTED_CODE_READ_PHONE_STATE -> {
                 if (grantResults.isNotEmpty() && grantResults.all { it == 0 }) {
-                    vm.getCallLogsHistory()
+                    //  vm.getCallLogsHistory()
+                    getPhoneNumbers().forEach {
+                        val phoneNumber = it
+                        Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                        binding.etMobile.setText(phoneNumber)
+                    }
+
+                    binding.etEmail.setText(GetEmailId())
                 }
             }
         }
     }
+
+    fun Context.getPhoneNumbers(): ArrayList<String> { // Required Permissions: READ_PHONE_STATE, READ_PHONE_NUMBERS
+        val phoneNumbers = arrayListOf<String>()
+        if (isFromAPI(20)) {
+            val subscriptionManager = getSystemService(SubscriptionManager::class.java)
+            val subsInfoList = subscriptionManager.activeSubscriptionInfoList
+            for (subscriptionInfo in subsInfoList) {
+                val phoneNumber =
+                    if (isFromAPI(33))
+                        subscriptionManager.getPhoneNumber(subscriptionInfo.subscriptionId)
+                    else subscriptionInfo.number
+                if (phoneNumber.isNullOrBlank().not()) phoneNumbers.add(phoneNumber)
+            }
+        }
+        return phoneNumbers
+    }
+
+    fun GetEmailId(): String {
+        var email = ""
+        val manager = getSystemService(ACCOUNT_SERVICE) as AccountManager
+        manager.accounts.forEach {
+            if (it.type.equals("com.google", true)) {
+                email = it.name
+            }
+        }
+        return email
+    }
+
+    private fun isFromAPI(apiLevel: Int) = Build.VERSION.SDK_INT >= apiLevel
 
 }
