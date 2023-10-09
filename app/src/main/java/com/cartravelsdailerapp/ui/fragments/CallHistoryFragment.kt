@@ -36,12 +36,12 @@ import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.coroutines.CoroutineContext
 
-class CallHistoryFragment : Fragment() {
+class CallHistoryFragment : Fragment(), CoroutineScope {
     var listOfCallHistroy: ArrayList<CallHistory> = ArrayList()
     lateinit var binding: FragmentCallHistoryBinding
     lateinit var adapter: CallHistoryAdapter
@@ -50,6 +50,13 @@ class CallHistoryFragment : Fragment() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var viewModel: MainActivityViewModel
     lateinit var newCallHistory: CallHistory
+    private lateinit var job: Job
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        job = Job()
+    }
+
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             newCallHistory = viewModel.getNewCallLogsHistory()
@@ -86,12 +93,16 @@ class CallHistoryFragment : Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadData()
-        viewModel.newCallLogs.observe(this) {
-            listOfCallHistroy.add(0, it)
-            adapter.notifyDataSetChanged()
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        launch {
+            context?.let {
+                loadData()
+                viewModel.newCallLogs.observe(this@CallHistoryFragment) {
+                    listOfCallHistroy.add(0, it)
+                    adapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 
@@ -129,7 +140,7 @@ class CallHistoryFragment : Fragment() {
             }
         }
 
-        adapter.filterList(filteredlist)
+        adapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
     }
 
 
@@ -158,4 +169,12 @@ class CallHistoryFragment : Fragment() {
             )
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
+
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
 }

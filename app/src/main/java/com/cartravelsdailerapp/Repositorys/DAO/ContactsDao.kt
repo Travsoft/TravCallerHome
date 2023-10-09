@@ -9,7 +9,7 @@ import com.cartravelsdailerapp.models.CallHistory
 @Dao
 interface CallHistoryDao {
 
-    @Query("SELECT * FROM CallHistory")
+    @Query("SELECT * FROM CallHistory ORDER BY id ASC")
     fun getAll(): List<CallHistory>
 
     @Insert

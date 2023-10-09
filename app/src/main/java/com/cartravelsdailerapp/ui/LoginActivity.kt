@@ -2,6 +2,7 @@ package com.cartravelsdailerapp.ui
 
 import android.Manifest
 import android.accounts.AccountManager
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -14,23 +15,33 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.*
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLoginBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.utils.RunTimePermission
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), CoroutineScope {
     lateinit var sharedPreferences: SharedPreferences
     lateinit var vm: MainActivityViewModel
     private lateinit var binding: ActivityLoginBinding
     var email: String? = null
     var mobileNo: String? = null
     private var REQUESTED_CODE_READ_PHONE_STATE = 1003
+    private lateinit var job: Job
+    val workManager = WorkManager.getInstance()
+    var runtimePermission: RunTimePermission = RunTimePermission(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +52,8 @@ class LoginActivity : AppCompatActivity() {
             this@LoginActivity,
             myViewModelFactory
         )[MainActivityViewModel::class.java]
+        job = Job()
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
@@ -54,7 +67,6 @@ class LoginActivity : AppCompatActivity() {
 
                 )
         }
-
 
         binding.btLogin.setOnClickListener {
             email = binding.etEmail.text.toString()
@@ -79,7 +91,11 @@ class LoginActivity : AppCompatActivity() {
                 ).show()
 
             } else {
-                vm.getAllCallLogsHistory()
+
+                if (launch {
+                        vm.getCallLogsHistory()
+                    }.isCompleted) {
+                }
                 startActivity(
                     Intent(
                         this,
@@ -122,56 +138,36 @@ class LoginActivity : AppCompatActivity() {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
             )
         }
-        if (this.let {
-                ActivityCompat.checkSelfPermission(
-                    it.applicationContext,
-                    Manifest.permission.READ_PHONE_STATE
-                )
-            } == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_CONTACTS
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_CALL_LOG
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_CALL_LOG
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_PHONE_STATE
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CALL_PHONE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        runtimePermission.requestPermission(
+            listOf(
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.READ_CALL_LOG,
+                Manifest.permission.READ_PHONE_NUMBERS,
+                Manifest.permission.WRITE_CALL_LOG,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.CALL_PHONE,
+                Manifest.permission.GET_ACCOUNTS
+            ),
+            object : RunTimePermission.PermissionCallback {
+                override fun onGranted() {
+                    binding.etEmail.text?.clear()
+                    binding.etMobile.text?.clear()
+                    getPhoneNumbers().forEach {
+                        val phoneNumber = it
+                        Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                        binding.etMobile.setText(phoneNumber)
+                    }
+                    binding.etEmail.setText(GetEmailId())
+                    launch {
+                        vm.getCallLogsHistory()
+                    }
+                }
 
-            getPhoneNumbers().forEach {
-                val phoneNumber = it
-                Log.d("DREG_PHONE", "phone number: $phoneNumber")
-                binding.etMobile.setText(phoneNumber)
-            }
-
-            binding.etEmail.setText(GetEmailId())
-            vm.getCallLogsHistory()
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.READ_CALL_LOG,
-                    Manifest.permission.READ_PHONE_NUMBERS,
-                    Manifest.permission.WRITE_CALL_LOG,
-                    Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.CALL_PHONE,
-                    Manifest.permission.GET_ACCOUNTS
-                ),
-                REQUESTED_CODE_READ_PHONE_STATE
-            )
-
-        }
-
-
+                override fun onDenied() {
+                    //show message if not allow storage permission
+                }
+            })
     }
 
     override fun onRequestPermissionsResult(
@@ -182,15 +178,17 @@ class LoginActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUESTED_CODE_READ_PHONE_STATE -> {
+                getPhoneNumbers().forEach {
+                    val phoneNumber = it
+                    Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                    binding.etMobile.setText(phoneNumber)
+                }
+                binding.etEmail.setText(GetEmailId())
                 if (grantResults.isNotEmpty() && grantResults.all { it == 0 }) {
-                    //  vm.getCallLogsHistory()
-                    getPhoneNumbers().forEach {
-                        val phoneNumber = it
-                        Log.d("DREG_PHONE", "phone number: $phoneNumber")
-                        binding.etMobile.setText(phoneNumber)
+                    launch {
+                        vm.getCallLogsHistory()
                     }
 
-                    binding.etEmail.setText(GetEmailId())
                 }
             }
         }
@@ -223,6 +221,24 @@ class LoginActivity : AppCompatActivity() {
         return email
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
+
     private fun isFromAPI(apiLevel: Int) = Build.VERSION.SDK_INT >= apiLevel
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
+
+    public class DownLoadFileWorkManager(context: Context, workerParams: WorkerParameters) :
+        Worker(context, workerParams) {
+        override fun doWork(): Result {
+            //TODO perform your async operational task here
+            /**
+             * We have performed download task here on above example
+             */
+            return Result.success()
+        }
+    }
 
 }

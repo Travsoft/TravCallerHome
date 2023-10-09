@@ -9,6 +9,8 @@ object PrefUtils {
     const val IsLogin = "IsLogin"
     const val LOCAL_BROADCAST_KEY = "step_counter_local_broadcast"
     const val ACTION_STEP_COUNTER_NOTIFICATION = "ACTION_STEP_COUNTER_NOTIFICATION"
+    const val PERMISION_REQUEST = 100
+
     fun getBoolean(contect1: Context?, string1: String?, bool1: Boolean): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(contect1).getBoolean(string1, bool1)
     }
