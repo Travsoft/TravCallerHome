@@ -7,6 +7,7 @@ import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -55,6 +56,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         job = Job()
+        registerBroadCastReceiver()
     }
 
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -89,21 +91,22 @@ class CallHistoryFragment : Fragment(), CoroutineScope {
             }
         })
         viewModel = (activity as MainActivity).vm
-        registerBroadCastReceiver()
+
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        launch {
-            context?.let {
-                loadData()
-                viewModel.newCallLogs.observe(this@CallHistoryFragment) {
-                    listOfCallHistroy.add(0, it)
-                    adapter.notifyDataSetChanged()
-                }
+    override fun onResume() {
+        super.onResume()
+        context?.let {
+            loadData()
+            viewModel.newCallLogs.observe(this@CallHistoryFragment)
+            {
+                val date = listOf(it)
+                listOfCallHistroy.add(0, date.get(0))
+                adapter.notifyDataSetChanged()
             }
         }
+
     }
 
     fun hideSoftKeyboard(view: View, context: Context) {
@@ -145,8 +148,11 @@ class CallHistoryFragment : Fragment(), CoroutineScope {
 
 
     private fun loadData() {
-        listOfCallHistroy =
-            viewModel.getAllCallLogsHistory() as ArrayList<CallHistory>
+        listOfCallHistroy.clear()
+        val d = viewModel.getAllCallLogsHistory().sortedByDescending {
+            SimpleDateFormat("dd/MM/yyyy kk:mm").parse(it.date)
+        }.distinctBy { i -> i.number }
+        listOfCallHistroy.addAll(d)
         setupRV()
     }
 

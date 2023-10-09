@@ -11,12 +11,12 @@ class CallLogsRepository(
     private val source: CallLogsDataSource,
     private val myDispatcher: CoroutineDispatcher
 ) {
-    fun fetchCallLogs(): List<CallHistory> {
+   fun fetchCallLogs(): List<CallHistory> {
         return source.fetchCallLogsList()
 
     }
 
-    fun fetchCallLogSignle(): CallHistory {
+   fun fetchCallLogSignle(): CallHistory {
         return source.fetchCallLogSingle()
 
     }

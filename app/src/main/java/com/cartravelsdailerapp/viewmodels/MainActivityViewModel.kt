@@ -19,7 +19,7 @@ class MainActivityViewModel(
     val newCallLogs: LiveData<CallHistory>
         get() = _newCallLogs
     var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
-    fun getCallLogsHistory() {
+   fun getCallLogsHistory() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs().distinctBy { i ->
                 {
@@ -37,8 +37,8 @@ class MainActivityViewModel(
     fun getNewCallLogsHistory(): CallHistory {
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
-            db.insertCallHistory(_newCallLogs.value!!)
         }
+        _newCallLogs.value?.let { db.insertCallHistory(it) }
         return callLogsRepository.fetchCallLogSignle()
     }
 }

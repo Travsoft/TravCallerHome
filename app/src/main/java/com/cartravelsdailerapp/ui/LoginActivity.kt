@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.telephony.SubscriptionManager
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
@@ -25,10 +26,7 @@ import com.cartravelsdailerapp.utils.RunTimePermission
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 class LoginActivity : AppCompatActivity(), CoroutineScope {
@@ -40,11 +38,10 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var job: Job
     val workManager = WorkManager.getInstance()
     var runtimePermission: RunTimePermission = RunTimePermission(this)
-
+    lateinit var dialog: IndeterminateProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
-        val db = DatabaseBuilder.getInstance(this).CallHistoryDao()
 
         val myViewModelFactory =
             MyViewModelFactory(this@LoginActivity.application)
@@ -53,20 +50,11 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             myViewModelFactory
         )[MainActivityViewModel::class.java]
         job = Job()
+        dialog = IndeterminateProgressDialog(this@LoginActivity)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
-        if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
-            startActivity(
-                Intent(
-                    this,
-                    MainActivity::class.java
-                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
-
-                )
-        }
 
         binding.btLogin.setOnClickListener {
             email = binding.etEmail.text.toString()
@@ -134,11 +122,11 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
             )
         }
-        val dialog = IndeterminateProgressDialog(this@LoginActivity)
-        dialog.setMessage("Please wait...")
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setCancelable(false)
-        dialog.show()
+
+    }
+
+    override fun onResume() {
+        super.onResume()
         runtimePermission.requestPermission(
             listOf(
                 Manifest.permission.READ_PHONE_STATE,
@@ -152,23 +140,40 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             ),
             object : RunTimePermission.PermissionCallback {
                 override fun onGranted() {
-                    binding.etEmail.text?.clear()
-                    binding.etMobile.text?.clear()
-                    getPhoneNumbers().forEach {
-                        val phoneNumber = it
-                        Log.d("DREG_PHONE", "phone number: $phoneNumber")
-                        binding.etMobile.setText(phoneNumber)
+                    if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
+                        startActivity(
+                            Intent(
+                                this@LoginActivity,
+                                MainActivity::class.java
+                            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+
+                            )
+                    } else {
+                        binding.etEmail.text?.clear()
+                        binding.etMobile.text?.clear()
+                        getPhoneNumbers().forEach {
+                            val phoneNumber = it
+                            Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                            binding.etMobile.setText(phoneNumber)
+                        }
+                        binding.etEmail.setText(GetEmailId())
+                       launch(Dispatchers.Default) {
+                            freezePleaseIAmDoingHeavyWork()
+                        }
+                        Toast.makeText(this@LoginActivity, "g", Toast.LENGTH_LONG).show()
+
                     }
-                    binding.etEmail.setText(GetEmailId())
-                    launch {
-                        vm.getCallLogsHistory()
-                    }
+
                 }
 
                 override fun onDenied() {
                     //show message if not allow storage permission
+                    Toast.makeText(this@LoginActivity, "d", Toast.LENGTH_LONG).show()
                 }
             })
+
+
     }
 
 
@@ -206,7 +211,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
     private fun isFromAPI(apiLevel: Int) = Build.VERSION.SDK_INT >= apiLevel
     override val coroutineContext: CoroutineContext
-        get() = job + Dispatchers.Main
+        get() = job + Dispatchers.IO
 
     public class DownLoadFileWorkManager(context: Context, workerParams: WorkerParameters) :
         Worker(context, workerParams) {
@@ -216,6 +221,15 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
              * We have performed download task here on above example
              */
             return Result.success()
+        }
+    }
+
+    suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
+        withContext(Dispatchers.Default) {
+            async {
+                //pretend this is a big network call
+                vm.getCallLogsHistory()
+            }
         }
     }
 
