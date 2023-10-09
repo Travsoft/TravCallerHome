@@ -2,26 +2,25 @@ package com.cartravelsdailerapp.ui
 
 import android.Manifest
 import android.accounts.AccountManager
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SubscriptionManager
 import android.text.TextUtils
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.work.*
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
+import com.cartravelsdailerapp.IndeterminateProgressDialog
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLoginBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
-import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.utils.RunTimePermission
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -38,7 +37,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var binding: ActivityLoginBinding
     var email: String? = null
     var mobileNo: String? = null
-    private var REQUESTED_CODE_READ_PHONE_STATE = 1003
     private lateinit var job: Job
     val workManager = WorkManager.getInstance()
     var runtimePermission: RunTimePermission = RunTimePermission(this)
@@ -46,6 +44,8 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
+        val db = DatabaseBuilder.getInstance(this).CallHistoryDao()
+
         val myViewModelFactory =
             MyViewModelFactory(this@LoginActivity.application)
         vm = ViewModelProvider(
@@ -92,10 +92,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
             } else {
 
-                if (launch {
-                        vm.getCallLogsHistory()
-                    }.isCompleted) {
-                }
                 startActivity(
                     Intent(
                         this,
@@ -138,6 +134,11 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
             )
         }
+        val dialog = IndeterminateProgressDialog(this@LoginActivity)
+        dialog.setMessage("Please wait...")
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
+        dialog.show()
         runtimePermission.requestPermission(
             listOf(
                 Manifest.permission.READ_PHONE_STATE,
@@ -170,29 +171,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             })
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUESTED_CODE_READ_PHONE_STATE -> {
-                getPhoneNumbers().forEach {
-                    val phoneNumber = it
-                    Log.d("DREG_PHONE", "phone number: $phoneNumber")
-                    binding.etMobile.setText(phoneNumber)
-                }
-                binding.etEmail.setText(GetEmailId())
-                if (grantResults.isNotEmpty() && grantResults.all { it == 0 }) {
-                    launch {
-                        vm.getCallLogsHistory()
-                    }
-
-                }
-            }
-        }
-    }
 
     fun Context.getPhoneNumbers(): ArrayList<String> { // Required Permissions: READ_PHONE_STATE, READ_PHONE_NUMBERS
         val phoneNumbers = arrayListOf<String>()

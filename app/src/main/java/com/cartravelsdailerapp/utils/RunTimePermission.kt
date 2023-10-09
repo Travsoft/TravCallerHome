@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.cartravelsdailerapp.PrefUtils.PERMISION_REQUEST
+import com.cartravelsdailerapp.PrefUtils
 
 class RunTimePermission(private var context: Context) {
 
@@ -28,7 +28,7 @@ class RunTimePermission(private var context: Context) {
             if (!checkAllPermisionGranted(arrPermisionName)) {
                 (context as Activity).requestPermissions(
                     arrPermisionName.toTypedArray(),
-                    PERMISION_REQUEST
+                    PrefUtils.REQUESTED_CODE_READ_PHONE_STATE
                 )
             } else {
                 permissionCallback.onGranted()

@@ -1,9 +1,6 @@
 package com.cartravelsdailerapp.Repositorys.DAO
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.cartravelsdailerapp.models.CallHistory
 
 @Dao
@@ -12,7 +9,7 @@ interface CallHistoryDao {
     @Query("SELECT * FROM CallHistory ORDER BY id ASC")
     fun getAll(): List<CallHistory>
 
-    @Insert
+    @Insert (onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(listofCallHistory: List<CallHistory>)
     @Insert
     fun insertCallHistory(callHistory: CallHistory)
