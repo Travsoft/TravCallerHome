@@ -13,7 +13,7 @@ class MyViewModelFactory(private val application: Application) :
         return if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
             val source =
                 CallLogsDataSource(application.contentResolver, application)
-            MainActivityViewModel(application, CallLogsRepository(source, Dispatchers.IO)) as T
+            MainActivityViewModel(application,CallLogsRepository(source,Dispatchers.Default)) as T
         } else
             throw IllegalArgumentException("Unknown ViewModel class")
     }

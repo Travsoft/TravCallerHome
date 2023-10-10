@@ -61,7 +61,9 @@ class CallHistoryFragment : Fragment(), CoroutineScope {
 
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            newCallHistory = viewModel.getNewCallLogsHistory()
+            launch {
+                newCallHistory = viewModel.getNewCallLogsHistory()
+            }
         }
     }
 

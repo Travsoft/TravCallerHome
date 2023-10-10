@@ -5,7 +5,9 @@ import androidx.lifecycle.*
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class MainActivityViewModel(
@@ -19,14 +21,16 @@ class MainActivityViewModel(
     val newCallLogs: LiveData<CallHistory>
         get() = _newCallLogs
     var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
-   fun getCallLogsHistory() {
+  suspend  fun getCallLogsHistory() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs().distinctBy { i ->
                 {
                     i.number
                 }
             }
-            db.insertAll(_callLogs.value!!)
+            withContext(Dispatchers.IO) {
+                db.insertAll(_callLogs.value!!)
+            }
         }
     }
 
@@ -34,7 +38,7 @@ class MainActivityViewModel(
         return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll()
     }
 
-    fun getNewCallLogsHistory(): CallHistory {
+  suspend  fun getNewCallLogsHistory(): CallHistory {
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
         }

@@ -38,7 +38,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var job: Job
     val workManager = WorkManager.getInstance()
     var runtimePermission: RunTimePermission = RunTimePermission(this)
-    lateinit var dialog: IndeterminateProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -50,8 +49,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             myViewModelFactory
         )[MainActivityViewModel::class.java]
         job = Job()
-        dialog = IndeterminateProgressDialog(this@LoginActivity)
-
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
@@ -127,6 +124,11 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onResume() {
         super.onResume()
+        var dialog = IndeterminateProgressDialog(this)
+
+       /* this@LoginActivity.runOnUiThread(java.lang.Runnable {
+          dialog.show()
+        })*/
         runtimePermission.requestPermission(
             listOf(
                 Manifest.permission.READ_PHONE_STATE,
@@ -150,6 +152,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
                             )
                     } else {
+
                         binding.etEmail.text?.clear()
                         binding.etMobile.text?.clear()
                         getPhoneNumbers().forEach {
@@ -158,9 +161,15 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             binding.etMobile.setText(phoneNumber)
                         }
                         binding.etEmail.setText(GetEmailId())
-                       launch(Dispatchers.Default) {
+                        launch(Dispatchers.IO) {
                             freezePleaseIAmDoingHeavyWork()
                         }
+/*
+                        this@LoginActivity.runOnUiThread(java.lang.Runnable {
+                            dialog.dismiss()
+                        })
+*/
+
                         Toast.makeText(this@LoginActivity, "g", Toast.LENGTH_LONG).show()
 
                     }
