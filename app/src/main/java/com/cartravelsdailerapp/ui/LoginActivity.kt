@@ -16,12 +16,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.cartravelsdailerapp.IndeterminateProgressDialog
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLoginBinding
-import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.utils.RunTimePermission
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -36,12 +34,10 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     var email: String? = null
     var mobileNo: String? = null
     private lateinit var job: Job
-    val workManager = WorkManager.getInstance()
     var runtimePermission: RunTimePermission = RunTimePermission(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
-
         val myViewModelFactory =
             MyViewModelFactory(this@LoginActivity.application)
         vm = ViewModelProvider(
@@ -124,11 +120,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onResume() {
         super.onResume()
-        var dialog = IndeterminateProgressDialog(this)
-
-       /* this@LoginActivity.runOnUiThread(java.lang.Runnable {
-          dialog.show()
-        })*/
         runtimePermission.requestPermission(
             listOf(
                 Manifest.permission.READ_PHONE_STATE,
@@ -164,14 +155,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                         launch(Dispatchers.IO) {
                             freezePleaseIAmDoingHeavyWork()
                         }
-/*
-                        this@LoginActivity.runOnUiThread(java.lang.Runnable {
-                            dialog.dismiss()
-                        })
-*/
-
-                        Toast.makeText(this@LoginActivity, "g", Toast.LENGTH_LONG).show()
-
                     }
 
                 }
@@ -221,18 +204,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     private fun isFromAPI(apiLevel: Int) = Build.VERSION.SDK_INT >= apiLevel
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
-
-    public class DownLoadFileWorkManager(context: Context, workerParams: WorkerParameters) :
-        Worker(context, workerParams) {
-        override fun doWork(): Result {
-            //TODO perform your async operational task here
-            /**
-             * We have performed download task here on above example
-             */
-            return Result.success()
-        }
-    }
-
     suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
         withContext(Dispatchers.Default) {
             async {

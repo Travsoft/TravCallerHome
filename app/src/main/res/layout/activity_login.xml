@@ -4,186 +4,202 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/orange"
     tools:context=".ui.LoginActivity">
-
-    <TextView
-        android:id="@+id/txt_skip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="10dp"
-        android:text="@string/skip"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/txt_version_no"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="10dp"
-        android:text="Version 1.0"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/txt_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:fontFamily="sans-serif-black"
-        android:padding="10dp"
-        android:text="@string/be_a_part_of_the_largest_indian_traval_community"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_version_no" />
-
-    <View
-        android:id="@+id/view"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:background="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/txt_title" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-
-        app:layout_constraintTop_toBottomOf="@+id/txt_title">
-
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/img_logo"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:background="@color/orange"
+            android:layout_height="wrap_content">
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="16dp"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="10dp"
-                app:boxCornerRadiusBottomStart="10dp"
-                app:boxCornerRadiusTopEnd="10dp"
-                app:boxCornerRadiusTopStart="10dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="@string/email"
-                    android:inputType="textWebEmailAddress" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="16dp"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="10dp"
-                app:boxCornerRadiusBottomStart="10dp"
-                app:boxCornerRadiusTopEnd="10dp"
-                app:boxCornerRadiusTopStart="10dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_mobile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="@string/mobile_number"
-                    android:inputType="phone"
-                    android:maxEms="10" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
+                android:layout_height="match_parent">
                 <TextView
-                    android:id="@+id/txt_signUp"
+                    android:id="@+id/txt_skip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/signup"
-                    android:textAlignment="textStart"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/skip"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/txt_forgotpassword"
+                    android:id="@+id/txt_version_no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/forgot_password"
-                    android:textAlignment="textEnd"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:layout_marginTop="50dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="Version 1.0"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/bt_login"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/next"
-                android:textSize="18sp"
-                android:textAllCaps="false" />
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-black"
+                    android:padding="10dp"
+                    android:text="@string/be_a_part_of_the_largest_indian_traval_community"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="30sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_version_no" />
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="100dp"
+                    android:background="@color/white"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+
+                    app:layout_constraintTop_toBottomOf="@+id/txt_title">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/img_logo"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center"
+                            android:src="@mipmap/ic_launcher" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginEnd="16dp"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="10dp"
+                            app:boxCornerRadiusBottomStart="10dp"
+                            app:boxCornerRadiusTopEnd="10dp"
+                            app:boxCornerRadiusTopStart="10dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_email"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:hint="@string/email"
+                                android:inputType="textWebEmailAddress" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="16dp"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="10dp"
+                            app:boxCornerRadiusBottomStart="10dp"
+                            app:boxCornerRadiusTopEnd="10dp"
+                            app:boxCornerRadiusTopStart="10dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_mobile"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:hint="@string/mobile_number"
+                                android:inputType="phone"
+                                android:maxEms="10" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="20dp"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:id="@+id/txt_signUp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="@string/signup"
+                                android:textAlignment="textStart"
+                                android:textColor="@color/black"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/txt_forgotpassword"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="@string/forgot_password"
+                                android:textAlignment="textEnd"
+                                android:textColor="@color/black"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/bt_login"
+                            android:layout_width="200dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginBottom="20dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/next"
+                            android:textSize="18sp"
+                            android:textAllCaps="false" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <CheckBox
+                    android:id="@+id/check_termandcondition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:lines="1"
+                    android:text="@string/by_continuing_i_agree_to_cartravals_com_t_amp_c"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/card_login" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
-    <CheckBox
-        android:id="@+id/check_termandcondition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:fontFamily="sans-serif-medium"
-        android:lines="1"
-        android:text="@string/by_continuing_i_agree_to_cartravals_com_t_amp_c"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/card_login" />
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
