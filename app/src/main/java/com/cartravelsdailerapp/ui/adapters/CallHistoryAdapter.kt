@@ -6,7 +6,10 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.AssetFileDescriptor
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -37,6 +40,8 @@ import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
 import java.io.ByteArrayInputStream
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.io.InputStream
 
 
@@ -47,7 +52,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         var number = itemView.findViewById<TextView>(R.id.txt_Contact_number)
         var date = itemView.findViewById<TextView>(R.id.txt_Contact_date)
         var calltype = itemView.findViewById<ImageView>(R.id.txt_Contact_type)
-        var profile_image = itemView.findViewById<ImageView>(R.id.profile_image)
+        var profile_image = itemView.findViewById<QuickContactBadge>(R.id.profile_image)
         var simType = itemView.findViewById<TextView>(R.id.txt_Contact_simtype)
         var duration = itemView.findViewById<TextView>(R.id.txt_Contact_duration)
         var call = itemView.findViewById<LinearLayout>(R.id.layout_call)
@@ -102,36 +107,14 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         // Set the visibility based on state
         // Set the visibility based on state
         holder.layout_sub_item.visibility = if (selectedData.IsExpand) View.VISIBLE else View.GONE
-/*
 
-        Glide.with(holder.itemView.context)
-            .load(BitmapFactory.decodeStream(openPhoto(selectedData.subscriberId.toLong())))
-            .into(holder.profile_image)
-
-*/
-/*
-        if (TextUtils.isEmpty(selectedData.photouri)) {
-            //Image not found then load any random image (whatever you like)
-            Picasso.get().load(R.drawable.userprofile).fit().into(holder.profile_image)
-        } else {
-            //Here it will load contact image in the imageview.
-            val bp: Bitmap
-            try {
-                bp = MediaStore.Images.Media
-                    .getBitmap(
-                        context.contentResolver,
-                        Uri.parse(getPhotoFromContacts(selectedData.number, ""))
-                    )
-                Glide.with(context)
-                    .load(BitmapFactory.decodeStream(openPhoto(selectedData.subscriberId.toLong())))
-                    .centerInside()
-                    .into(holder.profile_image)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                Picasso.get().load(R.drawable.userprofile).fit().into(holder.profile_image)
+        val imageUri = getPhotoFromContacts(selectedData.number)
+        if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
+            loadContactPhotoThumbnail(imageUri).also {
+                holder.profile_image.setImageBitmap(it)
             }
+
         }
-*/
         when (selectedData.calType) {
             "OUTGOING" -> {
                 holder.calltype.setImageDrawable(
@@ -204,7 +187,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 val point = Point()
                 point.x = location[0]
                 point.y = location[1]
-               // showPopup(context, point, selectedData.number)
+                // showPopup(context, point, selectedData.number)
                 AlertDialogOpenWhatsApp(selectedData.number)
             } else {
                 openWhatsAppByNumber(selectedData.number)
@@ -276,62 +259,9 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         return false
     }
 
-    private fun showPopup(context: Context, p: Point, number: String) {
 
-        val layoutInflater =
-            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-        val binding = PopupLayoutBinding.inflate(layoutInflater)
-        val popUp = PopupWindow(context)
-        popUp.contentView = binding.root
-        popUp.width = LinearLayout.LayoutParams.WRAP_CONTENT
-        popUp.height = LinearLayout.LayoutParams.WRAP_CONTENT
-        popUp.isFocusable = true
-        popUp.setBackgroundDrawable(ColorDrawable())
-        popUp.animationStyle = R.style.popup_window_animation
-        popUp.showAtLocation(binding.root, Gravity.CENTER, 0, 0)
-
-        binding.imageClose.setOnClickListener {
-            popUp.dismiss()
-        }
-        binding.imageWhatsappBussiness.setOnClickListener {
-            launchWhatsAppBusinessApp(number)
-        }
-        binding.imageWhatsapp.setOnClickListener {
-            openWhatsAppByNumber(number)
-        }
-
-    }
-
-    private fun openPhoto(contactId: Long): InputStream? {
-        val contactUri =
-            ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
-        val photoUri =
-            Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
-        Log.d("contactId" + contactId, photoUri.toString())
-        val cursor: Cursor = context.getContentResolver().query(
-            photoUri,
-            arrayOf<String>(ContactsContract.Contacts.Photo.PHOTO),
-            null,
-            null,
-            null
-        )
-            ?: return null
-        try {
-            if (cursor.moveToFirst()) {
-                val data: ByteArray = cursor.getBlob(0)
-                if (data != null) {
-                    return ByteArrayInputStream(data)
-                }
-            }
-        } finally {
-            cursor.close()
-        }
-        return null
-    }
-
-    private fun getPhotoFromContacts(num: String, phone_uri: String): String {
-        var uri =
+    private fun getPhotoFromContacts(num: String): String? {
+        val uri =
             Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
         //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
         val cursor: Cursor? = context.getContentResolver().query(uri, null, null, null, null)
@@ -341,7 +271,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 val id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
                 val name =
                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
-                var image_uri =
+                val image_uri =
                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
                 Log.d("image_uri-->", "name $name id $id image_uri $image_uri")
                 return image_uri
@@ -368,6 +298,68 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         }
         binding.imageWhatsapp.setOnClickListener {
             openWhatsAppByNumber(number)
+        }
+
+    }
+
+    /**
+     * Load a contact photo thumbnail and return it as a Bitmap,
+     * resizing the image to the provided image dimensions as needed.
+     * @param photoData photo ID Prior to Honeycomb, the contact's _ID value.
+     * For Honeycomb and later, the value of PHOTO_THUMBNAIL_URI.
+     * @return A thumbnail Bitmap, sized to the provided width and height.
+     * Returns null if the thumbnail is not found.
+     */
+    private fun loadContactPhotoThumbnail(photoData: String): Bitmap? {
+        // Creates an asset file descriptor for the thumbnail file
+        var afd: AssetFileDescriptor? = null
+        // try-catch block for file not found
+        return try {
+            // Creates a holder for the URI
+            val thumbUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                // If Android 3.0 or later,
+                // sets the URI from the incoming PHOTO_THUMBNAIL_URI
+                Uri.parse(photoData)
+            } else {
+                // Prior to Android 3.0, constructs a photo Uri using _ID
+                /*
+                 * Creates a contact URI from the Contacts content URI
+                 * incoming photoData (_ID)
+                 */
+                val contactUri: Uri =
+                    Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, photoData)
+                /*
+                 * Creates a photo URI by appending the content URI of
+                 * Contacts.Photo
+                 */
+                Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+            }
+
+            /*
+             * Retrieves an AssetFileDescriptor object for the thumbnail URI
+             * using ContentResolver.openAssetFileDescriptor
+             */
+            afd = context?.contentResolver?.openAssetFileDescriptor(thumbUri, "r")
+            /*
+             * Gets a file descriptor from the asset file descriptor.
+             * This object can be used across processes.
+             */
+            return afd?.fileDescriptor?.let { fileDescriptor ->
+                // Decodes the photo file and returns the result as a Bitmap
+                // if the file descriptor is valid
+                BitmapFactory.decodeFileDescriptor(fileDescriptor, null, null)
+            }
+        } catch (e: FileNotFoundException) {
+            /*
+             * Handle file not found errors
+             */
+            null
+        } finally {
+            // In all cases, close the asset file descriptor
+            try {
+                afd?.close()
+            } catch (e: IOException) {
+            }
         }
 
     }

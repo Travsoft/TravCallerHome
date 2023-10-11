@@ -32,12 +32,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
+                <QuickContactBadge
                     android:id="@+id/profile_image"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
+                    android:scaleType="fitXY"
                     android:src="@drawable/userprofile" />
+
             </LinearLayout>
 
             <TextView
@@ -68,6 +70,7 @@
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/profile_contact"
                 app:layout_constraintTop_toBottomOf="@+id/txt_Contact_name" />
+
             <TextView
                 android:id="@+id/txt_Contact_number_count"
                 android:layout_width="wrap_content"
@@ -193,8 +196,8 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:gravity="center"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:gravity="center">
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/card_call"
