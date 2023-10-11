@@ -113,6 +113,8 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             loadContactPhotoThumbnail(imageUri).also {
                 holder.profile_image.setImageBitmap(it)
             }
+        } else {
+            holder.profile_image.setImageToDefault()
 
         }
         when (selectedData.calType) {
