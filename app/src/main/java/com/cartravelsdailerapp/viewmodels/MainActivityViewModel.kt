@@ -41,8 +41,8 @@ class MainActivityViewModel(
   suspend  fun getNewCallLogsHistory(): CallHistory {
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
+            _newCallLogs.value?.let { db.insertCallHistory(it) }
         }
-        _newCallLogs.value?.let { db.insertCallHistory(it) }
         return callLogsRepository.fetchCallLogSignle()
     }
 }

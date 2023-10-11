@@ -101,12 +101,6 @@ class CallHistoryFragment : Fragment(), CoroutineScope {
         super.onResume()
         context?.let {
             loadData()
-            viewModel.newCallLogs.observe(this@CallHistoryFragment)
-            {
-                val date = listOf(it)
-                listOfCallHistroy.add(0, date.get(0))
-                adapter.notifyDataSetChanged()
-            }
         }
 
     }
@@ -166,6 +160,13 @@ class CallHistoryFragment : Fragment(), CoroutineScope {
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
         binding.recyclerViewCallHistory.adapter = adapter
+        viewModel.newCallLogs.observe(this@CallHistoryFragment)
+        {
+            val date = listOf(it)
+            listOfCallHistroy.add(0, date.get(0))
+            adapter.notifyDataSetChanged()
+        }
+
 
     }
 
