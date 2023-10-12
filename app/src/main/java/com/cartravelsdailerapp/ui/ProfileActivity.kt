@@ -3,15 +3,20 @@ package com.cartravelsdailerapp.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.AssetFileDescriptor
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import android.provider.ContactsContract
 import android.telecom.TelecomManager
 import android.text.TextUtils
+import android.util.Log
 import android.widget.ImageView
+import android.widget.QuickContactBadge
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -22,13 +27,15 @@ import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
 import java.io.FileDescriptor
+import java.io.FileNotFoundException
+import java.io.IOException
 
 class ProfileActivity : AppCompatActivity() {
     var name: String = ""
     var number: String = ""
     var photoUri: String = ""
     lateinit var txt_name: TextView
-    lateinit var img_profile: ImageView
+    lateinit var img_profile: QuickContactBadge
     lateinit var card_call: CardView
     lateinit var card_whatsapp: CardView
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,8 +51,14 @@ class ProfileActivity : AppCompatActivity() {
         card_call = findViewById(R.id.card_call)
         card_whatsapp = findViewById(R.id.card_whatsapp)
         txt_name.text = name
-        if (!TextUtils.isEmpty(photoUri))
-            img_profile.setImageBitmap(getBitmapFromUri(Uri.parse(photoUri)))
+        val imageUri = getPhotoFromContacts(number)
+        if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
+            loadContactPhotoThumbnail(imageUri).also {
+                img_profile.setImageBitmap(it)
+            }
+        } else {
+            img_profile.setImageToDefault()
+        }
 
         card_call.setOnClickListener {
             val uri = Uri.parse("tel:" + number)
@@ -74,13 +87,85 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
+    private fun getPhotoFromContacts(num: String): String? {
+        val uri =
+            Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
+        //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
+        val cursor: Cursor? = this.contentResolver.query(uri, null, null, null, null)
 
-    private fun getBitmapFromUri(uri: Uri): Bitmap {
-        val parcelFileDescriptor: ParcelFileDescriptor? =
-            contentResolver.openFileDescriptor(uri, "r")
-        val fileDescriptor: FileDescriptor? = parcelFileDescriptor?.fileDescriptor
-        val image: Bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-        parcelFileDescriptor?.close()
-        return image
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                val id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
+                val name =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                val image_uri =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
+                Log.d("image_uri-->", "name $name id $id image_uri $image_uri")
+                return image_uri
+            }
+            cursor.close()
+        }
+        return ""
+    }
+    /**
+     * Load a contact photo thumbnail and return it as a Bitmap,
+     * resizing the image to the provided image dimensions as needed.
+     * @param photoData photo ID Prior to Honeycomb, the contact's _ID value.
+     * For Honeycomb and later, the value of PHOTO_THUMBNAIL_URI.
+     * @return A thumbnail Bitmap, sized to the provided width and height.
+     * Returns null if the thumbnail is not found.
+     */
+    private fun loadContactPhotoThumbnail(photoData: String): Bitmap? {
+        // Creates an asset file descriptor for the thumbnail file
+        var afd: AssetFileDescriptor? = null
+        // try-catch block for file not found
+        return try {
+            // Creates a holder for the URI
+            val thumbUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                // If Android 3.0 or later,
+                // sets the URI from the incoming PHOTO_THUMBNAIL_URI
+                Uri.parse(photoData)
+            } else {
+                // Prior to Android 3.0, constructs a photo Uri using _ID
+                /*
+                 * Creates a contact URI from the Contacts content URI
+                 * incoming photoData (_ID)
+                 */
+                val contactUri: Uri =
+                    Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, photoData)
+                /*
+                 * Creates a photo URI by appending the content URI of
+                 * Contacts.Photo
+                 */
+                Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+            }
+
+            /*
+             * Retrieves an AssetFileDescriptor object for the thumbnail URI
+             * using ContentResolver.openAssetFileDescriptor
+             */
+            afd = this.contentResolver?.openAssetFileDescriptor(thumbUri, "r")
+            /*
+             * Gets a file descriptor from the asset file descriptor.
+             * This object can be used across processes.
+             */
+            return afd?.fileDescriptor?.let { fileDescriptor ->
+                // Decodes the photo file and returns the result as a Bitmap
+                // if the file descriptor is valid
+                BitmapFactory.decodeFileDescriptor(fileDescriptor, null, null)
+            }
+        } catch (e: FileNotFoundException) {
+            /*
+             * Handle file not found errors
+             */
+            null
+        } finally {
+            // In all cases, close the asset file descriptor
+            try {
+                afd?.close()
+            } catch (e: IOException) {
+            }
+        }
+
     }
 }

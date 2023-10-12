@@ -107,7 +107,6 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         // Set the visibility based on state
         // Set the visibility based on state
         holder.layout_sub_item.visibility = if (selectedData.IsExpand) View.VISIBLE else View.GONE
-
         val imageUri = getPhotoFromContacts(selectedData.number)
         if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
             loadContactPhotoThumbnail(imageUri).also {
@@ -115,7 +114,6 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             }
         } else {
             holder.profile_image.setImageToDefault()
-
         }
         when (selectedData.calType) {
             "OUTGOING" -> {
@@ -172,7 +170,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
                 telecomManager?.placeCall(uri, bundle)
             }
         }
-        holder.profile_contact.setOnClickListener {
+        holder.profile_image.setOnClickListener {
             val data = Bundle()
             data.putString(ContactName, selectedData.name)
             data.putString(ContactNumber, selectedData.number)
