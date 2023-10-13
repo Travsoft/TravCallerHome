@@ -15,18 +15,20 @@ import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.viewmodels.CallHistoryViewmodel
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-class CallHistroyActivity : AppCompatActivity() {
+class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
     lateinit var vm: CallHistoryViewmodel
     lateinit var binding: ActivityCallHistroyBinding
     private lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var adapter: CallHistoryByNumberAdapter
+    private lateinit var job: Job
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        job = Job()
+
         val myViewModelFactory =
             MyViewModelFactory(this@CallHistroyActivity.application)
 
@@ -43,7 +45,9 @@ class CallHistroyActivity : AppCompatActivity() {
         adapter = CallHistoryByNumberAdapter()
         linearLayoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        vm.getCallLogsHistoryByNumber(name)
+        launch {
+            vm.getCallLogsHistoryByNumber(number)
+        }
 
         vm.callLogsByNumber.observe(this@CallHistroyActivity) {
             adapter.updateCallHistoryByNumber(it)
@@ -53,4 +57,11 @@ class CallHistroyActivity : AppCompatActivity() {
         }
 
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
+
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
 }

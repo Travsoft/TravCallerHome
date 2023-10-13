@@ -20,14 +20,10 @@ class CallHistoryViewmodel(
     val callLogsByNumber: LiveData<List<CallHistory>>
         get() = _callLogsByNumber
 
-    fun fetchHistoryList(number: String): List<CallHistory> {
-        return DatabaseBuilder.getInstance(context).CallHistoryDao().callDataByNumber(number)
-    }
-
      fun getCallLogsHistoryByNumber(number: String) {
         viewModelScope.launch {
             _callLogsByNumber.value =
-                callLogsRepository.fetchCallLogs().filter{it.name.equals(number)}
+                callLogsRepository.fetchCallLogs().filter{it.number.equals(number)}
         }
     }
 

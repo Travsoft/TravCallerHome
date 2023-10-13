@@ -7,6 +7,7 @@ import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
@@ -16,13 +17,14 @@ import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.text.TextUtils
 import androidx.annotation.RequiresApi
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.models.CallHistory
 import java.io.InputStream
 import java.util.*
 
 
 class CallLogsDataSource(private val contentResolver: ContentResolver, val context: Context) {
-    var simpDate = SimpleDateFormat("dd/MM/yyyy kk:mm");
+    var simpDate = SimpleDateFormat(PrefUtils.DataFormate)
     val callHistoryList = mutableListOf<CallHistory>()
     private lateinit var callHistory: CallHistory
     var dir: String? = null
@@ -89,7 +91,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
         }
         cursor?.close()
 
-        return callHistoryList.distinctBy { i -> i.number }
+        return callHistoryList
 
     }
 

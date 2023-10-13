@@ -146,7 +146,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope {
     private fun loadData() {
         listOfCallHistroy.clear()
         val d = viewModel.getAllCallLogsHistory().sortedByDescending {
-            SimpleDateFormat("dd/MM/yyyy kk:mm").parse(it.date)
+            SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
         }.distinctBy { i -> i.number }
         listOfCallHistroy.addAll(d)
         setupRV()
