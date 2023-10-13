@@ -22,4 +22,7 @@
     <string name="EnterMobileNumber">Enter Mobile Number</string>
     <string name="CheckTermsAndConditions">Check Terms and Conditions</string>
     <string name="next">Next</string>
+    <string name="OutgoingCall">Outgoing Call</string>
+    <string name="IncomingCall">Incoming Call</string>
+    <string name="MissedCall">Missed Call</string>
 </resources>

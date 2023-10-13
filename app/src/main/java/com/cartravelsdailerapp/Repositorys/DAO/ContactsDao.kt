@@ -5,16 +5,18 @@ import com.cartravelsdailerapp.models.CallHistory
 
 @Dao
 interface CallHistoryDao {
-
     @Query("SELECT * FROM CallHistory ORDER BY id ASC")
     fun getAll(): List<CallHistory>
 
-    @Insert (onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(listofCallHistory: List<CallHistory>)
+
     @Insert
     fun insertCallHistory(callHistory: CallHistory)
 
     @Delete
     fun delete(callHistory: CallHistory)
 
+    @Query("SELECT * FROM CallHistory WHERE number = :number")
+    fun callDataByNumber(number: String):List<CallHistory>
 }

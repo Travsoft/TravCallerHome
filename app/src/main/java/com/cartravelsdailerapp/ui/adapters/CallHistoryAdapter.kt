@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
@@ -61,6 +62,7 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         var card_whatsapp = itemView.findViewById<CardView>(R.id.card_whatsapp)
         var card_telegram = itemView.findViewById<CardView>(R.id.card_telegram)
         var cardSms = itemView.findViewById<CardView>(R.id.card_sms)
+        var card_call = itemView.findViewById<CardView>(R.id.card_call)
         var txt_Contact_number_count =
             itemView.findViewById<TextView>(R.id.txt_Contact_number_count)
     }
@@ -198,6 +200,14 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         }
         holder.cardSms.setOnClickListener {
             openDefaultSmsAppByNumber(selectedData.number)
+        }
+        holder.card_call.setOnClickListener {
+            val data = Bundle()
+            data.putString(ContactNumber, selectedData.number)
+            data.putString(ContactName, selectedData.name)
+            val intent = Intent(context, CallHistroyActivity::class.java)
+            intent.putExtras(data)
+            context.startActivity(intent)
         }
     }
 

@@ -11,6 +11,9 @@ object PrefUtils {
     const val ACTION_STEP_COUNTER_NOTIFICATION = "ACTION_STEP_COUNTER_NOTIFICATION"
     const val PERMISION_REQUEST = 100
     const val REQUESTED_CODE_READ_PHONE_STATE = 1003
+    const val OUTGOING="OUTGOING"
+    const val INCOMING="INCOMING"
+    const val MISSED="MISSED"
 
     fun getBoolean(contect1: Context?, string1: String?, bool1: Boolean): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(contect1).getBoolean(string1, bool1)
