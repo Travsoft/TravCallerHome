@@ -10,6 +10,7 @@ import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class CallHistoryViewmodel(
@@ -23,8 +24,10 @@ class CallHistoryViewmodel(
 
      fun getCallLogsHistoryByNumber(number: String) {
         viewModelScope.launch(Dispatchers.Main) {
-            _callLogsByNumber.value =
-                callLogsRepository.fetchCallLogs().filter{it.number.equals(number)}
+            async {
+                _callLogsByNumber.value =
+                    callLogsRepository.fetchCallLogs().filter{it.number.equals(number)}
+            }
         }
     }
 

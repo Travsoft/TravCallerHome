@@ -1,6 +1,8 @@
 package com.cartravelsdailerapp.ui
 
 import android.Manifest
+import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
@@ -15,14 +17,20 @@ import android.provider.ContactsContract
 import android.telecom.TelecomManager
 import android.text.TextUtils
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.view.Window
 import android.widget.ImageView
 import android.widget.QuickContactBadge
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import com.cartravelsdailerapp.R
+import com.cartravelsdailerapp.databinding.LayoutPreviewProfilePicBinding
+import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
@@ -77,8 +85,30 @@ class ProfileActivity : AppCompatActivity() {
         card_whatsapp.setOnClickListener {
             openWhatsAppByNumber(number)
         }
+        img_profile.setOnClickListener {
+            val dialog = Dialog(this, android.R.style.Theme_Light)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            val layoutInflater =
+                this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val binding = LayoutPreviewProfilePicBinding.inflate(layoutInflater)
+
+            dialog.setContentView(binding.root)
+            dialog.show()
+            dialog.setCancelable(false)
+            binding.imgClose.setOnClickListener {
+                dialog.dismiss()
+            }
+            if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
+                loadContactPhotoThumbnail(imageUri).also {
+                    binding.previewProfilePic.setImageBitmap(it)
+                }
+            } else {
+                binding.previewProfilePic.setImageToDefault()
+            }
+        }
 
     }
+
     private fun openWhatsAppByNumber(toNumber: String) {
         val intent =
             Intent(Intent.ACTION_VIEW, Uri.parse("http://api.whatsapp.com/send?phone=" + toNumber))
@@ -107,6 +137,7 @@ class ProfileActivity : AppCompatActivity() {
         }
         return ""
     }
+
     /**
      * Load a contact photo thumbnail and return it as a Bitmap,
      * resizing the image to the provided image dimensions as needed.

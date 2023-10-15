@@ -11,18 +11,13 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.TextUtils
 import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityCallHistroyBinding
-import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
 import com.cartravelsdailerapp.ui.adapters.CallHistoryByNumberAdapter
 import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.viewmodels.CallHistoryViewmodel
-import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.*
 import java.io.FileNotFoundException
@@ -35,7 +30,7 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var adapter: CallHistoryByNumberAdapter
     private lateinit var job: Job
-
+    var number: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         job = Job()
@@ -48,25 +43,26 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
             myViewModelFactory
         )[CallHistoryViewmodel::class.java]
         val d = intent.extras
-        val number = d?.getString(CarTravelsDialer.ContactNumber).toString()
+        number = d?.getString(CarTravelsDialer.ContactNumber).toString()
         val name = d?.getString(CarTravelsDialer.ContactName).toString()
         val imageUri = getPhotoFromContacts(number)
         binding = ActivityCallHistroyBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-        adapter = CallHistoryByNumberAdapter()
         linearLayoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        launch {
-            vm.getCallLogsHistoryByNumber(number)
+        binding.recyclerCallHistoryByNumber.itemAnimator = DefaultItemAnimator()
+        binding.recyclerCallHistoryByNumber.layoutManager = linearLayoutManager
+        launch(Dispatchers.IO) {
+            freezePleaseIAmDoingHeavyWork()
         }
-
         vm.callLogsByNumber.observe(this@CallHistroyActivity) {
+            adapter = CallHistoryByNumberAdapter()
             adapter.updateCallHistoryByNumber(it)
-            binding.recyclerCallHistoryByNumber.itemAnimator = DefaultItemAnimator()
-            binding.recyclerCallHistoryByNumber.layoutManager = linearLayoutManager
             binding.recyclerCallHistoryByNumber.adapter = adapter
         }
+
+
         binding.imgBack.setOnClickListener {
             this.onBackPressed()
         }
@@ -84,6 +80,7 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
             binding.imgProfile.setImageToDefault()
         }
     }
+
     private fun getPhotoFromContacts(num: String): String? {
         val uri =
             Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
@@ -166,4 +163,14 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main
+
+    suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
+        withContext(Dispatchers.Default) {
+            async {
+                //pretend this is a big network call
+                vm.getCallLogsHistoryByNumber(number)
+            }
+        }
+    }
+
 }

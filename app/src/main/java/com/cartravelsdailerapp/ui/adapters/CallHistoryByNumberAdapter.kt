@@ -31,7 +31,7 @@ class CallHistoryByNumberAdapter :
     }
 
     override fun getItemCount(): Int {
-        return listOfCallHistory.size
+        return listOfCallHistory.size ?: 0
     }
 
     override fun onBindViewHolder(holder: CallHistoryByNumberViewHolder, position: Int) {
