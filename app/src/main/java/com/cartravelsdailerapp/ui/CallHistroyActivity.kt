@@ -53,13 +53,18 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerCallHistoryByNumber.itemAnimator = DefaultItemAnimator()
         binding.recyclerCallHistoryByNumber.layoutManager = linearLayoutManager
-        launch(Dispatchers.IO) {
-            freezePleaseIAmDoingHeavyWork()
+
+        launch(Dispatchers.Main)  {
+            async {
+                val data = vm.getCallLogsHistoryByNumber(number)
+                adapter = CallHistoryByNumberAdapter()
+                adapter.updateCallHistoryByNumber(data)
+                binding.recyclerCallHistoryByNumber.adapter = adapter
+            }
         }
+
         vm.callLogsByNumber.observe(this@CallHistroyActivity) {
-            adapter = CallHistoryByNumberAdapter()
-            adapter.updateCallHistoryByNumber(it)
-            binding.recyclerCallHistoryByNumber.adapter = adapter
+
         }
 
 
@@ -164,13 +169,5 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main
 
-    suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
-        withContext(Dispatchers.Default) {
-            async {
-                //pretend this is a big network call
-                vm.getCallLogsHistoryByNumber(number)
-            }
-        }
-    }
 
 }
