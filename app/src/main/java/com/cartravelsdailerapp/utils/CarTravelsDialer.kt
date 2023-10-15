@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 
 object CarTravelsDialer {
     const val ContactName = "contactName"
+    const val ContactProfile = "imageUri"
     const val ContactNumber = "contactNumber"
     const val ContactUri = "contactUri"
     const val WhatsAppPackage = "com.whatsapp"
