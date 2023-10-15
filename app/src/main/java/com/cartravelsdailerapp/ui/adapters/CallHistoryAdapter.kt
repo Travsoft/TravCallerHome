@@ -169,7 +169,11 @@ class CallHistoryAdapter(
             onclick.openSMSScreen(selectedData.number)
         }
         holder.card_call.setOnClickListener {
-            onclick.openPhoneNumberHistory(selectedData.number, selectedData.name!!)
+            if (TextUtils.isEmpty(selectedData.name))
+                onclick.openPhoneNumberHistory(selectedData.number, selectedData.number!!)
+            else
+                onclick.openPhoneNumberHistory(selectedData.number, selectedData.name!!)
+
         }
     }
 

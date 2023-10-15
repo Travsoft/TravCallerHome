@@ -157,12 +157,14 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
 
     private fun loadData() {
-        listOfCallHistroy.clear()
-        val d = viewModel.getAllCallLogsHistory().sortedByDescending {
-            SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
-        }.distinctBy { i -> i.number }
-        listOfCallHistroy.addAll(d)
-        setupRV()
+        launch(Dispatchers.Main) {
+            listOfCallHistroy.clear()
+            val d = viewModel.getAllCallLogsHistory().sortedByDescending {
+                SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
+            }.distinctBy { i -> i.number }
+            listOfCallHistroy.addAll(d)
+            setupRV()
+        }
     }
 
     private fun setupRV() {
