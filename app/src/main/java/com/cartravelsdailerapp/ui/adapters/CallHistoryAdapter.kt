@@ -46,8 +46,13 @@ import java.io.IOException
 import java.io.InputStream
 
 
-class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var context: Context) :
+class CallHistoryAdapter(
+    var listCallHistory: ArrayList<CallHistory>,
+    var context: Context,
+    val onclick: OnClickListeners
+) :
     RecyclerView.Adapter<CallHistoryAdapter.CallHistoryVm>() {
+
     class CallHistoryVm(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name = itemView.findViewById<TextView>(R.id.txt_Contact_name)
         var number = itemView.findViewById<TextView>(R.id.txt_Contact_number)
@@ -144,70 +149,27 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
             }
         }
         holder.call.setOnClickListener {
-            val uri = Uri.parse("tel:" + selectedData.number)
-            val telecomManager = holder.itemView.context.getSystemService<TelecomManager>()
-            val callCapablePhoneAccounts = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                telecomManager?.callCapablePhoneAccounts
-            } else {
-                TODO("VERSION.SDK_INT < M")
-            }
-            val bundle = Bundle()
-            if (callCapablePhoneAccounts != null) {
-                callCapablePhoneAccounts.find {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        it.id == selectedData.subscriberId
-                    } else {
-                        TODO("VERSION.SDK_INT < M")
-                    }
-                }
-                    ?.let { handle: PhoneAccountHandle ->
-                        bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
-                    }
-            }
-            if (ActivityCompat.checkSelfPermission(
-                    holder.itemView.context,
-                    Manifest.permission.CALL_PHONE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                telecomManager?.placeCall(uri, bundle)
-            }
+            onclick.callOnClick(selectedData.number, selectedData.subscriberId)
         }
         holder.profile_image.setOnClickListener {
-            val data = Bundle()
-            data.putString(ContactName, selectedData.name)
-            data.putString(ContactNumber, selectedData.number)
-            data.putString(ContactUri, selectedData.photouri)
-            val intent = Intent(context, ProfileActivity::class.java)
-            intent.putExtras(data)
-            context.startActivity(intent)
+            onclick.navigateToProfilePage(
+                selectedData.name!!,
+                selectedData.number,
+                selectedData.photouri
+            )
         }
         holder.card_whatsapp.setOnClickListener {
+            onclick.openWhatsApp(selectedData.number)
 
-            if (isAppInstalled("com.whatsapp.w4b")) {
-                val location = IntArray(2)
-                holder.itemView.getLocationOnScreen(location)
-                val point = Point()
-                point.x = location[0]
-                point.y = location[1]
-                // showPopup(context, point, selectedData.number)
-                AlertDialogOpenWhatsApp(selectedData.number)
-            } else {
-                openWhatsAppByNumber(selectedData.number)
-            }
         }
         holder.card_telegram.setOnClickListener {
-            openTelegramAppByNumber(selectedData.number)
+            onclick.openTelegramApp(selectedData.number)
         }
         holder.cardSms.setOnClickListener {
-            openDefaultSmsAppByNumber(selectedData.number)
+            onclick.openSMSScreen(selectedData.number)
         }
         holder.card_call.setOnClickListener {
-            val data = Bundle()
-            data.putString(ContactNumber, selectedData.number)
-            data.putString(ContactName, selectedData.name)
-            val intent = Intent(context, CallHistroyActivity::class.java)
-            intent.putExtras(data)
-            context.startActivity(intent)
+            onclick.openPhoneNumberHistory(selectedData.number, selectedData.name!!)
         }
     }
 
@@ -218,55 +180,6 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         // below line is to notify our adapter
         // as change in recycler view data.
         notifyDataSetChanged()
-    }
-
-    private fun openWhatsAppByNumber(toNumber: String) {
-        val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("http://api.whatsapp.com/send?phone=" + toNumber))
-        intent.setPackage("com.whatsapp")
-        context.startActivity(intent)
-
-    }
-
-    private fun openTelegramAppByNumber(toNumber: String) {
-        val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("tg://openmessage?user_id=" + toNumber))
-        intent.setPackage("org.telegram.messenger")
-        context.startActivity(intent)
-    }
-
-    private fun openDefaultSmsAppByNumber(toNumber: String) {
-        val intent =
-            Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + toNumber))
-        intent.addCategory(Intent.CATEGORY_DEFAULT)
-        context.startActivity(intent)
-    }
-
-    fun launchWhatsAppBusinessApp(toNumber: String) {
-        val pm: PackageManager = context.packageManager
-        try {
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("http://api.whatsapp.com/send?phone=" + toNumber)
-            )
-            intent.setPackage("com.whatsapp.w4b")
-            // pm.getLaunchIntentForPackage("com.whatsapp.w4b")
-            context.startActivity(intent)
-        } catch (e: PackageManager.NameNotFoundException) {
-            Toast.makeText(context, "Please install WA Business App", Toast.LENGTH_SHORT).show()
-        } catch (exception: NullPointerException) {
-        }
-    }
-
-    fun isAppInstalled(packageName: String?): Boolean {
-        val pm = context.packageManager
-        try {
-            pm.getPackageInfo(packageName!!, PackageManager.GET_ACTIVITIES)
-            return true
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e("isAppInstalled", "error :${e.message}")
-        }
-        return false
     }
 
 
@@ -291,26 +204,6 @@ class CallHistoryAdapter(var listCallHistory: ArrayList<CallHistory>, var contex
         return ""
     }
 
-    private fun AlertDialogOpenWhatsApp(number: String) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        val layoutInflater =
-            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val binding = PopupLayoutBinding.inflate(layoutInflater)
-        builder.setView(binding.root)
-
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-        binding.imageClose.setOnClickListener {
-            dialog.dismiss()
-        }
-        binding.imageWhatsappBussiness.setOnClickListener {
-            launchWhatsAppBusinessApp(number)
-        }
-        binding.imageWhatsapp.setOnClickListener {
-            openWhatsAppByNumber(number)
-        }
-
-    }
 
     /**
      * Load a contact photo thumbnail and return it as a Bitmap,
