@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.cartravelsdailerapp.IndeterminateProgressDialog
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
@@ -48,7 +49,10 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
+    }
 
+    override fun onResume() {
+        super.onResume()
         binding.btLogin.setOnClickListener {
             email = binding.etEmail.text.toString()
             mobileNo = binding.etMobile.text.toString()
@@ -84,42 +88,14 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 val edit = sharedPreferences.edit()
                 edit.putBoolean(PrefUtils.IsLogin, true)
                 edit.apply()
+
             }
-        }
-        binding.txtSignUp.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    SignUpActivity::class.java
-                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            vm.callLogs.observe(this) {
+                Toast.makeText(this,"data",Toast.LENGTH_SHORT).show()
+            }
 
-                )
-        }
-        binding.txtForgotpassword.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    ForgotPassword::class.java
-                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
-
-                )
-        }
-        binding.txtSkip.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    MainActivity::class.java
-                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
-            )
         }
 
-    }
-
-    override fun onResume() {
-        super.onResume()
         runtimePermission.requestPermission(
             listOf(
                 Manifest.permission.READ_PHONE_STATE,
@@ -204,6 +180,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     private fun isFromAPI(apiLevel: Int) = Build.VERSION.SDK_INT >= apiLevel
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
+
     suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
         withContext(Dispatchers.Default) {
             async {

@@ -1,11 +1,8 @@
 package com.cartravelsdailerapp.Repositorys
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
 import com.cartravelsdailerapp.models.CallHistory
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class CallLogsRepository(

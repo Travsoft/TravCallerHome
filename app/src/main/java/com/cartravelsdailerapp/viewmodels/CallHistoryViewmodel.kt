@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CallHistoryViewmodel(
@@ -21,7 +22,7 @@ class CallHistoryViewmodel(
         get() = _callLogsByNumber
 
      fun getCallLogsHistoryByNumber(number: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             _callLogsByNumber.value =
                 callLogsRepository.fetchCallLogs().filter{it.number.equals(number)}
         }
