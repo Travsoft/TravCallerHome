@@ -3,30 +3,23 @@ package com.cartravelsdailerapp.ui.fragments
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Point
-import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.getSystemService
 import androidx.core.text.isDigitsOnly
 import androidx.core.view.isVisible
@@ -35,12 +28,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
-import com.cartravelsdailerapp.PrefUtils.LOCAL_BROADCAST_KEY
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
-import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.Dialer
@@ -52,7 +42,6 @@ import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.*
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
@@ -105,17 +94,16 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
                 return false
             }
         })
-        viewModel = (activity as MainActivity).vm
+        val myViewModelFactory =
+            MyViewModelFactory(requireActivity().application)
+        viewModel = ViewModelProvider(
+            this,
+            myViewModelFactory
+        )[MainActivityViewModel::class.java]
+
+        loadData()
 
         return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-        context?.let {
-            loadData()
-        }
-
     }
 
     fun hideSoftKeyboard(view: View, context: Context) {
@@ -157,14 +145,17 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
 
     private fun loadData() {
+
         launch(Dispatchers.Main) {
+            viewModel.getAllCallLogsHistory()
+
+        }
+        viewModel.callLogsdb.observe(this@CallHistoryFragment) {
             listOfCallHistroy.clear()
-            val d = viewModel.getAllCallLogsHistory().sortedByDescending {
-                SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
-            }.distinctBy { i -> i.number }
-            listOfCallHistroy.addAll(d)
+            listOfCallHistroy.addAll(it)
             setupRV()
         }
+
     }
 
     private fun setupRV() {
