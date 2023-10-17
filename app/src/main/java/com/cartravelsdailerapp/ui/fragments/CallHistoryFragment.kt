@@ -29,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.PrefUtils
+import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.models.CallHistory
@@ -299,8 +300,8 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun openWhatsAppByNumber(toNumber: String) {
         val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("http://api.whatsapp.com/send?phone=" + toNumber))
-        intent.setPackage("com.whatsapp")
+            Intent(Intent.ACTION_VIEW, Uri.parse(PrefUtils.WhatsUri + toNumber))
+        intent.setPackage(PrefUtils.WhatsApp)
         context?.startActivity(intent)
 
     }
@@ -317,21 +318,25 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         try {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("http://api.whatsapp.com/send?phone=" + toNumber)
+                Uri.parse(PrefUtils.WhatsUri + toNumber)
             )
-            intent.setPackage("com.whatsapp.w4b")
+            intent.setPackage(PrefUtils.WhatsAppBusiness)
             // pm.getLaunchIntentForPackage("com.whatsapp.w4b")
             context?.startActivity(intent)
         } catch (e: PackageManager.NameNotFoundException) {
-            Toast.makeText(context, "Please install WA Business App", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                getText(R.string.Please_install_WA_Business_App),
+                Toast.LENGTH_SHORT
+            ).show()
         } catch (exception: NullPointerException) {
         }
     }
 
     private fun openTelegramAppByNumber(toNumber: String) {
         val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("tg://openmessage?user_id=" + toNumber))
-        intent.setPackage("org.telegram.messenger")
+            Intent(Intent.ACTION_VIEW, Uri.parse(PrefUtils.TelegramUri + toNumber))
+        intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
     }
 }

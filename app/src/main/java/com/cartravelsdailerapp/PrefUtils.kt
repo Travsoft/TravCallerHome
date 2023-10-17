@@ -15,6 +15,11 @@ object PrefUtils {
     const val INCOMING = "INCOMING"
     const val MISSED = "MISSED"
     const val DataFormate = "dd/MM/yyyy kk:mm"
+    const val WhatsApp = "com.whatsapp"
+    const val WhatsAppBusiness = "com.whatsapp.w4b"
+    const val TelegramMessage = "org.telegram.messenger"
+    const val WhatsUri = "http://api.whatsapp.com/send?phone="
+    const val TelegramUri = "tg://openmessage?user_id="
     fun getBoolean(contect1: Context?, string1: String?, bool1: Boolean): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(contect1).getBoolean(string1, bool1)
     }
