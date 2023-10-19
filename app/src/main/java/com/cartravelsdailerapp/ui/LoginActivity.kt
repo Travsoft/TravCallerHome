@@ -118,10 +118,13 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
                         binding.etEmail.text?.clear()
                         binding.etMobile.text?.clear()
-                        getPhoneNumbers().forEach {
-                            val phoneNumber = it
-                            Log.d("DREG_PHONE", "phone number: $phoneNumber")
-                            binding.etMobile.setText(phoneNumber)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                            getPhoneNumbers().forEach {
+                                val phoneNumber = it
+                                Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                                binding.etMobile.setText(phoneNumber)
+                            }
+
                         }
                         binding.etEmail.setText(GetEmailId())
                         launch(Dispatchers.IO) {

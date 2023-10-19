@@ -32,11 +32,11 @@ class MainActivityViewModel(
     suspend fun getCallLogsHistory() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs().sortedByDescending {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
                 } else {
-                    TODO("VERSION.SDK_INT < N")
-                }
+                    it.date
+                }).toString()
             }.distinctBy { i ->
                 i.number
             }
@@ -49,11 +49,11 @@ class MainActivityViewModel(
     fun getAllCallLogsHistory(offset: Int): List<CallHistory> {
         return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll(offset)
             .sortedByDescending {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
                 } else {
-                    TODO("VERSION.SDK_INT < N")
-                }
+                    it.date
+                }).toString()
             }.distinctBy { i -> i.number }
 
     }
