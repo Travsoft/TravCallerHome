@@ -46,19 +46,16 @@ class MainActivityViewModel(
         }
     }
 
-    fun getAllCallLogsHistory() {
-        viewModelScope.launch {
-            async {
-                _callLogsdb.value = DatabaseBuilder.getInstance(context).CallHistoryDao().getAll()
-                    .sortedByDescending {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
-                        } else {
-                            TODO("VERSION.SDK_INT < N")
-                        }
-                    }.distinctBy { i -> i.number }
-            }
-        }
+    fun getAllCallLogsHistory(offset: Int): List<CallHistory> {
+        return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll(offset)
+            .sortedByDescending {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
+                } else {
+                    TODO("VERSION.SDK_INT < N")
+                }
+            }.distinctBy { i -> i.number }
+
     }
 
     suspend fun getNewCallLogsHistory(): CallHistory {

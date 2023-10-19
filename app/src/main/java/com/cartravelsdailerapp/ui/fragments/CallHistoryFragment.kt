@@ -32,21 +32,25 @@ import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
+import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
 import com.cartravelsdailerapp.ui.adapters.OnClickListeners
+import com.cartravelsdailerapp.ui.adapters.PaginationScrollListener
 import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.*
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
+
 class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
-    var listOfCallHistroy: ArrayList<CallHistory> = ArrayList()
+    var listOfCallHistroy = ArrayList<CallHistory>()
     lateinit var binding: FragmentCallHistoryBinding
     lateinit var adapter: CallHistoryAdapter
     private var REQUESTED_CODE_READ_PHONE_STATE = 1003
@@ -55,6 +59,11 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     lateinit var newCallHistory: CallHistory
     private lateinit var job: Job
+    private val PAGE_START = 1
+    private var isLoading = false
+    private var isLastPage = false
+    private val TOTAL_PAGES = 5
+    private var currentPage = PAGE_START
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,9 +111,14 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             myViewModelFactory
         )[MainActivityViewModel::class.java]
 
-        loadData()
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadData()
+
     }
 
     fun hideSoftKeyboard(view: View, context: Context) {
@@ -116,10 +130,12 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun filter(text: String) {
         // creating a new array list to filter our data.
-        val filteredlist: ArrayList<CallHistory> = ArrayList()
+        val filteredlist: ArrayList<CallHistory> = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+            .searchCall(text) as ArrayList<CallHistory>
 
         // running a for loop to compare elements.
-        for (item in listOfCallHistroy) {
+/*
+        for (item in filteredlist) {
             // checking if the entered string matched with any item of our recycler view.
             if (text.isDigitsOnly()) {
                 if (item.number.contains(text.lowercase(Locale.getDefault())) == true
@@ -140,6 +156,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
             }
         }
+*/
 
         adapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
     }
@@ -147,35 +164,72 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun loadData() {
 
-        launch(Dispatchers.Main) {
-            viewModel.getAllCallLogsHistory()
-
-        }
-        viewModel.callLogsdb.observe(this@CallHistoryFragment) {
-            listOfCallHistroy.clear()
-            listOfCallHistroy.addAll(it)
-            setupRV()
-        }
-
+        setupRV()
+        listOfCallHistroy.clear()
+        var d = viewModel.getAllCallLogsHistory(0)
+        adapter.addAll(d)
     }
 
     private fun setupRV() {
         binding.txtNodataFound.isVisible = false
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        adapter = CallHistoryAdapter(listOfCallHistroy, requireContext(), this@CallHistoryFragment)
+        adapter = CallHistoryAdapter(requireContext(), this@CallHistoryFragment)
         binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
         binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
         binding.recyclerViewCallHistory.adapter = adapter
+
+        binding.recyclerViewCallHistory.addOnScrollListener(object :
+            PaginationScrollListener(linearLayoutManager) {
+            override fun isLastPage(): Boolean {
+                return isLastPage;
+            }
+
+            override fun isLoading(): Boolean {
+                return isLoading;
+            }
+
+            override fun loadMoreItems() {
+                isLoading = true;
+                currentPage += 10;
+                loadNextPage();
+            }
+
+        });
         viewModel.newCallLogs.observe(this@CallHistoryFragment)
         {
             val date = listOf(it)
             listOfCallHistroy.add(0, date.get(0))
             adapter.notifyDataSetChanged()
         }
+        loadFirstPage();
 
 
     }
+
+    private fun loadFirstPage() {
+        viewModel.callLogsdb.observe(this) {
+            adapter.addAll(it)
+            if (currentPage <= TOTAL_PAGES) adapter.addLoadingFooter() else isLastPage =
+                true
+        }
+    }
+
+    private fun loadNextPage() {
+        adapter.removeLoadingFooter();
+        isLoading = false;
+        var d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(currentPage)
+        var results = d;
+        adapter.addAll(results);
+        listOfCallHistroy.addAll(d)
+        if (currentPage != TOTAL_PAGES) {
+            adapter.addLoadingFooter()
+        } else {
+            isLastPage = true
+        }
+
+    }
+
 
     private fun registerBroadCastReceiver() {
         context?.let {

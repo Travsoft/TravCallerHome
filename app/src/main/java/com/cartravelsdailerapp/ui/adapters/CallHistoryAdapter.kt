@@ -25,14 +25,17 @@ import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.models.CallHistory
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class CallHistoryAdapter(
-    var listCallHistory: ArrayList<CallHistory>,
     var context: Context,
     val onclick: OnClickListeners
 ) :
     RecyclerView.Adapter<CallHistoryAdapter.CallHistoryVm>() {
+    private var isLoadingAdded = false
+     var listCallHistory= ArrayList<CallHistory>()
 
     class CallHistoryVm(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name = itemView.findViewById<TextView>(R.id.txt_Contact_name)
@@ -61,11 +64,11 @@ class CallHistoryAdapter(
     }
 
     override fun getItemCount(): Int {
-        return this.listCallHistory.size
+        return listCallHistory.size
     }
 
     override fun onBindViewHolder(holder: CallHistoryVm, position: Int) {
-        val selectedData = listCallHistory.get(position)
+        val selectedData = listCallHistory[position]
 
         if (selectedData.name.isNullOrBlank()) {
             holder.name.text = selectedData.number
@@ -250,5 +253,30 @@ class CallHistoryAdapter(
             }
         }
 
+    }
+
+    fun addLoadingFooter() {
+        isLoadingAdded = true
+    }
+    fun removeLoadingFooter() {
+        isLoadingAdded = false
+        val position: Int = listCallHistory.size - 1
+        val result: CallHistory = listCallHistory[position]
+        if (result != null) {
+            listCallHistory.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+    fun add(callHistory: CallHistory) {
+        listCallHistory.add(callHistory)
+        notifyItemInserted(listCallHistory.size - 1)
+    }
+
+    fun addAll(list: List<CallHistory>) {
+        listCallHistory.addAll(list)
+    }
+
+    fun setMovieList(list: ArrayList<CallHistory>) {
+        listCallHistory = list
     }
 }
