@@ -2,6 +2,7 @@ package com.cartravelsdailerapp.ui
 
 import android.Manifest
 import android.accounts.AccountManager
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -87,7 +88,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
             }
             vm.callLogs.observe(this) {
-                Toast.makeText(this,"data",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "data", Toast.LENGTH_SHORT).show()
             }
 
         }
@@ -115,10 +116,13 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
                             )
                     } else {
-
+                        val mProgressDialog = ProgressDialog(this@LoginActivity)
+                        mProgressDialog.setTitle("This is TITLE")
+                        mProgressDialog.setMessage("This is MESSAGE")
+                        mProgressDialog.show()
                         binding.etEmail.text?.clear()
                         binding.etMobile.text?.clear()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             getPhoneNumbers().forEach {
                                 val phoneNumber = it
                                 Log.d("DREG_PHONE", "phone number: $phoneNumber")
@@ -127,9 +131,15 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
                         }
                         binding.etEmail.setText(GetEmailId())
+
                         launch(Dispatchers.IO) {
                             freezePleaseIAmDoingHeavyWork()
                         }
+                        vm.callLogs.observe(this@LoginActivity) {
+                            Thread.sleep(1000)
+                            mProgressDialog.dismiss()
+                        }
+
                     }
 
                 }
