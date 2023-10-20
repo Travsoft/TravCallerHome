@@ -57,7 +57,6 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var calendar: Calendar
     private lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var viewModel: MainActivityViewModel
-    lateinit var newCallHistory: CallHistory
     private lateinit var job: Job
     private val PAGE_START = 1
     private var isLoading = false
@@ -74,7 +73,8 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             launch {
-                newCallHistory = viewModel.getNewCallLogsHistory()
+                viewModel.getNewCallLogsHistory()
+                Toast.makeText(context, "getNewCallLogsHistory", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -129,15 +129,19 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     private fun filter(text: String) {
-        // creating a new array list to filter our data.
-        val filteredlist: ArrayList<CallHistory> = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-            .searchCall(text) as ArrayList<CallHistory>
-        adapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
+        if (text.isEmpty()) {
+            loadData()
+        } else {
+            // creating a new array list to filter our data.
+            val filteredlist: ArrayList<CallHistory> =
+                DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                    .searchCall(text) as ArrayList<CallHistory>
+            adapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
+        }
     }
 
 
     private fun loadData() {
-
         setupRV()
         listOfCallHistroy.clear()
         var d = viewModel.getAllCallLogsHistory(0)

@@ -3,6 +3,7 @@ package com.cartravelsdailerapp.viewmodels
 import android.app.Application
 import android.icu.text.SimpleDateFormat
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.*
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
@@ -34,6 +35,7 @@ class MainActivityViewModel(
             _callLogs.value = callLogsRepository.fetchCallLogs()
             withContext(Dispatchers.IO) {
                 db.insertAll(_callLogs.value!!)
+                Log.d("insert data-->", _callLogs.value!!.count().toString())
             }
         }
     }
@@ -42,12 +44,11 @@ class MainActivityViewModel(
         return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll(offset)
     }
 
-    suspend fun getNewCallLogsHistory(): CallHistory {
+    suspend fun getNewCallLogsHistory() {
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
             _newCallLogs.value?.let { db.insertCallHistory(it) }
         }
-        return callLogsRepository.fetchCallLogSignle()
     }
 
 
