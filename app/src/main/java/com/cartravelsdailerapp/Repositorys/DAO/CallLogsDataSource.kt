@@ -36,7 +36,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.CACHED_PHOTO_URI
                 ),
                 null,
-                null, CallLog.Calls.DATE + " DESC"
+                null, null
             )!!
 
         } else {
@@ -52,7 +52,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.PHONE_ACCOUNT_ID
                 ),
                 null,
-                null, CallLog.Calls.DATE + " DESC"
+                null, null
             )!!
 
 
@@ -149,7 +149,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.CACHED_PHOTO_URI
                 ),
                 null,
-                null, CallLog.Calls.DATE + " DESC"
+                null, null
             )!!
         } else {
             cursor = contentResolver.query(
@@ -165,7 +165,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.PHONE_ACCOUNT_ID
                 ),
                 null,
-                null, CallLog.Calls.DATE + " DESC"
+                null, null
             )!!
 
         }

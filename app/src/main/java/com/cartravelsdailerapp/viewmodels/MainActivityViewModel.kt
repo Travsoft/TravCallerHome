@@ -31,15 +31,7 @@ class MainActivityViewModel(
     var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
     suspend fun getCallLogsHistory() {
         viewModelScope.launch {
-            _callLogs.value = callLogsRepository.fetchCallLogs().sortedByDescending {
-                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
-                } else {
-                    it.date
-                }).toString()
-            }.distinctBy { i ->
-                i.number
-            }
+            _callLogs.value = callLogsRepository.fetchCallLogs()
             withContext(Dispatchers.IO) {
                 db.insertAll(_callLogs.value!!)
             }
@@ -48,14 +40,6 @@ class MainActivityViewModel(
 
     fun getAllCallLogsHistory(offset: Int): List<CallHistory> {
         return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll(offset)
-            .sortedByDescending {
-                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
-                } else {
-                    it.date
-                }).toString()
-            }.distinctBy { i -> i.number }
-
     }
 
     suspend fun getNewCallLogsHistory(): CallHistory {

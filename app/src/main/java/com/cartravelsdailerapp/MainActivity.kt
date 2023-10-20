@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             CurvedBottomNavigation.Model(
                 CALL_HISTORY,
                 "",
-                R.drawable.history_svgrepo_com
+                R.drawable.ic_history
             ),
             CurvedBottomNavigation.Model(
                 HOME_ITEM, "",

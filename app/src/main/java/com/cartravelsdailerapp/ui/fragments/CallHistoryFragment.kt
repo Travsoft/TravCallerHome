@@ -132,32 +132,6 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         // creating a new array list to filter our data.
         val filteredlist: ArrayList<CallHistory> = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
             .searchCall(text) as ArrayList<CallHistory>
-
-        // running a for loop to compare elements.
-/*
-        for (item in filteredlist) {
-            // checking if the entered string matched with any item of our recycler view.
-            if (text.isDigitsOnly()) {
-                if (item.number.contains(text.lowercase(Locale.getDefault())) == true
-                ) {
-                    // if the item is matched we are
-                    // adding it to our filtered list.
-                    filteredlist.add(item)
-                }
-
-            } else {
-                if (item.name?.lowercase(Locale.getDefault())
-                        ?.contains(text.lowercase(Locale.getDefault())) == true
-                ) {
-                    // if the item is matched we are
-                    // adding it to our filtered list.
-                    filteredlist.add(item)
-                }
-
-            }
-        }
-*/
-
         adapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
     }
 
@@ -217,10 +191,9 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun loadNextPage() {
         adapter.removeLoadingFooter();
-        isLoading = false;
-        var d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(currentPage)
-        var results = d;
-        adapter.addAll(results);
+        isLoading = false
+        val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(currentPage)
+        adapter.addAll(d);
         listOfCallHistroy.addAll(d)
         if (currentPage != TOTAL_PAGES) {
             adapter.addLoadingFooter()
@@ -281,7 +254,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     override fun navigateToProfilePage(name: String, number: String, photoUri: String) {
         val data = Bundle()
-        if (name.isNullOrBlank()) {
+        if (name.isBlank()) {
             data.putString(CarTravelsDialer.ContactName, number)
         } else {
             data.putString(CarTravelsDialer.ContactName, name)

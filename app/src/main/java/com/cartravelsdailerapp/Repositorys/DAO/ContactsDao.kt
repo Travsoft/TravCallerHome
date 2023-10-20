@@ -5,7 +5,7 @@ import com.cartravelsdailerapp.models.CallHistory
 
 @Dao
 interface CallHistoryDao {
-    @Query("SELECT * FROM CallHistory ORDER BY id ASC LIMIT 10 OFFSET :offset")
+    @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC LIMIT 10 OFFSET :offset")
     fun getAll(offset: Int): List<CallHistory>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
