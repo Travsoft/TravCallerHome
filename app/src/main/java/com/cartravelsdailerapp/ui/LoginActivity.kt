@@ -87,10 +87,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 edit.apply()
 
             }
-            vm.callLogs.observe(this) {
-                Toast.makeText(this, "data", Toast.LENGTH_SHORT).show()
-            }
-
         }
 
         runtimePermission.requestPermission(
@@ -117,8 +113,9 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             )
                     } else {
                         val mProgressDialog = ProgressDialog(this@LoginActivity)
-                        mProgressDialog.setTitle("This is TITLE")
-                        mProgressDialog.setMessage("This is MESSAGE")
+                        mProgressDialog.setTitle("Loading")
+                        mProgressDialog.setMessage("Preparing Call History...")
+                        mProgressDialog.setCancelable(false)
                         mProgressDialog.show()
                         binding.etEmail.text?.clear()
                         binding.etMobile.text?.clear()
@@ -138,6 +135,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                         vm.callLogs.observe(this@LoginActivity) {
                             Thread.sleep(1000)
                             mProgressDialog.dismiss()
+                            Log.d("Login activity", "call history completed")
                         }
 
                     }
