@@ -54,17 +54,16 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
         binding.recyclerCallHistoryByNumber.itemAnimator = DefaultItemAnimator()
         binding.recyclerCallHistoryByNumber.layoutManager = linearLayoutManager
 
-        launch(Dispatchers.Main)  {
-            async {
-                val data = vm.getCallLogsHistoryByNumber(number)
-                adapter = CallHistoryByNumberAdapter()
-                adapter.updateCallHistoryByNumber(data)
-                binding.recyclerCallHistoryByNumber.adapter = adapter
-            }
+        launch(Dispatchers.Main) {
+            vm.getCallLogsHistoryByNumber(number)
         }
 
         vm.callLogsByNumber.observe(this@CallHistroyActivity) {
-
+            adapter = CallHistoryByNumberAdapter()
+            if (it != null) {
+                adapter.updateCallHistoryByNumber(it)
+            }
+            binding.recyclerCallHistoryByNumber.adapter = adapter
         }
 
 
