@@ -20,6 +20,7 @@ object PrefUtils {
     const val TelegramMessage = "org.telegram.messenger"
     const val WhatsUri = "http://api.whatsapp.com/send?phone="
     const val TelegramUri = "tg://openmessage?user_id="
+    const val PackageName = "com.cartravelsdailerapp"
     fun getBoolean(contect1: Context?, string1: String?, bool1: Boolean): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(contect1).getBoolean(string1, bool1)
     }

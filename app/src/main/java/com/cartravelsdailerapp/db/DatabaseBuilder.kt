@@ -2,6 +2,7 @@ package com.cartravelsdailerapp.db
 
 import android.content.Context
 import androidx.room.Room
+import com.cartravelsdailerapp.PrefUtils
 
 object DatabaseBuilder {
     private var INSTANCE: AppDatabase? = null
@@ -18,6 +19,6 @@ object DatabaseBuilder {
         Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "com.cartravelsdailerapp"
+            PrefUtils.PackageName
         ).allowMainThreadQueries().build()
 }
