@@ -2,6 +2,7 @@ package com.cartravelsdailerapp.ui
 
 import android.Manifest
 import android.Manifest.permission.CALL_PHONE
+import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -10,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telephony.SubscriptionInfo
@@ -19,25 +21,33 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.cartravelsdailerapp.PrefUtils
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.R
+import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
 import com.cartravelsdailerapp.dialerstates.CallManager
 import com.cartravelsdailerapp.dialerstates.GsmCall
+import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.service.MyConnectionService
+import com.cartravelsdailerapp.ui.adapters.ContactsAdapter
 import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.utils.isPackageInstalled
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.disposables.Disposables
+import kotlinx.coroutines.*
 import java.util.regex.Pattern
+import kotlin.coroutines.CoroutineContext
 
 
-class Dialer : AppCompatActivity(), View.OnClickListener {
+class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
     private val LOG_TAG = "DialerActivity"
     lateinit var time: String
 
@@ -55,10 +65,19 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
     lateinit var subList: List<SubscriptionInfo>
     lateinit var img_whatsapp: ImageView
     lateinit var img_telegram: ImageView
+    lateinit var recy_list_contacts: RecyclerView
     lateinit var subscriptionManager: SubscriptionManager
+    lateinit var listContacts: ArrayList<Contact>
+    lateinit var contactsAdapter: ContactsAdapter
+    private lateinit var job: Job
+    lateinit var cancel_button: ImageView
+    lateinit var add_user: ImageView
+    lateinit var contactIntent: Intent
+    lateinit var launcherContact: ActivityResultLauncher<Intent>
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
+        job = Job()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dialer)
         edtInput = findViewById(R.id.edtInput)
@@ -69,10 +88,21 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
         txt_sim_type = findViewById(R.id.txt_sim_type)
         img_whatsapp = findViewById(R.id.img_whatsapp)
         img_telegram = findViewById(R.id.img_telegram)
+        recy_list_contacts = findViewById(R.id.recy_list_contacts)
+        cancel_button = findViewById(R.id.cancel_button)
+        add_user = findViewById(R.id.add_user)
         supportActionBar?.hide()
         img_whatsapp.setOnClickListener(this)
         img_telegram.setOnClickListener(this)
-
+        cancel_button.setOnClickListener(this)
+        add_user.setOnClickListener(this)
+        launcherContact =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    // There are no request codes
+                    val data: Intent? = result.data
+                }
+            }
         fab.setOnClickListener { view ->
             if (dialerView.visibility == View.GONE) {
                 dialerView.visibility = View.VISIBLE
@@ -143,9 +173,10 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
-
+        launch {
+            freezePleaseIAmDoingHeavyWork()
+        }
     }
-
 
     override fun onResume() {
         updatesDisposable = CallManager.updates()
@@ -395,6 +426,18 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
                     }
                 }
             }
+            R.id.cancel_button -> {
+                onBackPressed()
+            }
+            R.id.add_user -> {
+                contactIntent = Intent(ContactsContract.Intents.Insert.ACTION)
+                contactIntent.type = ContactsContract.RawContacts.CONTENT_TYPE
+                contactIntent
+                    // .putExtra(ContactsContract.Intents.Insert.NAME, name)
+                    .putExtra(ContactsContract.Intents.Insert.PHONE, number)
+                //.putExtra(ContactsContract.Intents.Insert.EMAIL, email)
+                launcherContact.launch(contactIntent)
+            }
 
 /*
             R.id.call_list_rv -> {
@@ -440,4 +483,23 @@ class Dialer : AppCompatActivity(), View.OnClickListener {
         startActivity(intent)
     }
 
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
+
+    suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
+        val list = withContext(Dispatchers.Default) {
+            //pretend this is a big network call
+            CallLogsDataSource(
+                application.contentResolver,
+                this@Dialer
+            ).readContacts()
+        }
+        contactsAdapter = ContactsAdapter()
+        val layoutInflater = LinearLayoutManager(this)
+        contactsAdapter.updateContacts(list)
+        recy_list_contacts.layoutManager = layoutInflater
+        recy_list_contacts.adapter = contactsAdapter
+        contactsAdapter.notifyDataSetChanged()
+
+    }
 }

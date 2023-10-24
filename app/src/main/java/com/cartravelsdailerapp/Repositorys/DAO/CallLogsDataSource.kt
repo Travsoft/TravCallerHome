@@ -1,18 +1,26 @@
 package com.cartravelsdailerapp.Repositorys.DAO
 
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
+import android.net.Uri
 import android.os.Build
 import android.provider.CallLog
+import android.provider.ContactsContract
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.models.Contact
+import java.io.ByteArrayInputStream
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 private const val s = "SDK_INT"
@@ -253,6 +261,68 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
 
         return callHistory
 
+    }
+
+   suspend  fun readContacts(): List<Contact> {
+        Log.i("readContacts", "Reading Contacts")
+        val listOfContact = ArrayList<Contact>()
+        val contentResolver = context.contentResolver
+        val nameCursor: Cursor? = contentResolver.query(
+            ContactsContract.Contacts.CONTENT_URI,
+            null, null, null, "DISPLAY_NAME ASC"
+        )
+        if (nameCursor!!.moveToFirst()) {
+            do {
+                val id: String =
+                    nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.Contacts._ID))
+                val name: String =
+                    nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+                var number = ""
+                var photo: Bitmap? = null
+                var photoUri: Uri? = null
+                if (nameCursor.getInt(nameCursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+                    val numberCursor: Cursor? = contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                        arrayOf(id),
+                        null
+                    )
+                    while (numberCursor!!.moveToNext()) {
+                        number =
+                            numberCursor.getString(numberCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                    }
+                    numberCursor.close()
+
+                    val phoneContactID =
+                        nameCursor.getLong(nameCursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID))
+                    val contactUri: Uri = ContentUris.withAppendedId(
+                        ContactsContract.Contacts.CONTENT_URI,
+                        phoneContactID
+                    )
+                    photoUri = Uri.withAppendedPath(
+                        contactUri,
+                        ContactsContract.Contacts.Photo.CONTENT_DIRECTORY
+                    )
+
+                    val photoCursor: Cursor? = contentResolver.query(
+                        photoUri, arrayOf(ContactsContract.Contacts.Photo.PHOTO),
+                        null, null, null
+                    )
+
+                    if (photoCursor!!.moveToFirst()) {
+                        val data = photoCursor.getBlob(0)
+                        if (data != null) {
+                            photo = BitmapFactory.decodeStream(ByteArrayInputStream(data))
+                        }
+                    }
+                    photoCursor.close()
+                }
+                listOfContact.add(Contact(name, number, photoUri.toString()))
+            } while (nameCursor.moveToNext())
+        }
+        nameCursor.close()
+        return listOfContact
     }
 
     private fun getSimCardInfosBySubscriptionId(subscriptionId: String): SubscriptionInfo? {
