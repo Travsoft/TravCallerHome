@@ -28,8 +28,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
+import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
@@ -38,6 +40,7 @@ import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
+import com.cartravelsdailerapp.ui.adapters.ContactsAdapter
 import com.cartravelsdailerapp.ui.adapters.OnClickListeners
 import com.cartravelsdailerapp.ui.adapters.PaginationScrollListener
 import com.cartravelsdailerapp.utils.CarTravelsDialer
@@ -63,6 +66,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     private var isLastPage = false
     private val TOTAL_PAGES = 5
     private var currentPage = PAGE_START
+    lateinit var contactsAdapter: ContactsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,7 +115,19 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             myViewModelFactory
         )[MainActivityViewModel::class.java]
 
+        binding.cardHistory.setOnClickListener {
+            binding.recyclerViewCallHistory.isVisible = true
+            binding.recyListContacts.isVisible = false
+        }
+        binding.cardContacts.setOnClickListener {
+            binding.recyclerViewCallHistory.isVisible = false
+            binding.recyListContacts.isVisible = true
 
+        }
+        binding.cardHistory.performClick()
+        launch {
+            freezePleaseIAmDoingHeavyWork()
+        }
         return binding.root
     }
 
@@ -370,4 +386,27 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
     }
+
+    suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
+        val list = withContext(Dispatchers.Default) {
+            //pretend this is a big network call
+            context?.let {
+                CallLogsDataSource(
+                    context!!.applicationContext
+                        .contentResolver,
+                    it.applicationContext
+                ).readContacts()
+            }
+        }
+        contactsAdapter = ContactsAdapter()
+        val layoutInflater = LinearLayoutManager(context)
+        if (list != null) {
+            contactsAdapter.updateContacts(list)
+        }
+        binding.recyListContacts.layoutManager = layoutInflater
+        binding.recyListContacts.adapter = contactsAdapter
+        contactsAdapter.notifyDataSetChanged()
+
+    }
+
 }

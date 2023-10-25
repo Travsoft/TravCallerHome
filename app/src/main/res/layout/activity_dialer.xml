@@ -36,6 +36,7 @@
         android:id="@+id/recy_list_contacts"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/layout_item_contacts"
         app:layout_constraintStart_toStartOf="parent"
