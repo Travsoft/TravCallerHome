@@ -72,20 +72,20 @@
                     <ImageView
                         android:id="@+id/img_ic_history"
                         android:layout_width="24dp"
-                        android:visibility="gone"
                         android:layout_height="24dp"
                         android:layout_marginTop="3dp"
                         android:backgroundTint="@color/orange"
                         android:gravity="center"
-                        android:src="@drawable/ic_history" />
+                        android:src="@drawable/ic_history"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/txt_call_history"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="5dp"
-                        android:gravity="center"
                         android:fontFamily="sans-serif-black"
+                        android:gravity="center"
                         android:text="@string/call_history"
                         android:textColor="@color/orange" />
                 </LinearLayout>
@@ -112,16 +112,16 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:gravity="center"
-                        android:visibility="gone"
-                        android:src="@drawable/ic_sms" />
+                        android:src="@drawable/ic_sms"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/txt_contacts"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="5dp"
-                        android:gravity="center"
                         android:fontFamily="sans-serif-black"
+                        android:gravity="center"
                         android:text="@string/contacts"
                         android:textColor="@color/black" />
 
@@ -136,23 +136,23 @@
             android:layout_width="match_parent"
             android:layout_height="5dp"
             android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/layout_recyclerview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_tabs"
-            app:layout_constraintBottom_toTopOf="@+id/layout_recyclerview">
+            app:layout_constraintTop_toBottomOf="@+id/layout_tabs">
 
             <View
                 android:id="@+id/view_history"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:background="@color/orange" />
 
             <View
                 android:id="@+id/view_contacts"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:background="@color/white" />
         </LinearLayout>
 
@@ -175,16 +175,30 @@
                     android:id="@+id/recycler_view_call_history"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:listitem="@layout/item_callhistory"
-                    android:padding="10dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recy_list_contacts"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
                     android:padding="10dp"
                     android:visibility="gone"
-                    tools:listitem="@layout/layout_item_contacts" />
+                    tools:listitem="@layout/item_callhistory" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:padding="5dp"
+                    android:layout_height="wrap_content">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recy_list_favourites_contacts"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        tools:listitem="@layout/item_favourites_contacts"
+                        android:padding="10dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recy_list_contacts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        tools:listitem="@layout/layout_item_contacts" />
+                </LinearLayout>
+
             </RelativeLayout>
 
 
@@ -201,8 +215,7 @@
                 app:cardElevation="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/recycler_view_call_history">
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
                     android:layout_width="30dp"
@@ -218,6 +231,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="No Call Logs Found"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

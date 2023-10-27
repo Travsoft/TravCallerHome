@@ -8,12 +8,16 @@ import com.cartravelsdailerapp.models.Contact
 interface CallHistoryDao {
     @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC LIMIT 10 OFFSET :offset")
     fun getAll(offset: Int): List<CallHistory>
+
     @Query("SELECT * FROM Contact group by number ORDER BY id DESC LIMIT 10 OFFSET :offset")
     fun getAllContacts(offset: Int): List<Contact>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(listofCallHistory: List<CallHistory>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllContacts(listofContact: List<Contact>)
+
     @Insert
     fun insertCallHistory(callHistory: CallHistory)
 
@@ -28,4 +32,12 @@ interface CallHistoryDao {
 
     @Query("SELECT * FROM Contact WHERE number || name LIKE '%' || :searchQuery || '%'")
     fun searchContactCall(searchQuery: String): List<Contact>
+
+    @Query("UPDATE Contact SET isFavourites =:isFavourites WHERE number =:number")
+    fun updateContacts(isFavourites: Boolean, number: String)
+
+    @Query("SELECT * FROM Contact WHERE isFavourites = true")
+    fun getAllFavouriteContacts(): List<Contact>
+    @Query("SELECT * FROM Contact WHERE number =:number")
+    fun getFavouriteContactsByNumber(number: String): Contact
 }

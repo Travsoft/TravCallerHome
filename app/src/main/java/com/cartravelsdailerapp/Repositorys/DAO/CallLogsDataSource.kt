@@ -318,7 +318,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     }
                     photoCursor.close()
                 }
-                listOfContact.add(Contact(name, number, photoUri.toString()))
+                listOfContact.add(Contact(name, number, photoUri.toString(),isFavourites = false))
             } while (nameCursor.moveToNext())
         }
         nameCursor.close()

@@ -36,13 +36,22 @@
                         android:id="@+id/layout"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:background="@color/yellow"
+                        android:background="@color/orange"
                         android:orientation="vertical"
+
                         app:layout_constraintBottom_toTopOf="@+id/img_profile"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
+                        <ImageView
+                            android:id="@+id/img_Favourite"
+                            android:layout_gravity="end"
+                            android:layout_width="50dp"
+                            android:layout_margin="10dp"
+                            android:background="@color/white"
+                            android:src="@android:drawable/ic_menu_help"
+                            android:layout_height="50dp" />
                     </LinearLayout>
 
                     <QuickContactBadge

@@ -9,78 +9,50 @@ import android.os.Build
 import android.provider.ContactsContract
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.cartravelsdailerapp.databinding.LayoutItemContactsBinding
+import com.cartravelsdailerapp.databinding.ItemCallhistoryBinding
+import com.cartravelsdailerapp.databinding.ItemFavouritesContactsBinding
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import java.io.FileNotFoundException
 import java.io.IOException
 
-class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
-    RecyclerView.Adapter<ContactsAdapter.ContactsViewHolder>() {
-    lateinit var binding: LayoutItemContactsBinding
-    var listOfConttacts = ArrayList<Contact>()
-    private var isLoadingAdded = false
+class FavouritesContactAdapter :
+    RecyclerView.Adapter<FavouritesContactAdapter.FavouritesContactVM>() {
+    lateinit var binding: ItemFavouritesContactsBinding
+    lateinit var context: Context
+    lateinit var listOfContact: List<Contact>
 
-    inner class ContactsViewHolder(binding: LayoutItemContactsBinding) :
-        RecyclerView.ViewHolder(binding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
-        binding =
-            LayoutItemContactsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ContactsViewHolder(binding)
+    inner class FavouritesContactVM(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesContactVM {
+        binding = ItemFavouritesContactsBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        context = parent.context
+        return FavouritesContactVM(binding.root)
     }
 
     override fun getItemCount(): Int {
-        return listOfConttacts.size
+        return listOfContact.size
     }
 
-    fun addLoadingFooter() {
-        isLoadingAdded = true
-    }
-
-    override fun onBindViewHolder(holder: ContactsViewHolder, position: Int) {
-        with(listOfConttacts[position]) {
-            binding.txtContactName.text = this.name
-            binding.txtContactNumber.text = this.number
+    override fun onBindViewHolder(holder: FavouritesContactVM, position: Int) {
+        with(listOfContact[position]) {
+            binding.txtContactsName.text = this.name
+            binding.quickProfileImage
             if (!TextUtils.isEmpty(this.photoUri)) {
-                binding.profileImage.setImageBitmap(loadContactPhotoThumbnail(this.photoUri))
+                binding.quickProfileImage.setImageBitmap(loadContactPhotoThumbnail(this.photoUri))
             } else {
-                binding.profileImage.setImageToDefault()
+                binding.quickProfileImage.setImageToDefault()
             }
-            binding.profileImage.setOnClickListener {
-                onclick.navigateToProfilePage(
-                    this.name,
-                    this.number,
-                    this.photoUri
-                )
-            }
-
-        }
-
-    }
-
-    fun addAll(list: List<Contact>) {
-        listOfConttacts.addAll(list)
-    }
-
-    fun filterList(filterlist: ArrayList<Contact>) {
-        // below line is to add our filtered
-        // list in our course array list.
-        listOfConttacts = filterlist
-        // below line is to notify our adapter
-        // as change in recycler view data.
-        notifyDataSetChanged()
-    }
-
-    fun removeLoadingFooter() {
-        isLoadingAdded = false
-        val position: Int = listOfConttacts.size - 1
-        val result: Contact = listOfConttacts[position]
-        if (result != null) {
-            listOfConttacts.removeAt(position)
-            notifyItemRemoved(position)
         }
     }
 
@@ -138,5 +110,8 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
 
     }
 
-
+    fun updateFavouritesContactList(list: List<Contact>) {
+        listOfContact = list
+        notifyDataSetChanged()
+    }
 }

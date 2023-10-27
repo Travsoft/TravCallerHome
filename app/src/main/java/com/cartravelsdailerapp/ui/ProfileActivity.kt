@@ -23,6 +23,7 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.QuickContactBadge
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -31,9 +32,11 @@ import androidx.core.content.getSystemService
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.LayoutPreviewProfilePicBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
+import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
 import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
+import com.google.android.material.snackbar.Snackbar
 import java.io.FileDescriptor
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -46,6 +49,9 @@ class ProfileActivity : AppCompatActivity() {
     lateinit var img_profile: QuickContactBadge
     lateinit var card_call: CardView
     lateinit var card_whatsapp: CardView
+    lateinit var img_Favourite: ImageView
+    var isFavouries: Boolean = false
+    var db = DatabaseBuilder.getInstance(this).CallHistoryDao()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -58,6 +64,7 @@ class ProfileActivity : AppCompatActivity() {
         img_profile = findViewById(R.id.img_profile)
         card_call = findViewById(R.id.card_call)
         card_whatsapp = findViewById(R.id.card_whatsapp)
+        img_Favourite = findViewById(R.id.img_Favourite)
         txt_name.text = name
         val imageUri = getPhotoFromContacts(number)
         if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
@@ -106,7 +113,16 @@ class ProfileActivity : AppCompatActivity() {
                 binding.previewProfilePic.setImageToDefault()
             }
         }
-
+        img_Favourite.setOnClickListener {
+            isFavouries = db.getFavouriteContactsByNumber(number).isFavourites
+            if (isFavouries) {
+                Toast.makeText(this, "Added $number as a your favorites", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Removed $number from your favorites list", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            db.updateContacts(!isFavouries, number)
+        }
     }
 
     private fun openWhatsAppByNumber(toNumber: String) {

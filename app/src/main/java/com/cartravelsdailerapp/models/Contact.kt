@@ -11,7 +11,9 @@ data class Contact(
     @ColumnInfo
     val number: String,
     @ColumnInfo
-    val photoUri: String
+    val photoUri: String,
+    @ColumnInfo
+    val isFavourites: Boolean
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

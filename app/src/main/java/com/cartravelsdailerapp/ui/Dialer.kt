@@ -497,7 +497,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                 this@Dialer
             ).readContacts()
         }
-        contactsAdapter = ContactsAdapter(this)
+      //  contactsAdapter = ContactsAdapter(this)
         val layoutInflater = LinearLayoutManager(this)
         recy_list_contacts.layoutManager = layoutInflater
         recy_list_contacts.adapter = contactsAdapter

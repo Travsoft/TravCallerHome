@@ -40,10 +40,7 @@ import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.ProfileActivity
-import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
-import com.cartravelsdailerapp.ui.adapters.ContactsAdapter
-import com.cartravelsdailerapp.ui.adapters.OnClickListeners
-import com.cartravelsdailerapp.ui.adapters.PaginationScrollListener
+import com.cartravelsdailerapp.ui.adapters.*
 import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -74,6 +71,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     private var currentPage = PAGE_START
     private var currentContactPage = PAGE_ContactSTART
     lateinit var contactsAdapter: ContactsAdapter
+    lateinit var favcontactsAdapter: FavouritesContactAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -148,6 +146,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
         }
         binding.cardHistory.performClick()
+
         return binding.root
     }
 
@@ -195,6 +194,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         listOfContact.clear()
         var d = viewModel.getAllContacts(0)
         contactsAdapter.addAll(d)
+
     }
 
     private fun setupRV() {
@@ -235,12 +235,18 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     private fun setUpContactsRv() {
-        contactsAdapter = ContactsAdapter(requireContext())
+        contactsAdapter = ContactsAdapter(requireContext(),this@CallHistoryFragment)
+        var listOfFavouritesContacts= DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAllFavouriteContacts()
+        favcontactsAdapter = FavouritesContactAdapter()
+        favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyListContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListContacts.layoutManager = linearLayoutManager
         binding.recyListContacts.adapter = contactsAdapter
+        binding.recyListFavouritesContacts.itemAnimator=DefaultItemAnimator()
+        binding.recyListFavouritesContacts.layoutManager=LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.recyListFavouritesContacts.adapter=favcontactsAdapter
         binding.recyListContacts.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun isLastPage(): Boolean {
