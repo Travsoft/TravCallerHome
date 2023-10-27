@@ -26,6 +26,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -496,7 +497,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                 this@Dialer
             ).readContacts()
         }
-        contactsAdapter = ContactsAdapter()
+        contactsAdapter = ContactsAdapter(this)
         val layoutInflater = LinearLayoutManager(this)
         recy_list_contacts.layoutManager = layoutInflater
         recy_list_contacts.adapter = contactsAdapter

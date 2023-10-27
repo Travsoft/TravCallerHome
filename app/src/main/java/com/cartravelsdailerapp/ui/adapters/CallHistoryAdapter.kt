@@ -175,7 +175,7 @@ class CallHistoryAdapter(
         val uri =
             Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
         //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
-        val cursor: Cursor? = context.getContentResolver().query(uri, null, null, null, null)
+        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
 
         if (cursor != null) {
             if (cursor.moveToNext()) {

@@ -235,7 +235,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     private fun setUpContactsRv() {
-        contactsAdapter = ContactsAdapter()
+        contactsAdapter = ContactsAdapter(requireContext())
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyListContacts.itemAnimator = DefaultItemAnimator()
