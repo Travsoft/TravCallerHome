@@ -36,6 +36,7 @@ import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.ProfileActivity
