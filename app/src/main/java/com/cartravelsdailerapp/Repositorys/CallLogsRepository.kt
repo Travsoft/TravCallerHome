@@ -16,6 +16,7 @@ class CallLogsRepository(
         }
 
     }
+
     suspend fun fetchContacts(): List<Contact> {
         return withContext(myDispatcher) {
             source.readContacts()

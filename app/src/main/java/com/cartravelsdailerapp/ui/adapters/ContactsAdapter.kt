@@ -4,11 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.databinding.LayoutItemContactsBinding
+import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 
 class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ContactsViewHolder>() {
     lateinit var binding: LayoutItemContactsBinding
-    lateinit var listOfConttacts: ArrayList<Contact>
+    var listOfConttacts = ArrayList<Contact>()
+    private var isLoadingAdded = false
 
     inner class ContactsViewHolder(binding: LayoutItemContactsBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -23,16 +25,31 @@ class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ContactsViewHolder>
         return listOfConttacts.size
     }
 
+    fun addLoadingFooter() {
+        isLoadingAdded = true
+    }
+
     override fun onBindViewHolder(holder: ContactsViewHolder, position: Int) {
         with(listOfConttacts[position]) {
-            binding.txtContactName.text=this.name
-            binding.txtContactNumber.text=this.number
+            binding.txtContactName.text = this.name
+            binding.txtContactNumber.text = this.number
         }
 
     }
 
-    fun updateContacts(list: List<Contact>) {
-        listOfConttacts = list as ArrayList<Contact>
-        notifyDataSetChanged()
+    fun addAll(list: List<Contact>) {
+        listOfConttacts.addAll(list)
     }
+
+
+    fun removeLoadingFooter() {
+        isLoadingAdded = false
+        val position: Int = listOfConttacts.size - 1
+        val result: Contact = listOfConttacts[position]
+        if (result != null) {
+            listOfConttacts.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
 }

@@ -13,6 +13,7 @@ import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.models.Contact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -40,5 +41,6 @@ class CallHistoryViewmodel(
         }
         return _callLogsByNumber.value
     }
+
 
 }

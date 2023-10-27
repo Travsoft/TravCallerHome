@@ -2,15 +2,18 @@ package com.cartravelsdailerapp.Repositorys.DAO
 
 import androidx.room.*
 import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.models.Contact
 
 @Dao
 interface CallHistoryDao {
     @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC LIMIT 10 OFFSET :offset")
     fun getAll(offset: Int): List<CallHistory>
-
+    @Query("SELECT * FROM Contact ORDER BY id DESC LIMIT 10 OFFSET :offset")
+    fun getAllContacts(offset: Int): List<Contact>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(listofCallHistory: List<CallHistory>)
-
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAllContacts(listofContact: List<Contact>)
     @Insert
     fun insertCallHistory(callHistory: CallHistory)
 

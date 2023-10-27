@@ -133,7 +133,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             freezePleaseIAmDoingHeavyWork()
                         }
                         vm.callLogs.observe(this@LoginActivity) {
-                            Thread.sleep(1000)
+                            Thread.sleep(3000)
                             mProgressDialog.dismiss()
                             Log.d("Login activity", "call history completed")
                         }
@@ -193,6 +193,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             async {
                 //pretend this is a big network call
                 vm.getCallLogsHistory()
+                vm.getAllContacts()
             }
         }
     }

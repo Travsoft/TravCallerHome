@@ -30,6 +30,10 @@ class MainActivityViewModel(
     private val _newCallLogs = MutableLiveData<CallHistory>()
     val newCallLogs: LiveData<CallHistory>
         get() = _newCallLogs
+
+    private val _contact = MutableLiveData<List<Contact>>()
+    val contacts: LiveData<List<Contact>> get() = _contact
+
     var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
     suspend fun getCallLogsHistory() {
         viewModelScope.launch {
@@ -45,6 +49,10 @@ class MainActivityViewModel(
         return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll(offset)
     }
 
+    fun getAllContacts(offset: Int): List<Contact> {
+        return DatabaseBuilder.getInstance(context).CallHistoryDao().getAllContacts(offset)
+    }
+
     suspend fun getNewCallLogsHistory() {
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
@@ -52,6 +60,15 @@ class MainActivityViewModel(
         }
     }
 
+    suspend fun getAllContacts() {
+        viewModelScope.launch {
+            _contact.value = callLogsRepository.fetchContacts()
+            withContext(Dispatchers.IO) {
+                db.insertAllContacts(_contact.value!!)
+            }
+
+        }
+    }
 
 }
 

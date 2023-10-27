@@ -173,9 +173,11 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                 }
             }
         }
+/*
         launch {
             freezePleaseIAmDoingHeavyWork()
         }
+*/
     }
 
     override fun onResume() {
@@ -496,7 +498,6 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
         }
         contactsAdapter = ContactsAdapter()
         val layoutInflater = LinearLayoutManager(this)
-        contactsAdapter.updateContacts(list)
         recy_list_contacts.layoutManager = layoutInflater
         recy_list_contacts.adapter = contactsAdapter
         contactsAdapter.notifyDataSetChanged()

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -55,6 +54,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     var listOfCallHistroy = ArrayList<CallHistory>()
+    var listOfContact = ArrayList<Contact>()
     lateinit var binding: FragmentCallHistoryBinding
     lateinit var adapter: CallHistoryAdapter
     private var REQUESTED_CODE_READ_PHONE_STATE = 1003
@@ -63,10 +63,15 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     private lateinit var job: Job
     private val PAGE_START = 1
+    private val PAGE_ContactSTART = 1
     private var isLoading = false
+    private var isContactLoading = false
     private var isLastPage = false
+    private var isContactLastPage = false
     private val TOTAL_PAGES = 5
+    private val TOTAL_CONTACT_PAGES = 5
     private var currentPage = PAGE_START
+    private var currentContactPage = PAGE_ContactSTART
     lateinit var contactsAdapter: ContactsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,30 +124,25 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.cardHistory.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = true
             binding.recyListContacts.isVisible = false
+            loadData()
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.orange))
             binding.txtContacts.setTextColor(resources.getColor(R.color.black))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.white))
+
         }
         binding.cardContacts.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = false
             binding.recyListContacts.isVisible = true
+            loadContactsData()
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.black))
             binding.txtContacts.setTextColor(resources.getColor(R.color.orange))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.orange))
+
         }
         binding.cardHistory.performClick()
-        launch {
-            freezePleaseIAmDoingHeavyWork()
-        }
         return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-        loadData()
-
     }
 
     fun hideSoftKeyboard(view: View, context: Context) {
@@ -170,6 +170,13 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         listOfCallHistroy.clear()
         var d = viewModel.getAllCallLogsHistory(0)
         adapter.addAll(d)
+    }
+
+    private fun loadContactsData() {
+        setUpContactsRv()
+        listOfContact.clear()
+        var d = viewModel.getAllContacts(0)
+        contactsAdapter.addAll(d)
     }
 
     private fun setupRV() {
@@ -209,6 +216,33 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     }
 
+    private fun setUpContactsRv() {
+        contactsAdapter = ContactsAdapter()
+        linearLayoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.recyListContacts.itemAnimator = DefaultItemAnimator()
+        binding.recyListContacts.layoutManager = linearLayoutManager
+        binding.recyListContacts.adapter = contactsAdapter
+        binding.recyListContacts.addOnScrollListener(object :
+            PaginationScrollListener(linearLayoutManager) {
+            override fun isLastPage(): Boolean {
+                return isContactLastPage;
+            }
+
+            override fun isLoading(): Boolean {
+                return isContactLoading;
+            }
+
+            override fun loadMoreItems() {
+                isContactLoading = true;
+                currentContactPage += 10;
+                loadNextContactPage()
+            }
+
+        })
+        loadContactsFirstPage()
+    }
+
     private fun loadFirstPage() {
         viewModel.callLogsdb.observe(this) {
             adapter.addAll(it)
@@ -217,11 +251,34 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         }
     }
 
+    private fun loadContactsFirstPage() {
+        viewModel.contacts.observe(this) {
+            contactsAdapter.addAll(it)
+            if (currentContactPage <= TOTAL_CONTACT_PAGES) contactsAdapter.addLoadingFooter() else isContactLastPage =
+                true
+        }
+    }
+
+    private fun loadNextContactPage() {
+        contactsAdapter.removeLoadingFooter();
+        isContactLoading = false
+        val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+            .getAllContacts(currentContactPage)
+        contactsAdapter.addAll(d)
+        listOfContact.addAll(d)
+        if (currentContactPage != TOTAL_CONTACT_PAGES) {
+            contactsAdapter.addLoadingFooter()
+        } else {
+            isContactLoading = true
+        }
+
+    }
+
     private fun loadNextPage() {
         adapter.removeLoadingFooter();
         isLoading = false
         val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(currentPage)
-        adapter.addAll(d);
+        adapter.addAll(d)
         listOfCallHistroy.addAll(d)
         if (currentPage != TOTAL_PAGES) {
             adapter.addLoadingFooter()
@@ -394,27 +451,4 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
     }
-
-    suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
-        val list = withContext(Dispatchers.Default) {
-            //pretend this is a big network call
-            context?.let {
-                CallLogsDataSource(
-                    context!!.applicationContext
-                        .contentResolver,
-                    it.applicationContext
-                ).readContacts()
-            }
-        }
-        contactsAdapter = ContactsAdapter()
-        val layoutInflater = LinearLayoutManager(context)
-        if (list != null) {
-            contactsAdapter.updateContacts(list)
-        }
-        binding.recyListContacts.layoutManager = layoutInflater
-        binding.recyListContacts.adapter = contactsAdapter
-        contactsAdapter.notifyDataSetChanged()
-
-    }
-
 }

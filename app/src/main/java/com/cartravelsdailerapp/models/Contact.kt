@@ -1,3 +1,19 @@
 package com.cartravelsdailerapp.models
 
-data class Contact(val name: String, val number: String, val photoUri: String)
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
+data class Contact(
+    @ColumnInfo
+    val name: String,
+    @ColumnInfo
+    val number: String,
+    @ColumnInfo
+    val photoUri: String
+) {
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
+
+}
