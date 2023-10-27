@@ -111,7 +111,12 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             }
 
             override fun onQueryTextChange(msg: String): Boolean {
-                filter(msg)
+                if (binding.recyclerViewCallHistory.isVisible)
+                {
+                    filter(msg)
+                } else {
+                    filterContacts(msg)
+                }
                 return false
             }
         })
@@ -162,6 +167,18 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
                 DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
                     .searchCall(text) as ArrayList<CallHistory>
             adapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
+        }
+    }
+
+    private fun filterContacts(text: String) {
+        if (text.isEmpty()) {
+            loadContactsData()
+        } else {
+            // creating a new array list to filter our data.
+            val filteredlist: ArrayList<Contact> =
+                DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                    .searchContactCall(text) as ArrayList<Contact>
+            contactsAdapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<Contact>)
         }
     }
 

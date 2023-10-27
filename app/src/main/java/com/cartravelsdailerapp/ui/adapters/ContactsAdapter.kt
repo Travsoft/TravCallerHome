@@ -41,6 +41,14 @@ class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ContactsViewHolder>
         listOfConttacts.addAll(list)
     }
 
+    fun filterList(filterlist: ArrayList<Contact>) {
+        // below line is to add our filtered
+        // list in our course array list.
+        listOfConttacts = filterlist
+        // below line is to notify our adapter
+        // as change in recycler view data.
+        notifyDataSetChanged()
+    }
 
     fun removeLoadingFooter() {
         isLoadingAdded = false

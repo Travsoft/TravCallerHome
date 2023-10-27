@@ -25,4 +25,7 @@ interface CallHistoryDao {
 
     @Query("SELECT * FROM CallHistory WHERE number || name LIKE '%' || :searchQuery || '%'")
     fun searchCall(searchQuery: String): List<CallHistory>
+
+    @Query("SELECT * FROM Contact WHERE number || name LIKE '%' || :searchQuery || '%'")
+    fun searchContactCall(searchQuery: String): List<Contact>
 }
