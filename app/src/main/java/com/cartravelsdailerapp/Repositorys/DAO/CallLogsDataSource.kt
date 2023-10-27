@@ -20,7 +20,6 @@ import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import java.io.ByteArrayInputStream
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 private const val s = "SDK_INT"
@@ -263,7 +262,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
 
     }
 
-   suspend  fun readContacts(): List<Contact> {
+    fun readContacts(): List<Contact> {
         Log.i("readContacts", "Reading Contacts")
         val listOfContact = ArrayList<Contact>()
         val contentResolver = context.contentResolver
@@ -275,8 +274,9 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
             do {
                 val id: String =
                     nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.Contacts._ID))
-                val name: String =
-                    nameCursor.getString(nameCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+                val columnContactName =
+                    nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val name = nameCursor.getString(columnContactName) ?: ""
                 var number = ""
                 var photo: Bitmap? = null
                 var photoUri: Uri? = null

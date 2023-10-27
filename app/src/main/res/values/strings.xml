@@ -26,4 +26,6 @@
     <string name="IncomingCall">Incoming Call</string>
     <string name="MissedCall">Missed Call</string>
     <string name="Please_install_WA_Business_App">"Please install WA Business App"</string>
+    <string name="call_history">Call History</string>
+    <string name="contacts">Contacts</string>
 </resources>

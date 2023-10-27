@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -118,11 +119,18 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.cardHistory.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = true
             binding.recyListContacts.isVisible = false
+            binding.txtCallHistory.setTextColor(resources.getColor(R.color.orange))
+            binding.txtContacts.setTextColor(resources.getColor(R.color.black))
+            binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
+            binding.viewContacts.setBackgroundColor(resources.getColor(R.color.white))
         }
         binding.cardContacts.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = false
             binding.recyListContacts.isVisible = true
-
+            binding.txtCallHistory.setTextColor(resources.getColor(R.color.black))
+            binding.txtContacts.setTextColor(resources.getColor(R.color.orange))
+            binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
+            binding.viewContacts.setBackgroundColor(resources.getColor(R.color.orange))
         }
         binding.cardHistory.performClick()
         launch {
