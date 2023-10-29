@@ -109,8 +109,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             }
 
             override fun onQueryTextChange(msg: String): Boolean {
-                if (binding.recyclerViewCallHistory.isVisible)
-                {
+                if (binding.recyclerViewCallHistory.isVisible) {
                     filter(msg)
                 } else {
                     filterContacts(msg)
@@ -128,22 +127,22 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.cardHistory.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = true
             binding.recyListContacts.isVisible = false
-            loadData()
+            binding.recyListFavouritesContacts.isVisible=false
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.orange))
             binding.txtContacts.setTextColor(resources.getColor(R.color.black))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.white))
-
+            loadData()
         }
         binding.cardContacts.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = false
             binding.recyListContacts.isVisible = true
-            loadContactsData()
+            binding.recyListFavouritesContacts.isVisible=true
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.black))
             binding.txtContacts.setTextColor(resources.getColor(R.color.orange))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.orange))
-
+            loadContactsData()
         }
         binding.cardHistory.performClick()
 
@@ -194,7 +193,6 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         listOfContact.clear()
         var d = viewModel.getAllContacts(0)
         contactsAdapter.addAll(d)
-
     }
 
     private fun setupRV() {
@@ -235,8 +233,9 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     private fun setUpContactsRv() {
-        contactsAdapter = ContactsAdapter(requireContext(),this@CallHistoryFragment)
-        var listOfFavouritesContacts= DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAllFavouriteContacts()
+        contactsAdapter = ContactsAdapter(requireContext(), this@CallHistoryFragment)
+        var listOfFavouritesContacts =
+            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAllFavouriteContacts()
         favcontactsAdapter = FavouritesContactAdapter()
         favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
         linearLayoutManager =
@@ -244,9 +243,10 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyListContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListContacts.layoutManager = linearLayoutManager
         binding.recyListContacts.adapter = contactsAdapter
-        binding.recyListFavouritesContacts.itemAnimator=DefaultItemAnimator()
-        binding.recyListFavouritesContacts.layoutManager=LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.recyListFavouritesContacts.adapter=favcontactsAdapter
+        binding.recyListFavouritesContacts.itemAnimator = DefaultItemAnimator()
+        binding.recyListFavouritesContacts.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.recyListFavouritesContacts.adapter = favcontactsAdapter
         binding.recyListContacts.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun isLastPage(): Boolean {
@@ -265,6 +265,11 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
         })
         loadContactsFirstPage()
+        if (listOfFavouritesContacts.isEmpty() == true) {
+            binding.recyListFavouritesContacts.isVisible = false
+        } else {
+            binding.recyListFavouritesContacts.isVisible = true
+        }
     }
 
     private fun loadFirstPage() {

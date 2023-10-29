@@ -33,8 +33,8 @@ interface CallHistoryDao {
     @Query("SELECT * FROM Contact WHERE number || name LIKE '%' || :searchQuery || '%'")
     fun searchContactCall(searchQuery: String): List<Contact>
 
-    @Query("UPDATE Contact SET isFavourites =:isFavourites WHERE number =:number")
-    fun updateContacts(isFavourites: Boolean, number: String)
+    @Query("UPDATE Contact SET isFavourites =:isFavourites WHERE id =:id")
+    fun updateContacts(isFavourites: Boolean, id: Int)
 
     @Query("SELECT * FROM Contact WHERE isFavourites = true")
     fun getAllFavouriteContacts(): List<Contact>

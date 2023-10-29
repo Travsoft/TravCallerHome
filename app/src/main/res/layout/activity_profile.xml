@@ -32,13 +32,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/layout"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:background="@color/orange"
                         android:orientation="vertical"
-
                         app:layout_constraintBottom_toTopOf="@+id/img_profile"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -46,13 +45,23 @@
 
                         <ImageView
                             android:id="@+id/img_Favourite"
-                            android:layout_gravity="end"
                             android:layout_width="50dp"
                             android:layout_margin="10dp"
+                            android:layout_alignParentEnd="true"
                             android:background="@color/white"
-                            android:src="@android:drawable/ic_menu_help"
+                            android:src="@drawable/ic_heart"
                             android:layout_height="50dp" />
-                    </LinearLayout>
+                        <ImageView
+                            android:id="@+id/img_Favourite_filled"
+                            android:layout_gravity="end"
+                            android:layout_width="50dp"
+                            android:visibility="gone"
+                            android:layout_alignParentEnd="true"
+                            android:layout_margin="10dp"
+                            android:background="@color/white"
+                            android:src="@drawable/ic_heart_filled"
+                            android:layout_height="50dp" />
+                    </RelativeLayout>
 
                     <QuickContactBadge
                         android:id="@+id/img_profile"

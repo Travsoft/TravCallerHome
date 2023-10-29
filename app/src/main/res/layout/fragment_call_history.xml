@@ -188,6 +188,7 @@
                         android:id="@+id/recy_list_favourites_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="150dp"
+                        android:visibility="gone"
                         tools:listitem="@layout/item_favourites_contacts"
                         android:padding="10dp" />
 
