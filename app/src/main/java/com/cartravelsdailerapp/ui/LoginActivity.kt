@@ -73,15 +73,14 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 ).show()
 
             } else {
-
-                startActivity(
-                    Intent(
-                        this,
-                        MainActivity::class.java
-                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
-
-                    )
+                val intent = Intent(
+                    this,
+                    SignUpActivity::class.java
+                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                intent.putExtra(PrefUtils.KeyEmail, email)
+                intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
+                startActivity(intent)
                 val edit = sharedPreferences.edit()
                 edit.putBoolean(PrefUtils.IsLogin, true)
                 edit.apply()
