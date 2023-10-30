@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SubscriptionManager
@@ -46,6 +47,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
+
     }
 
     override fun onResume() {
@@ -87,67 +89,129 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
             }
         }
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+            runtimePermission.requestPermission(
+                listOf(
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.READ_PHONE_NUMBERS,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_CALL_LOG,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.CALL_PHONE,
+                    Manifest.permission.GET_ACCOUNTS
+                ),
+                object : RunTimePermission.PermissionCallback {
+                    override fun onGranted() {
+                        if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
+                            startActivity(
+                                Intent(
+                                    this@LoginActivity,
+                                    MainActivity::class.java
+                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
 
-        runtimePermission.requestPermission(
-            listOf(
-                Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.READ_CONTACTS,
-                Manifest.permission.READ_CALL_LOG,
-                Manifest.permission.READ_PHONE_NUMBERS,
-                Manifest.permission.WRITE_CALL_LOG,
-                Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.CALL_PHONE,
-                Manifest.permission.GET_ACCOUNTS
-            ),
-            object : RunTimePermission.PermissionCallback {
-                override fun onGranted() {
-                    if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
-                        startActivity(
-                            Intent(
-                                this@LoginActivity,
-                                MainActivity::class.java
-                            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                                )
+                        } else {
+                            val mProgressDialog = ProgressDialog(this@LoginActivity)
+                            mProgressDialog.setTitle("Loading")
+                            mProgressDialog.setMessage("Preparing Call History...")
+                            mProgressDialog.setCancelable(false)
+                            mProgressDialog.show()
+                            binding.etEmail.text?.clear()
+                            binding.etMobile.text?.clear()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                getPhoneNumbers().forEach {
+                                    val phoneNumber = it
+                                    Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                                    binding.etMobile.setText(phoneNumber)
+                                }
 
-                            )
-                    } else {
-                        val mProgressDialog = ProgressDialog(this@LoginActivity)
-                        mProgressDialog.setTitle("Loading")
-                        mProgressDialog.setMessage("Preparing Call History...")
-                        mProgressDialog.setCancelable(false)
-                        mProgressDialog.show()
-                        binding.etEmail.text?.clear()
-                        binding.etMobile.text?.clear()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            getPhoneNumbers().forEach {
-                                val phoneNumber = it
-                                Log.d("DREG_PHONE", "phone number: $phoneNumber")
-                                binding.etMobile.setText(phoneNumber)
+                            }
+                            binding.etEmail.setText(GetEmailId())
+
+                            launch(Dispatchers.IO) {
+                                freezePleaseIAmDoingHeavyWork()
+                            }
+                            vm.callLogs.observe(this@LoginActivity) {
+                                Thread.sleep(3000)
+                                mProgressDialog.dismiss()
+                                Log.d("Login activity", "call history completed")
                             }
 
-                        }
-                        binding.etEmail.setText(GetEmailId())
-
-                        launch(Dispatchers.IO) {
-                            freezePleaseIAmDoingHeavyWork()
-                        }
-                        vm.callLogs.observe(this@LoginActivity) {
-                            Thread.sleep(3000)
-                            mProgressDialog.dismiss()
-                            Log.d("Login activity", "call history completed")
                         }
 
                     }
 
-                }
+                    override fun onDenied() {
+                        //show message if not allow storage permission
+                        Toast.makeText(this@LoginActivity, "d", Toast.LENGTH_LONG).show()
+                    }
+                })
 
-                override fun onDenied() {
-                    //show message if not allow storage permission
-                    Toast.makeText(this@LoginActivity, "d", Toast.LENGTH_LONG).show()
-                }
-            })
+        } else {
+            runtimePermission.requestPermission(
+                listOf(
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.READ_PHONE_NUMBERS,
+                    Manifest.permission.WRITE_CALL_LOG,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.CALL_PHONE,
+                    Manifest.permission.GET_ACCOUNTS
+                ),
+                object : RunTimePermission.PermissionCallback {
+                    override fun onGranted() {
+                        if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
+                            startActivity(
+                                Intent(
+                                    this@LoginActivity,
+                                    MainActivity::class.java
+                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
 
+                                )
+                        } else {
+                            val mProgressDialog = ProgressDialog(this@LoginActivity)
+                            mProgressDialog.setTitle("Loading")
+                            mProgressDialog.setMessage("Preparing Call History...")
+                            mProgressDialog.setCancelable(false)
+                            mProgressDialog.show()
+                            binding.etEmail.text?.clear()
+                            binding.etMobile.text?.clear()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                getPhoneNumbers().forEach {
+                                    val phoneNumber = it
+                                    Log.d("DREG_PHONE", "phone number: $phoneNumber")
+                                    binding.etMobile.setText(phoneNumber)
+                                }
 
+                            }
+                            binding.etEmail.setText(GetEmailId())
+
+                            launch(Dispatchers.IO) {
+                                freezePleaseIAmDoingHeavyWork()
+                            }
+                            vm.callLogs.observe(this@LoginActivity) {
+                                Thread.sleep(3000)
+                                mProgressDialog.dismiss()
+                                Log.d("Login activity", "call history completed")
+                            }
+
+                        }
+
+                    }
+
+                    override fun onDenied() {
+                        //show message if not allow storage permission
+                        Toast.makeText(this@LoginActivity, "d", Toast.LENGTH_LONG).show()
+                    }
+                })
+
+        }
     }
 
 
