@@ -36,8 +36,9 @@ interface CallHistoryDao {
     @Query("UPDATE Contact SET isFavourites =:isFavourites WHERE id =:id")
     fun updateContacts(isFavourites: Boolean, id: Int)
 
-    @Query("SELECT * FROM Contact WHERE isFavourites = true")
-    fun getAllFavouriteContacts(): List<Contact>
+    @Query("SELECT * FROM Contact WHERE isFavourites =:isFavourites")
+    fun getAllFavouriteContacts(isFavourites: Boolean): List<Contact>
+
     @Query("SELECT * FROM Contact WHERE number =:number")
     fun getFavouriteContactsByNumber(number: String): Contact
 }

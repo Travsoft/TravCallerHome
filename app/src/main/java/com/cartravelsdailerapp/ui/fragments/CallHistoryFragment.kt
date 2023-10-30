@@ -254,8 +254,8 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun setUpContactsRv() {
         contactsAdapter = ContactsAdapter(requireContext(), this@CallHistoryFragment)
-        var listOfFavouritesContacts =
-            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAllFavouriteContacts()
+        val listOfFavouritesContacts =
+            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAllFavouriteContacts(true)
         favcontactsAdapter = FavouritesContactAdapter()
         favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
         linearLayoutManagerContacts =
