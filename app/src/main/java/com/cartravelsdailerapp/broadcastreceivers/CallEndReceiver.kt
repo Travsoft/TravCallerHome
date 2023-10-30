@@ -30,15 +30,6 @@ class CallEndReceiver : BroadcastReceiver() {
 
         override fun onCallStateChanged(state: Int, incomingNumber: String) {
             if (state == 0) {
-/*
-                startActivity(
-                    context,
-                    Intent(context, MainActivity::class.java)
-                        .setFlags(FLAG_ACTIVITY_NEW_TASK)
-                        .addFlags(FLAG_ACTIVITY_CLEAR_TOP),
-                    null
-                )
-*/
                 val intent = Intent(LOCAL_BROADCAST_KEY)
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
             }

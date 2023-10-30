@@ -74,7 +74,7 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
         notifyDataSetChanged()
     }
 
-    fun removeLoadingFooter() {
+    fun removeLoadingContactFooter() {
         isLoadingAdded = false
         val position: Int = listOfConttacts.size - 1
         val result: Contact = listOfConttacts[position]

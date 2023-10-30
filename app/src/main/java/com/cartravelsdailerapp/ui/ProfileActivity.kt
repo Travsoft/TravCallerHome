@@ -124,13 +124,9 @@ class ProfileActivity : AppCompatActivity() {
         if (data?.isFavourites == true) {
             img_Favourite.isVisible = false
             img_Favouritefilled.isVisible = true
-            Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
-                .show()
         } else {
             img_Favourite.isVisible = true
             img_Favouritefilled.isVisible = false
-            Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
-                .show()
         }
         img_Favourite.setOnClickListener {
             it.isVisible = false
