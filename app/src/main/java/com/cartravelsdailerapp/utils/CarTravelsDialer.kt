@@ -2,6 +2,8 @@ package com.cartravelsdailerapp.utils
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.cartravelsdailerapp.models.Contact
+import com.cartravelsdailerapp.ui.fragments.CallHistoryFragment
 
 
 object CarTravelsDialer {
