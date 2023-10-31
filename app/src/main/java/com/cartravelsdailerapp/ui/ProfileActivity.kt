@@ -31,6 +31,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.LayoutPreviewProfilePicBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
@@ -49,13 +50,13 @@ class ProfileActivity : AppCompatActivity() {
     var name: String = ""
     var number: String = ""
     var photoUri: String = ""
-    lateinit var txt_name: TextView
-    lateinit var img_profile: QuickContactBadge
-    lateinit var card_call: CardView
-    lateinit var card_whatsapp: CardView
-    lateinit var img_Favourite: ImageView
-    lateinit var img_Favouritefilled: ImageView
-    var isFavouries: Boolean = false
+    var activityType: String = ""
+    private lateinit var txt_name: TextView
+    private lateinit var img_profile: QuickContactBadge
+    private lateinit var card_call: CardView
+    private lateinit var card_whatsapp: CardView
+    private lateinit var img_Favourite: ImageView
+    private lateinit var img_Favouritefilled: ImageView
     var db = DatabaseBuilder.getInstance(this).CallHistoryDao()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +66,7 @@ class ProfileActivity : AppCompatActivity() {
         name = d?.getString(ContactName).toString()
         number = d?.getString(ContactNumber).toString()
         photoUri = d?.getString(ContactUri).toString()
+        activityType = d?.getString(PrefUtils.ActivityType).toString()
         txt_name = findViewById(R.id.txt_name)
         img_profile = findViewById(R.id.img_profile)
         card_call = findViewById(R.id.card_call)
@@ -120,33 +122,38 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        val data = db.getFavouriteContactsByNumber(number)
-        if (data?.isFavourites == true) {
-            img_Favourite.isVisible = false
-            img_Favouritefilled.isVisible = true
-            Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            img_Favourite.isVisible = true
-            img_Favouritefilled.isVisible = false
-            Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
-                .show()
-        }
-        img_Favourite.setOnClickListener {
-            it.isVisible = false
-            img_Favouritefilled.isVisible = true
-            Toast.makeText(this, "Added $number as a your favorites", Toast.LENGTH_SHORT).show()
-            db.updateContacts(
-                true, data.id
-            )
-        }
-        img_Favouritefilled.setOnClickListener {
-            it.isVisible = false
-            img_Favourite.isVisible = true
-            Toast.makeText(this, "Removed $number from your favorites list", Toast.LENGTH_SHORT)
-                .show()
-            db.updateContacts(false, data.id)
-        }
+        if (activityType == PrefUtils.ContactFragment)
+        {
+            
+            val data = db.getFavouriteContactsByNumber(number)
+            if (data?.isFavourites == true) {
+                img_Favourite.isVisible = false
+                img_Favouritefilled.isVisible = true
+                Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                img_Favourite.isVisible = true
+                img_Favouritefilled.isVisible = false
+                Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
+                    .show()
+            }
+            img_Favourite.setOnClickListener {
+                it.isVisible = false
+                img_Favouritefilled.isVisible = true
+                Toast.makeText(this, "Added $number as a your favorites", Toast.LENGTH_SHORT).show()
+                db.updateContacts(
+                    true, data.id
+                )
+            }
+            img_Favouritefilled.setOnClickListener {
+                it.isVisible = false
+                img_Favourite.isVisible = true
+                Toast.makeText(this, "Removed $number from your favorites list", Toast.LENGTH_SHORT)
+                    .show()
+                db.updateContacts(false, data.id)
+            }
+        } 
+
     }
 
     private fun openWhatsAppByNumber(toNumber: String) {

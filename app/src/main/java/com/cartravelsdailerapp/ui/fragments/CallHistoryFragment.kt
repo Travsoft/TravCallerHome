@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.PrefUtils
+import com.cartravelsdailerapp.PrefUtils.ActivityType
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
@@ -127,7 +128,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.cardHistory.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = true
             binding.recyListContacts.isVisible = false
-            binding.recyListFavouritesContacts.isVisible=false
+            binding.recyListFavouritesContacts.isVisible = false
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.orange))
             binding.txtContacts.setTextColor(resources.getColor(R.color.black))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
@@ -137,7 +138,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.cardContacts.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = false
             binding.recyListContacts.isVisible = true
-            binding.recyListFavouritesContacts.isVisible=true
+            binding.recyListFavouritesContacts.isVisible = true
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.black))
             binding.txtContacts.setTextColor(resources.getColor(R.color.orange))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
@@ -207,27 +208,27 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyclerViewCallHistory.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun isLastPage(): Boolean {
-                return isLastPage;
+                return isLastPage
             }
 
             override fun isLoading(): Boolean {
-                return isLoading;
+                return isLoading
             }
 
             override fun loadMoreItems() {
-                isLoading = true;
-                currentPage += 10;
-                loadNextPage();
+                isLoading = true
+                currentPage += 10
+                loadNextPage()
             }
 
-        });
+        })
         viewModel.newCallLogs.observe(this@CallHistoryFragment)
         {
             val date = listOf(it)
             listOfCallHistroy.add(0, date.get(0))
             adapter.notifyDataSetChanged()
         }
-        loadFirstPage();
+        loadFirstPage()
 
 
     }
@@ -235,7 +236,8 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     private fun setUpContactsRv() {
         contactsAdapter = ContactsAdapter(requireContext(), this@CallHistoryFragment)
         val listOfFavouritesContacts =
-            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAllFavouriteContacts(true)
+            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                .getAllFavouriteContacts(true)
         favcontactsAdapter = FavouritesContactAdapter()
         favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
         linearLayoutManager =
@@ -250,26 +252,22 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyListContacts.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun isLastPage(): Boolean {
-                return isContactLastPage;
+                return isContactLastPage
             }
 
             override fun isLoading(): Boolean {
-                return isContactLoading;
+                return isContactLoading
             }
 
             override fun loadMoreItems() {
-                isContactLoading = true;
-                currentContactPage += 10;
+                isContactLoading = true
+                currentContactPage += 10
                 loadNextContactPage()
             }
 
         })
         loadContactsFirstPage()
-        if (listOfFavouritesContacts.isEmpty() == true) {
-            binding.recyListFavouritesContacts.isVisible = false
-        } else {
-            binding.recyListFavouritesContacts.isVisible = true
-        }
+        binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
     }
 
     private fun loadFirstPage() {
@@ -289,7 +287,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     private fun loadNextContactPage() {
-        contactsAdapter.removeLoadingFooter();
+        contactsAdapter.removeLoadingFooter()
         isContactLoading = false
         val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
             .getAllContacts(currentContactPage)
@@ -304,7 +302,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     private fun loadNextPage() {
-        adapter.removeLoadingFooter();
+        adapter.removeLoadingFooter()
         isLoading = false
         val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(currentPage)
         adapter.addAll(d)
@@ -336,7 +334,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         get() = job + Dispatchers.Main
 
     override fun callOnClick(number: String, subscriberId: String) {
-        val uri = Uri.parse("tel:" + number)
+        val uri = Uri.parse("tel:$number")
         val telecomManager = context?.getSystemService<TelecomManager>()
         val callCapablePhoneAccounts = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             telecomManager?.callCapablePhoneAccounts
@@ -366,7 +364,12 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         }
     }
 
-    override fun navigateToProfilePage(name: String, number: String, photoUri: String) {
+    override fun navigateToProfilePage(
+        name: String,
+        number: String,
+        photoUri: String,
+        activityType: String
+    ) {
         val data = Bundle()
         if (name.isBlank()) {
             data.putString(CarTravelsDialer.ContactName, number)
@@ -375,6 +378,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         }
         data.putString(CarTravelsDialer.ContactNumber, number)
         data.putString(CarTravelsDialer.ContactUri, photoUri)
+        data.putString(ActivityType, activityType)
         val intent = Intent(context, ProfileActivity::class.java)
         intent.putExtras(data)
         context?.startActivity(intent)
@@ -449,7 +453,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun openDefaultSmsAppByNumber(toNumber: String) {
         val intent =
-            Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + toNumber))
+            Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:$toNumber"))
         intent.addCategory(Intent.CATEGORY_DEFAULT)
         context?.startActivity(intent)
     }

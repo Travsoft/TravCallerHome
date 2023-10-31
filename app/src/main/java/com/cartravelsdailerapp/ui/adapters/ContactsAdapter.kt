@@ -11,6 +11,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.databinding.LayoutItemContactsBinding
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
@@ -53,7 +54,8 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                 onclick.navigateToProfilePage(
                     this.name,
                     this.number,
-                    this.photoUri
+                    this.photoUri,
+                    PrefUtils.ContactFragment
                 )
             }
 

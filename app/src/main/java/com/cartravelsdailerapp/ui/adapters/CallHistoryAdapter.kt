@@ -21,6 +21,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.models.CallHistory
 import java.io.FileNotFoundException
@@ -139,7 +140,8 @@ class CallHistoryAdapter(
             onclick.navigateToProfilePage(
                 selectedData.name!!,
                 selectedData.number,
-                selectedData.photouri
+                selectedData.photouri,
+                PrefUtils.CallHistoryFragment
             )
         }
         holder.card_whatsapp.setOnClickListener {

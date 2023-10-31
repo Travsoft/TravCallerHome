@@ -23,6 +23,9 @@ object PrefUtils {
     const val PackageName = "com.cartravelsdailerapp"
     const val KeyEmail = "email"
     const val KeyPhoneNumber = "number"
+    const val ActivityType = "activity_type"
+    const val CallHistoryFragment = "CallHistoryFragment"
+    const val ContactFragment = "ContactFragment"
     fun getBoolean(contect1: Context?, string1: String?, bool1: Boolean): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(contect1).getBoolean(string1, bool1)
     }
