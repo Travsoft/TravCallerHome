@@ -124,9 +124,8 @@ class ProfileActivity : AppCompatActivity() {
 
         if (activityType == PrefUtils.ContactFragment)
         {
-            
             val data = db.getFavouriteContactsByNumber(number)
-            if (data?.isFavourites == true) {
+            if (data.isFavourites) {
                 img_Favourite.isVisible = false
                 img_Favouritefilled.isVisible = true
                 Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
@@ -245,5 +244,10 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 }
