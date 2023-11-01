@@ -79,11 +79,9 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
     fun removeLoadingContactFooter() {
         isLoadingAdded = false
         val position: Int = listOfConttacts.size - 1
-        val result: Contact = listOfConttacts[position]
-        if (result != null) {
-            listOfConttacts.removeAt(position)
-            notifyItemRemoved(position)
-        }
+        listOfConttacts.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemCount)
     }
 
     private fun loadContactPhotoThumbnail(photoData: String): Bitmap? {

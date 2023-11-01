@@ -75,12 +75,14 @@ class ProfileActivity : AppCompatActivity() {
         img_Favouritefilled = findViewById(R.id.img_Favourite_filled)
         txt_name.text = name
         val imageUri = getPhotoFromContacts(number)
-        if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
-            loadContactPhotoThumbnail(imageUri).also {
-                img_profile.setImageBitmap(it)
+        if (!imageUri.isNullOrBlank()) {
+            if (!TextUtils.isEmpty(imageUri)) {
+                loadContactPhotoThumbnail(imageUri).also {
+                    img_profile.setImageBitmap(it)
+                }
+            } else {
+                img_profile.setImageToDefault()
             }
-        } else {
-            img_profile.setImageToDefault()
         }
 
         card_call.setOnClickListener {
@@ -128,13 +130,9 @@ class ProfileActivity : AppCompatActivity() {
             if (data.isFavourites) {
                 img_Favourite.isVisible = false
                 img_Favouritefilled.isVisible = true
-                Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
-                    .show()
             } else {
                 img_Favourite.isVisible = true
                 img_Favouritefilled.isVisible = false
-                Toast.makeText(this, data.number + "--->" + data.isFavourites, Toast.LENGTH_SHORT)
-                    .show()
             }
             img_Favourite.setOnClickListener {
                 it.isVisible = false

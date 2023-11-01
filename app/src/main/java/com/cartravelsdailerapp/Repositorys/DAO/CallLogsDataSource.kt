@@ -33,7 +33,6 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
     /*CallLog.Calls.DATE + " DESC"*/
     fun fetchCallLogsList(): List<CallHistory> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Log.d("SDK_INT-- 27", Build.VERSION.SDK_INT.toString())
             try {
                 cursor = contentResolver.query(
                     CallLog.Calls.CONTENT_URI,
@@ -70,7 +69,6 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                 null,
                 null, null
             )!!
-            Log.d("SDK_INT-- 59", Build.VERSION.SDK_INT.toString())
 
         }
         while (cursor.moveToNext()) {
@@ -82,7 +80,6 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
             cursor.getColumnIndex(CallLog.Calls.NUMBER)
                 ?.let { cursor.getString(it) }?.let {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Log.d("SDK_INT-- 71", Build.VERSION.SDK_INT.toString())
                         val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
                         CallHistory(
                             number = it,
@@ -113,7 +110,6 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                         )
 
                     } else {
-                        Log.d("SDK_INT-- 102", Build.VERSION.SDK_INT.toString())
                         CallHistory(
                             number = it,
                             name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME))
@@ -268,7 +264,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
         val contentResolver = context.contentResolver
         val nameCursor: Cursor? = contentResolver.query(
             ContactsContract.Contacts.CONTENT_URI,
-            null, null, null, "DISPLAY_NAME ASC"
+            null, null, null, null
         )
         if (nameCursor!!.moveToFirst()) {
             do {

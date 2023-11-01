@@ -161,6 +161,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.white))
             loadData()
+            binding.recyListFavouritesContacts.isVisible=false
         }
         binding.cardContacts.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = false
@@ -171,9 +172,9 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.orange))
             loadContactsData()
+            initFavouritesContact()
         }
         binding.cardHistory.performClick()
-
         return binding.root
     }
 
@@ -265,20 +266,12 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun setUpContactsRv() {
         contactsAdapter = ContactsAdapter(requireContext(), this@CallHistoryFragment)
-        val listOfFavouritesContacts =
-            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-                .getAllFavouriteContacts(true)
-        favcontactsAdapter = FavouritesContactAdapter()
-        favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
+
         linearLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyListContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListContacts.layoutManager = linearLayoutManager
         binding.recyListContacts.adapter = contactsAdapter
-        binding.recyListFavouritesContacts.itemAnimator = DefaultItemAnimator()
-        binding.recyListFavouritesContacts.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.recyListFavouritesContacts.adapter = favcontactsAdapter
         binding.recyListContacts.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun isLastPage(): Boolean {
@@ -299,8 +292,22 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
         })
         loadContactsFirstPage()
-        binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
     }
+   fun initFavouritesContact(){
+
+       val listOfFavouritesContacts =
+           DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+               .getAllFavouriteContacts(true)
+       binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
+
+       favcontactsAdapter = FavouritesContactAdapter()
+       favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
+       binding.recyListFavouritesContacts.layoutManager =
+           LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+       binding.recyListFavouritesContacts.itemAnimator = DefaultItemAnimator()
+       binding.recyListFavouritesContacts.adapter = favcontactsAdapter
+
+   }
 
     private fun loadFirstPage() {
         viewModel.callLogsdb.observe(this) {
@@ -411,9 +418,11 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         data.putString(CarTravelsDialer.ContactNumber, number)
         data.putString(CarTravelsDialer.ContactUri, photoUri)
         data.putString(ActivityType, activityType)
-        val intent = Intent(context, ProfileActivity::class.java)
-        intent.putExtras(data)
-        context?.startActivity(intent)
+        if (!number.isNullOrBlank()) {
+            val intent = Intent(context, ProfileActivity::class.java)
+            intent.putExtras(data)
+            context?.startActivity(intent)
+        }
     }
 
     override fun openWhatsApp(number: String) {

@@ -9,7 +9,7 @@ interface CallHistoryDao {
     @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC LIMIT 10 OFFSET :offset")
     fun getAll(offset: Int): List<CallHistory>
 
-    @Query("SELECT * FROM Contact group by number ORDER BY id DESC LIMIT 10 OFFSET :offset")
+    @Query("SELECT * FROM Contact group by name ORDER BY id DESC LIMIT 10 OFFSET :offset")
     fun getAllContacts(offset: Int): List<Contact>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
