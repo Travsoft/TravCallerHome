@@ -49,7 +49,6 @@ import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-
 class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     var listOfCallHistroy = ArrayList<CallHistory>()
     var listOfContact = ArrayList<Contact>()
@@ -73,16 +72,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var contactsAdapter: ContactsAdapter
     lateinit var favcontactsAdapter: FavouritesContactAdapter
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
-        println("onResult -> $phone, $name, $photoUri ")
-        Toast.makeText(context, phone, Toast.LENGTH_SHORT).show()
-        //  val dataTv = findViewById<TextView>(R.id.data_tv)
-        //val imageView = findViewById<ImageView>(R.id.imageView_screenshot)
-        val uriString = photoUri.toString().ifBlank { "No photo" }
-        val formattedName = name?.ifBlank { phone } ?: phone
-        //dataTv.text = "phone number: $phone\ncallerName: $formattedName\nimageUri: ${if(uriString == "null") "No photo" else uriString}"
-        // requestMediaProjection()
-
-        launch {
+            launch {
             viewModel.getNewCallLogsHistory()
         }
     }
@@ -172,6 +162,12 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.callLogsdb.observe(requireActivity()){
+            loadData()
+        }
+    }
     fun hideSoftKeyboard(view: View, context: Context) {
         val imm =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as
@@ -311,11 +307,10 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
    }
 
     private fun loadFirstPage() {
-        viewModel.callLogsdb.observe(this) {
-            adapter.addAll(it)
-            if (currentPage <= TOTAL_PAGES) adapter.addLoadingFooter() else isLastPage =
-                true
-        }
+        val firstLogsData=DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(0)
+        adapter.addAll(firstLogsData)
+        if (currentPage <= TOTAL_PAGES) adapter.addLoadingFooter() else isLastPage =
+            true
     }
 
     private fun loadContactsFirstPage() {

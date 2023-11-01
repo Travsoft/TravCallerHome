@@ -20,6 +20,9 @@ class MainActivityViewModel(
     var context: Application,
     private val callLogsRepository: CallLogsRepository
 ) : AndroidViewModel(context) {
+    private val _isCallLogsdb = MutableLiveData<Boolean>()
+    val IsCallLogsdb: LiveData<Boolean>
+        get() = _isCallLogsdb
     private val _callLogsdb = MutableLiveData<List<CallHistory>>()
     val callLogsdb: LiveData<List<CallHistory>>
         get() = _callLogsdb
@@ -38,9 +41,10 @@ class MainActivityViewModel(
     suspend fun getCallLogsHistory() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs()
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
                 db.insertAll(_callLogs.value!!)
                 Log.d("insert data-->", _callLogs.value!!.count().toString())
+                _isCallLogsdb.value=true
             }
         }
     }

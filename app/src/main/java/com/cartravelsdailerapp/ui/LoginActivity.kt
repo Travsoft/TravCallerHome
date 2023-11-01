@@ -135,10 +135,11 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             launch(Dispatchers.IO) {
                                 freezePleaseIAmDoingHeavyWork()
                             }
-                            launch {
+                            launch(Dispatchers.IO) {
                                 fetchContacts()
                             }
                             vm.contacts.observe(this@LoginActivity) {
+                                Thread.sleep(5000)
                                 mProgressDialog.dismiss()
                                 Log.d("Login activity", "call history completed")
                             }
@@ -162,7 +163,8 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                     Manifest.permission.WRITE_CALL_LOG,
                     Manifest.permission.READ_PHONE_STATE,
                     Manifest.permission.CALL_PHONE,
-                    Manifest.permission.GET_ACCOUNTS
+                    Manifest.permission.GET_ACCOUNTS,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ),
                 object : RunTimePermission.PermissionCallback {
                     override fun onGranted() {
@@ -199,9 +201,11 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             launch(Dispatchers.IO) {
                                 fetchContacts()
                             }
-                            vm.contacts.observe(this@LoginActivity) {
-                                mProgressDialog.dismiss()
-                                Log.d("Login activity", "call history completed")
+                            vm.IsCallLogsdb.observe(this@LoginActivity){
+                                if (it) {
+                                    mProgressDialog.dismiss()
+                                    Log.d("Login activity", "call history completed")
+                                }
                             }
 
                         }

@@ -3,7 +3,6 @@ package com.cartravelsdailerapp.Repositorys.DAO
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -15,13 +14,7 @@ import android.provider.ContactsContract
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.util.Log
-import android.widget.Toast
-import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
