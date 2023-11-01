@@ -1,15 +1,13 @@
 package com.cartravelsdailerapp.ui.fragments
 
 import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telephony.TelephonyManager
@@ -25,18 +23,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.RECEIVER_EXPORTED
 import androidx.core.content.ContextCompat.registerReceiver
 import androidx.core.content.getSystemService
-import androidx.core.text.isDigitsOnly
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.ActivityType
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
 import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
@@ -52,7 +47,6 @@ import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.*
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 
@@ -218,10 +212,45 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     private fun loadContactsData() {
-        setUpContactsRv()
+        contactsAdapter = ContactsAdapter(requireContext(), this@CallHistoryFragment)
+        linearLayoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.recyListContacts.itemAnimator = DefaultItemAnimator()
+        binding.recyListContacts.layoutManager = linearLayoutManager
+        binding.recyListContacts.adapter = contactsAdapter
+        binding.recyListContacts.addOnScrollListener(object :
+            PaginationScrollListener(linearLayoutManager) {
+            override fun isLastPage(): Boolean {
+                return isContactLastPage
+            }
+
+            override fun isLoading(): Boolean {
+                return isContactLoading
+            }
+
+            override fun loadMoreItems() {
+                isContactLoading = true
+                currentContactPage += 10
+                Handler().post {
+                    contactsAdapter.removeLoadingContactFooter()
+                    isContactLoading = false
+                    val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                        .getAllContacts(currentContactPage)
+                    contactsAdapter.addAll(d)
+                    listOfContact.addAll(d)
+                    if (currentContactPage != TOTAL_CONTACT_PAGES) {
+                        contactsAdapter.addLoadingFooter()
+                    } else {
+                        isContactLoading = true
+                    }
+                }
+            }
+
+        })
         listOfContact.clear()
         var d = viewModel.getAllContacts(0)
         contactsAdapter.addAll(d)
+        contactsAdapter.notifyDataSetChanged()
     }
 
     private fun setupRV() {
@@ -264,35 +293,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     }
 
-    private fun setUpContactsRv() {
-        contactsAdapter = ContactsAdapter(requireContext(), this@CallHistoryFragment)
 
-        linearLayoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.recyListContacts.itemAnimator = DefaultItemAnimator()
-        binding.recyListContacts.layoutManager = linearLayoutManager
-        binding.recyListContacts.adapter = contactsAdapter
-        binding.recyListContacts.addOnScrollListener(object :
-            PaginationScrollListener(linearLayoutManager) {
-            override fun isLastPage(): Boolean {
-                return isContactLastPage
-            }
-
-            override fun isLoading(): Boolean {
-                return isContactLoading
-            }
-
-            override fun loadMoreItems() {
-                isContactLoading = true
-                currentContactPage += 10
-                Handler().post {
-                    loadNextContactPage()
-                }
-            }
-
-        })
-        loadContactsFirstPage()
-    }
    fun initFavouritesContact(){
 
        val listOfFavouritesContacts =
@@ -325,20 +326,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         }
     }
 
-    private fun loadNextContactPage() {
-        contactsAdapter.removeLoadingContactFooter()
-        isContactLoading = false
-        val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-            .getAllContacts(currentContactPage)
-        contactsAdapter.addAll(d)
-        listOfContact.addAll(d)
-        if (currentContactPage != TOTAL_CONTACT_PAGES) {
-            contactsAdapter.addLoadingFooter()
-        } else {
-            isContactLoading = true
-        }
 
-    }
 
     private fun loadNextPage() {
         adapter.removeLoadingFooter()
@@ -525,5 +513,4 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
     }
-
 }

@@ -65,6 +65,7 @@ class MainActivityViewModel(
             _contact.value = callLogsRepository.fetchContacts()
             withContext(Dispatchers.IO) {
                 db.insertAllContacts(_contact.value!!)
+
             }
 
         }

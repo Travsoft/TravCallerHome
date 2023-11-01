@@ -35,7 +35,8 @@
                 android:textSize="20sp"
                 app:iconifiedByDefault="false"
                 app:queryHint="@string/app_name"
-                app:searchHintIcon="@null" />
+                app:searchHintIcon="@null"
+                />
 
             <ImageView
                 android:layout_width="50dp"
@@ -181,17 +182,18 @@
                     tools:listitem="@layout/item_callhistory" />
 
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:padding="5dp"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recy_list_favourites_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="150dp"
+                        android:padding="10dp"
                         android:visibility="gone"
-                        tools:listitem="@layout/item_favourites_contacts"
-                        android:padding="10dp" />
+                        tools:listitem="@layout/item_favourites_contacts" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recy_list_contacts"

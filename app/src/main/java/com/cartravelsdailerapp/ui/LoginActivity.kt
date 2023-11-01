@@ -135,12 +135,13 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             launch(Dispatchers.IO) {
                                 freezePleaseIAmDoingHeavyWork()
                             }
-                            vm.callLogs.observe(this@LoginActivity) {
-                                Thread.sleep(3000)
+                            launch {
+                                fetchContacts()
+                            }
+                            vm.contacts.observe(this@LoginActivity) {
                                 mProgressDialog.dismiss()
                                 Log.d("Login activity", "call history completed")
                             }
-
                         }
 
                     }
@@ -195,8 +196,10 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             launch(Dispatchers.IO) {
                                 freezePleaseIAmDoingHeavyWork()
                             }
-                            vm.callLogs.observe(this@LoginActivity) {
-                                Thread.sleep(3000)
+                            launch(Dispatchers.IO) {
+                                fetchContacts()
+                            }
+                            vm.contacts.observe(this@LoginActivity) {
                                 mProgressDialog.dismiss()
                                 Log.d("Login activity", "call history completed")
                             }
@@ -256,6 +259,13 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             async {
                 //pretend this is a big network call
                 vm.getCallLogsHistory()
+            }
+        }
+    }
+
+    suspend fun fetchContacts() {
+        withContext(Dispatchers.Default) {
+            async {
                 vm.getAllContacts()
             }
         }
