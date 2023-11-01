@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telephony.TelephonyManager
@@ -244,7 +245,10 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             override fun loadMoreItems() {
                 isLoading = true
                 currentPage += 10
-                loadNextPage()
+                Handler().post {
+                    loadNextPage()
+                }
+
             }
 
         })
@@ -288,7 +292,9 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             override fun loadMoreItems() {
                 isContactLoading = true
                 currentContactPage += 10
-                loadNextContactPage()
+                Handler().post {
+                    loadNextContactPage()
+                }
             }
 
         })

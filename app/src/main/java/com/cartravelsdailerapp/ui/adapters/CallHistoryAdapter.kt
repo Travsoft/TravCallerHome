@@ -263,11 +263,9 @@ class CallHistoryAdapter(
     fun removeLoadingFooter() {
         isLoadingAdded = false
         val position: Int = listCallHistory.size - 1
-        val result: CallHistory = listCallHistory[position]
-        if (result != null) {
-            listCallHistory.removeAt(position)
-            notifyItemRemoved(position)
-        }
+        listCallHistory.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemCount)
     }
     fun add(callHistory: CallHistory) {
         listCallHistory.add(callHistory)
