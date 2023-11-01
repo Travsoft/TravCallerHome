@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat.RECEIVER_EXPORTED
+import androidx.core.content.ContextCompat.registerReceiver
 import androidx.core.content.getSystemService
 import androidx.core.text.isDigitsOnly
 import androidx.core.view.isVisible
@@ -33,6 +36,7 @@ import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.ActivityType
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
+import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
@@ -73,11 +77,33 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     private var currentContactPage = PAGE_ContactSTART
     lateinit var contactsAdapter: ContactsAdapter
     lateinit var favcontactsAdapter: FavouritesContactAdapter
+    private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
+        println("onResult -> $phone, $name, $photoUri ")
+        Toast.makeText(context, phone, Toast.LENGTH_SHORT).show()
+        //  val dataTv = findViewById<TextView>(R.id.data_tv)
+        //val imageView = findViewById<ImageView>(R.id.imageView_screenshot)
+        val uriString = photoUri.toString().ifBlank { "No photo" }
+        val formattedName = name?.ifBlank { phone } ?: phone
+        //dataTv.text = "phone number: $phone\ncallerName: $formattedName\nimageUri: ${if(uriString == "null") "No photo" else uriString}"
+        // requestMediaProjection()
+
+        launch {
+            viewModel.getNewCallLogsHistory()
+        }
+    }
+
+    private val receiver1 = CustomPhoneStateReceiver(onResult)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         job = Job()
-        registerBroadCastReceiver()
+     //   registerBroadCastReceiver()
+        registerReceiver(
+            requireContext(),
+            receiver1,
+            IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED),
+            RECEIVER_EXPORTED
+        )
     }
 
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -484,4 +510,5 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
     }
+
 }

@@ -18,6 +18,8 @@ class CallEndReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         c = context
         try {
+            var ringing = intent?.getStringExtra(TelephonyManager.CALL_STATE_RINGING.toString())
+            Toast.makeText(context, ringing, Toast.LENGTH_SHORT).show()
             val tmgr = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             val PhoneListener = intent?.let { MyPhoneStateListener(c!!, it) }
             tmgr.listen(PhoneListener, PhoneStateListener.LISTEN_CALL_STATE)
@@ -26,7 +28,7 @@ class CallEndReceiver : BroadcastReceiver() {
         }
     }
 
-    class MyPhoneStateListener(var context: Context,var i: Intent) : PhoneStateListener() {
+    class MyPhoneStateListener(var context: Context, var i: Intent) : PhoneStateListener() {
 
         override fun onCallStateChanged(state: Int, incomingNumber: String) {
             if (state == 0) {
