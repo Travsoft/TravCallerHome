@@ -47,7 +47,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
-
     }
 
     override fun onResume() {
@@ -163,8 +162,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                     Manifest.permission.WRITE_CALL_LOG,
                     Manifest.permission.READ_PHONE_STATE,
                     Manifest.permission.CALL_PHONE,
-                    Manifest.permission.GET_ACCOUNTS,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    Manifest.permission.GET_ACCOUNTS
                 ),
                 object : RunTimePermission.PermissionCallback {
                     override fun onGranted() {
@@ -201,7 +199,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             launch(Dispatchers.IO) {
                                 fetchContacts()
                             }
-                            vm.IsCallLogsdb.observe(this@LoginActivity){
+                            vm.IsCallLogsdb.observe(this@LoginActivity) {
                                 if (it) {
                                     mProgressDialog.dismiss()
                                     Log.d("Login activity", "call history completed")

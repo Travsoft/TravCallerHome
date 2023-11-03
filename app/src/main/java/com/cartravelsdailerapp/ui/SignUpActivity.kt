@@ -26,7 +26,7 @@ class SignUpActivity : AppCompatActivity() {
         binding.btSignup.setOnClickListener {
             val intent = Intent(
                 this,
-                MainActivity::class.java
+                Login2Activity::class.java
             ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
