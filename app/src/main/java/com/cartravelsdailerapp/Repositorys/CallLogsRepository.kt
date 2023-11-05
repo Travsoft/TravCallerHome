@@ -17,12 +17,12 @@ class CallLogsRepository(
 
     }
 
-    suspend fun fetchContacts(): List<Contact> {
+    /*suspend fun fetchContacts(): List<Contact> {
         return withContext(myDispatcher) {
             source.readContacts()
         }
 
-    }
+    }*/
 
     suspend fun fetchCallLogSignle(): CallHistory {
         return withContext(myDispatcher) { source.fetchCallLogSingle() }

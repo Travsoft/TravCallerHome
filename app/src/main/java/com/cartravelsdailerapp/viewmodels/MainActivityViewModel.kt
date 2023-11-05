@@ -1,11 +1,10 @@
 package com.cartravelsdailerapp.viewmodels
 
 import android.app.Application
-import android.icu.text.SimpleDateFormat
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.*
-import com.cartravelsdailerapp.PrefUtils
+import com.alexstyl.contactstore.ContactStore
+import com.alexstyl.contactstore.thumbnailUri
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
@@ -14,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 
 class MainActivityViewModel(
     var context: Application,
@@ -34,27 +32,18 @@ class MainActivityViewModel(
     val newCallLogs: LiveData<CallHistory>
         get() = _newCallLogs
 
-    private val _contact = MutableLiveData<List<Contact>>()
-    val contacts: LiveData<List<Contact>> get() = _contact
-
     var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
+    lateinit var listOfContactStore: ContactStore
+
     suspend fun getCallLogsHistory() {
         viewModelScope.launch {
             _callLogs.value = callLogsRepository.fetchCallLogs()
             withContext(Dispatchers.Main) {
                 db.insertAll(_callLogs.value!!)
                 Log.d("insert data-->", _callLogs.value!!.count().toString())
-                _isCallLogsdb.value=true
+                _isCallLogsdb.value = true
             }
         }
-    }
-
-    fun getAllCallLogsHistory(offset: Int): List<CallHistory> {
-        return DatabaseBuilder.getInstance(context).CallHistoryDao().getAll(offset)
-    }
-
-    fun getAllContacts(offset: Int): List<Contact> {
-        return DatabaseBuilder.getInstance(context).CallHistoryDao().getAllContacts(offset)
     }
 
     suspend fun getNewCallLogsHistory() {
@@ -63,17 +52,5 @@ class MainActivityViewModel(
             _newCallLogs.value?.let { db.insertCallHistory(it) }
         }
     }
-
-    suspend fun getAllContacts() {
-        viewModelScope.launch {
-            _contact.value = callLogsRepository.fetchContacts()
-            withContext(Dispatchers.IO) {
-                db.insertAllContacts(_contact.value!!)
-
-            }
-
-        }
-    }
-
 }
 

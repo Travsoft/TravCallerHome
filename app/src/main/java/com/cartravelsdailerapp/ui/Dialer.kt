@@ -490,6 +490,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
         get() = job + Dispatchers.Main
 
     suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
+/*
         val list = withContext(Dispatchers.Default) {
             //pretend this is a big network call
             CallLogsDataSource(
@@ -497,6 +498,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                 this@Dialer
             ).readContacts()
         }
+*/
       //  contactsAdapter = ContactsAdapter(this)
         val layoutInflater = LinearLayoutManager(this)
         recy_list_contacts.layoutManager = layoutInflater

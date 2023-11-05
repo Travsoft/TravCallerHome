@@ -6,7 +6,6 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SubscriptionManager
@@ -15,10 +14,15 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.alexstyl.contactstore.ContactStore
+import com.alexstyl.contactstore.thumbnailUri
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLoginBinding
+import com.cartravelsdailerapp.db.AppDatabase
+import com.cartravelsdailerapp.db.DatabaseBuilder
+import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.utils.RunTimePermission
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -33,7 +37,9 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     var email: String? = null
     var mobileNo: String? = null
     private lateinit var job: Job
+    lateinit var listOfContactStore: ContactStore
     var runtimePermission: RunTimePermission = RunTimePermission(this)
+    lateinit var db: AppDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -47,6 +53,9 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
+        listOfContactStore = ContactStore.newInstance(this)
+        db = DatabaseBuilder.getInstance(this)
+
     }
 
     override fun onResume() {
@@ -134,10 +143,8 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             launch(Dispatchers.IO) {
                                 freezePleaseIAmDoingHeavyWork()
                             }
-                            launch(Dispatchers.IO) {
-                                fetchContacts()
-                            }
-                            vm.contacts.observe(this@LoginActivity) {
+
+                            vm.callLogsdb.observe(this@LoginActivity) {
                                 Thread.sleep(5000)
                                 mProgressDialog.dismiss()
                                 Log.d("Login activity", "call history completed")
@@ -195,9 +202,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
                             launch(Dispatchers.IO) {
                                 freezePleaseIAmDoingHeavyWork()
-                            }
-                            launch(Dispatchers.IO) {
-                                fetchContacts()
                             }
                             vm.IsCallLogsdb.observe(this@LoginActivity) {
                                 if (it) {
@@ -261,14 +265,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             async {
                 //pretend this is a big network call
                 vm.getCallLogsHistory()
-            }
-        }
-    }
-
-    suspend fun fetchContacts() {
-        withContext(Dispatchers.Default) {
-            async {
-                vm.getAllContacts()
             }
         }
     }

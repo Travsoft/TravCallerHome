@@ -60,6 +60,7 @@ dependencies {
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'androidx.work:work-runtime-ktx:2.8.1'
+    implementation 'com.alexstyl:contactstore:1.7.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

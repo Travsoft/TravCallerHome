@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telephony.TelephonyManager
@@ -29,6 +28,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.alexstyl.contactstore.ContactStore
+import com.alexstyl.contactstore.thumbnailUri
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.ActivityType
 import com.cartravelsdailerapp.R
@@ -45,6 +46,7 @@ import com.cartravelsdailerapp.ui.adapters.*
 import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -60,19 +62,14 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     private lateinit var job: Job
     private val PAGE_START = 1
-    private val PAGE_ContactSTART = 1
     private var isLoading = false
-    private var isContactLoading = false
     private var isLastPage = false
-    private var isContactLastPage = false
     private val TOTAL_PAGES = 5
-    private val TOTAL_CONTACT_PAGES = 5
     private var currentPage = PAGE_START
-    private var currentContactPage = PAGE_ContactSTART
     lateinit var contactsAdapter: ContactsAdapter
     lateinit var favcontactsAdapter: FavouritesContactAdapter
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
-            launch {
+        launch {
             viewModel.getNewCallLogsHistory()
         }
     }
@@ -82,7 +79,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         job = Job()
-     //   registerBroadCastReceiver()
+        //   registerBroadCastReceiver()
         registerReceiver(
             requireContext(),
             receiver1,
@@ -145,29 +142,53 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.white))
             loadData()
-            binding.recyListFavouritesContacts.isVisible=false
+            binding.recyListFavouritesContacts.isVisible = false
         }
         binding.cardContacts.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = false
             binding.recyListContacts.isVisible = true
-            binding.recyListFavouritesContacts.isVisible = true
+            binding.recyListFavouritesContacts.isVisible = false
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.black))
             binding.txtContacts.setTextColor(resources.getColor(R.color.orange))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.orange))
-            loadContactsData()
-            initFavouritesContact()
+
+            contactsAdapter = ContactsAdapter(requireContext(), this@CallHistoryFragment)
+            binding.recyListContacts.itemAnimator = DefaultItemAnimator()
+            binding.recyListContacts.layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+
+            binding.recyListContacts.adapter = contactsAdapter
+
+            val listOfContactStore = ContactStore.newInstance(requireContext())
+            val list = ArrayList<Contact>()
+
+            listOfContactStore.fetchContacts().collect { it ->
+                it.forEach {
+                    list.add(
+                        Contact(
+                            it.displayName,
+                            "",
+                            it.thumbnailUri.toString(),
+                            isFavourites = false
+                        )
+                    )
+                }
+                launch(Dispatchers.Main) {
+                    contactsAdapter.addAll(list.filterNotNull().sortedBy { i -> i.name }
+                        .distinctBy { i -> i.name })
+                    contactsAdapter.notifyDataSetChanged()
+                }
+            }
+
+
         }
+        initFavouritesContact()
+
         binding.cardHistory.performClick()
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.callLogsdb.observe(requireActivity()){
-            loadData()
-        }
-    }
     fun hideSoftKeyboard(view: View, context: Context) {
         val imm =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as
@@ -202,9 +223,8 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     private fun loadData() {
         setupRV()
-        listOfCallHistroy.clear()
-        var d = viewModel.getAllCallLogsHistory(0)
-        adapter.addAll(d)
+        loadFirstPage()
+
     }
 
     private fun loadContactsData() {
@@ -214,6 +234,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyListContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListContacts.layoutManager = linearLayoutManager
         binding.recyListContacts.adapter = contactsAdapter
+/*
         binding.recyListContacts.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun isLastPage(): Boolean {
@@ -227,26 +248,21 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             override fun loadMoreItems() {
                 isContactLoading = true
                 currentContactPage += 10
-                Handler().post {
-                    contactsAdapter.removeLoadingContactFooter()
-                    isContactLoading = false
-                    val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-                        .getAllContacts(currentContactPage)
-                    contactsAdapter.addAll(d)
-                    listOfContact.addAll(d)
-                    if (currentContactPage != TOTAL_CONTACT_PAGES) {
-                        contactsAdapter.addLoadingFooter()
-                    } else {
-                        isContactLoading = true
-                    }
+                contactsAdapter.removeLoadingContactFooter()
+                isContactLoading = false
+                val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                    .getAllContacts()
+                contactsAdapter.addAll(d)
+                listOfContact.addAll(d)
+                if (currentContactPage != TOTAL_CONTACT_PAGES) {
+                    contactsAdapter.addLoadingFooter()
+                } else {
+                    isContactLoading = true
                 }
             }
 
         })
-        listOfContact.clear()
-        var d = viewModel.getAllContacts(0)
-        contactsAdapter.addAll(d)
-        contactsAdapter.notifyDataSetChanged()
+*/
     }
 
     private fun setupRV() {
@@ -269,10 +285,18 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             }
 
             override fun loadMoreItems() {
-                isLoading = true
-                currentPage += 10
                 Handler().post {
-                    loadNextPage()
+                    adapter.removeLoadingFooter()
+                    isLoading = false
+                    val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                        .getAllCallLogs()
+                    adapter.addAll(d)
+
+                    if (currentPage != TOTAL_PAGES) {
+                        adapter.addLoadingFooter()
+                    } else {
+                        isLastPage = true
+                    }
                 }
 
             }
@@ -284,59 +308,37 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             listOfCallHistroy.add(0, date.get(0))
             adapter.notifyDataSetChanged()
         }
-        loadFirstPage()
-
-
     }
 
 
-   fun initFavouritesContact(){
+    fun initFavouritesContact() {
 
-       val listOfFavouritesContacts =
-           DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-               .getAllFavouriteContacts(true)
-       binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
+        val listOfFavouritesContacts =
+            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                .getAllFavouriteContacts(true)
+        binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
 
-       favcontactsAdapter = FavouritesContactAdapter()
-       favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
-       binding.recyListFavouritesContacts.layoutManager =
-           LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-       binding.recyListFavouritesContacts.itemAnimator = DefaultItemAnimator()
-       binding.recyListFavouritesContacts.adapter = favcontactsAdapter
+        favcontactsAdapter = FavouritesContactAdapter()
+        favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
+        binding.recyListFavouritesContacts.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.recyListFavouritesContacts.itemAnimator = DefaultItemAnimator()
+        binding.recyListFavouritesContacts.adapter = favcontactsAdapter
 
-   }
+    }
 
     private fun loadFirstPage() {
-        val firstLogsData=DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(0)
+        val firstLogsData =
+            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAllCallLogs()
         adapter.addAll(firstLogsData)
         if (currentPage <= TOTAL_PAGES) adapter.addLoadingFooter() else isLastPage =
             true
     }
 
     private fun loadContactsFirstPage() {
-        viewModel.contacts.observe(this) {
-            contactsAdapter.addAll(it)
-            if (currentContactPage <= TOTAL_CONTACT_PAGES) contactsAdapter.addLoadingFooter() else isContactLastPage =
-                true
-        }
-    }
-
-
-
-    private fun loadNextPage() {
-        adapter.removeLoadingFooter()
-        isLoading = false
-        val d = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao().getAll(currentPage)
-        adapter.addAll(d)
-        listOfCallHistroy.addAll(d)
-        if (currentPage != TOTAL_PAGES) {
-            adapter.addLoadingFooter()
-        } else {
-            isLastPage = true
-        }
+        loadContactsData()
 
     }
-
 
     private fun registerBroadCastReceiver() {
         context?.let {

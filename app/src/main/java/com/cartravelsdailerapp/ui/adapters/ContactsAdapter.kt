@@ -9,48 +9,51 @@ import android.os.Build
 import android.provider.ContactsContract
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.QuickContactBadge
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.PrefUtils
+import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.LayoutItemContactsBinding
-import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import java.io.FileNotFoundException
 import java.io.IOException
 
 class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
     RecyclerView.Adapter<ContactsAdapter.ContactsViewHolder>() {
-    lateinit var binding: LayoutItemContactsBinding
     var listOfConttacts = ArrayList<Contact>()
-    private var isLoadingAdded = false
 
-    inner class ContactsViewHolder(binding: LayoutItemContactsBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    class ContactsViewHolder(item: View) :
+        RecyclerView.ViewHolder(item) {
+        var txtContactName = itemView.findViewById<TextView>(R.id.txt_Contact_name)
+        var profileImage = itemView.findViewById<QuickContactBadge>(R.id.profile_image)
+
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
-        binding =
-            LayoutItemContactsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ContactsViewHolder(binding)
+        return ContactsViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.layout_item_contacts, parent, false)
+        )
     }
 
     override fun getItemCount(): Int {
         return listOfConttacts.size
     }
 
-    fun addLoadingFooter() {
-        isLoadingAdded = true
-    }
-
     override fun onBindViewHolder(holder: ContactsViewHolder, position: Int) {
+        val listOfContacts = listOfConttacts[position]
+        holder.txtContactName.text = listOfContacts.name
+
         with(listOfConttacts[position]) {
-            binding.txtContactName.text = this.name
-            binding.txtContactNumber.text = this.number
             if (!TextUtils.isEmpty(this.photoUri)) {
-                binding.profileImage.setImageBitmap(loadContactPhotoThumbnail(this.photoUri))
+                holder.profileImage.setImageBitmap(loadContactPhotoThumbnail(this.photoUri))
             } else {
-                binding.profileImage.setImageToDefault()
+                holder.profileImage.setImageToDefault()
             }
-            binding.profileImage.setOnClickListener {
+            holder.profileImage.setOnClickListener {
                 onclick.navigateToProfilePage(
                     this.name,
                     this.number,
@@ -76,13 +79,6 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
         notifyDataSetChanged()
     }
 
-    fun removeLoadingContactFooter() {
-        isLoadingAdded = false
-        val position: Int = listOfConttacts.size - 1
-        listOfConttacts.removeAt(position)
-        notifyItemRemoved(position)
-        notifyItemRangeChanged(position, itemCount)
-    }
 
     private fun loadContactPhotoThumbnail(photoData: String): Bitmap? {
         // Creates an asset file descriptor for the thumbnail file

@@ -17,7 +17,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.models.CallHistory
-import com.cartravelsdailerapp.models.Contact
 import java.io.ByteArrayInputStream
 import java.util.*
 
@@ -258,12 +257,19 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
 
     }
 
+/*
     fun readContacts(): List<Contact> {
+        val data = arrayOf(
+            ContactsContract.CommonDataKinds.Phone.NUMBER,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+            ContactsContract.CommonDataKinds.Phone._ID
+        )
+
         Log.i("readContacts", "Reading Contacts")
         val listOfContact = ArrayList<Contact>()
         val contentResolver = context.contentResolver
         val nameCursor: Cursor? = contentResolver.query(
-            ContactsContract.Contacts.CONTENT_URI,
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             null, null, null, null
         )
         if (nameCursor!!.moveToFirst()) {
@@ -321,6 +327,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
         Log.d("321--->", listOfContact.count().toString())
         return listOfContact
     }
+*/
 
     private fun getSimCardInfosBySubscriptionId(subscriptionId: String): SubscriptionInfo? {
         val subscriptionManager: SubscriptionManager =
