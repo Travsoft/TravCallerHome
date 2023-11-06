@@ -6,17 +6,6 @@ import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.fragments.CallHistoryFragment
 
 
-object CarTravelsDialer {
-    const val ContactName = "contactName"
-    const val ContactProfile = "imageUri"
-    const val ContactNumber = "contactNumber"
-    const val ContactUri = "contactUri"
-    const val WhatsAppPackage = "com.whatsapp"
-    const val TelegramAppPackage = "org.telegram.messenger"
-    const val GOOGLE_PAY_PACKAGE_NAME = "com.google.android.apps.nbu.paisa.user"
-    var GOOGLE_PAY_REQUEST_CODE = 123
-}
-
 fun Context.isPackageInstalled(context: Context, packageName: String): Boolean {
 
     var available = true

@@ -28,6 +28,7 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
     class ContactsViewHolder(item: View) :
         RecyclerView.ViewHolder(item) {
         var txtContactName = itemView.findViewById<TextView>(R.id.txt_Contact_name)
+        var txtContactNumber = itemView.findViewById<TextView>(R.id.txt_Contact_number)
         var profileImage = itemView.findViewById<QuickContactBadge>(R.id.profile_image)
 
     }
@@ -46,24 +47,23 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
     override fun onBindViewHolder(holder: ContactsViewHolder, position: Int) {
         val listOfContacts = listOfConttacts[position]
         holder.txtContactName.text = listOfContacts.name
+        holder.txtContactNumber.text = listOfContacts.number
+        if (!TextUtils.isEmpty(listOfContacts.photoUri)) {
+            holder.profileImage.setImageBitmap(loadContactPhotoThumbnail(listOfContacts.photoUri))
+        } else {
+            holder.profileImage.setImageToDefault()
+        }
+        holder.profileImage.setOnClickListener {
+            onclick.navigateToProfilePage(
+                listOfContacts.name,
+                "",
+                listOfContacts.photoUri,
+                PrefUtils.ContactFragment,
+                listOfContacts.id.toString()
+            )
 
-        with(listOfConttacts[position]) {
-            if (!TextUtils.isEmpty(this.photoUri)) {
-                holder.profileImage.setImageBitmap(loadContactPhotoThumbnail(this.photoUri))
-            } else {
-                holder.profileImage.setImageToDefault()
-            }
-            holder.profileImage.setOnClickListener {
-                onclick.navigateToProfilePage(
-                    this.name,
-                    this.number,
-                    this.photoUri,
-                    PrefUtils.ContactFragment
-                )
-            }
 
         }
-
     }
 
     fun addAll(list: List<Contact>) {
@@ -102,7 +102,10 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                  * Creates a photo URI by appending the content URI of
                  * Contacts.Photo
                  */
-                Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+                Uri.withAppendedPath(
+                    contactUri,
+                    ContactsContract.Contacts.Photo.CONTENT_DIRECTORY
+                )
             }
 
             /*

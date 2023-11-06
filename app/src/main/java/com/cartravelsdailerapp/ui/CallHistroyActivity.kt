@@ -14,9 +14,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.cartravelsdailerapp.PrefUtils.ContactName
+import com.cartravelsdailerapp.PrefUtils.ContactNumber
 import com.cartravelsdailerapp.databinding.ActivityCallHistroyBinding
 import com.cartravelsdailerapp.ui.adapters.CallHistoryByNumberAdapter
-import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.viewmodels.CallHistoryViewmodel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.*
@@ -43,8 +44,8 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
             myViewModelFactory
         )[CallHistoryViewmodel::class.java]
         val d = intent.extras
-        number = d?.getString(CarTravelsDialer.ContactNumber).toString()
-        val name = d?.getString(CarTravelsDialer.ContactName).toString()
+        number = d?.getString(ContactNumber).toString()
+        val name = d?.getString(ContactName).toString()
         val imageUri = getPhotoFromContacts(number)
         binding = ActivityCallHistroyBinding.inflate(layoutInflater)
         setContentView(binding.root)

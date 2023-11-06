@@ -5,6 +5,15 @@ import android.preference.PreferenceManager
 
 
 object PrefUtils {
+    const val ContactName = "contactName"
+    const val ContactProfile = "imageUri"
+    const val ContactNumber = "contactNumber"
+    const val ContactUri = "contactUri"
+    const val WhatsAppPackage = "com.whatsapp"
+    const val TelegramAppPackage = "org.telegram.messenger"
+    const val GOOGLE_PAY_PACKAGE_NAME = "com.google.android.apps.nbu.paisa.user"
+    var GOOGLE_PAY_REQUEST_CODE = 123
+    const val ContactId = "contactid"
     const val CallTravelsSharedPref = "CallTravelsSharedPref"
     const val IsLogin = "IsLogin"
     const val LOCAL_BROADCAST_KEY = "step_counter_local_broadcast"

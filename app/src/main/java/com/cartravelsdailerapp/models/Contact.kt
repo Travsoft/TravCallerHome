@@ -13,6 +13,8 @@ data class Contact(
     @ColumnInfo
     val photoUri: String,
     @ColumnInfo
+    val contactId:String,
+    @ColumnInfo
     val isFavourites: Boolean
 ) {
     @PrimaryKey(autoGenerate = true)

@@ -12,37 +12,28 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.ParcelFileDescriptor
 import android.provider.ContactsContract
 import android.telecom.TelecomManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.Window
 import android.widget.ImageView
 import android.widget.QuickContactBadge
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.cartravelsdailerapp.PrefUtils
+import com.cartravelsdailerapp.PrefUtils.ContactName
+import com.cartravelsdailerapp.PrefUtils.ContactNumber
+import com.cartravelsdailerapp.PrefUtils.ContactUri
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.LayoutPreviewProfilePicBinding
-import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
-import com.cartravelsdailerapp.models.Contact
-import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactName
-import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactNumber
-import com.cartravelsdailerapp.utils.CarTravelsDialer.ContactUri
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.launch
-import java.io.FileDescriptor
 import java.io.FileNotFoundException
 import java.io.IOException
 
@@ -62,17 +53,19 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
         supportActionBar?.hide()
-        val d = intent.extras
-        name = d?.getString(ContactName).toString()
-        number = d?.getString(ContactNumber).toString()
-        photoUri = d?.getString(ContactUri).toString()
-        activityType = d?.getString(PrefUtils.ActivityType).toString()
+
         txt_name = findViewById(R.id.txt_name)
         img_profile = findViewById(R.id.img_profile)
         card_call = findViewById(R.id.card_call)
         card_whatsapp = findViewById(R.id.card_whatsapp)
         img_Favourite = findViewById(R.id.img_Favourite)
         img_Favouritefilled = findViewById(R.id.img_Favourite_filled)
+
+        val d = intent.extras
+        name =  d?.getString(ContactName).toString()
+        number = d?.getString(ContactNumber).toString()
+        photoUri = d?.getString(ContactUri).toString()
+        activityType = d?.getString(PrefUtils.ActivityType).toString()
         txt_name.text = name
         val imageUri = getPhotoFromContacts(number)
         if (!imageUri.isNullOrBlank()) {
@@ -82,6 +75,16 @@ class ProfileActivity : AppCompatActivity() {
                 }
             } else {
                 img_profile.setImageToDefault()
+            }
+        }else{
+            if(!photoUri.isNullOrBlank()){
+                if (!TextUtils.isEmpty(photoUri)) {
+                    loadContactPhotoThumbnail(photoUri).also {
+                        img_profile.setImageBitmap(it)
+                    }
+                } else {
+                    img_profile.setImageToDefault()
+                }
             }
         }
 
@@ -115,19 +118,32 @@ class ProfileActivity : AppCompatActivity() {
             binding.imgClose.setOnClickListener {
                 dialog.dismiss()
             }
-            if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
-                loadContactPhotoThumbnail(imageUri).also {
-                    binding.previewProfilePic.setImageBitmap(it)
+            if (!imageUri.isNullOrBlank()) {
+                if (!TextUtils.isEmpty(imageUri)) {
+                    loadContactPhotoThumbnail(imageUri).also {
+                        img_profile.setImageBitmap(it)
+                    }
+                } else {
+                    img_profile.setImageToDefault()
                 }
-            } else {
-                binding.previewProfilePic.setImageToDefault()
+            }else{
+                if(!photoUri.isNullOrBlank())
+                {
+                    if (!TextUtils.isEmpty(photoUri)) {
+                        loadContactPhotoThumbnail(photoUri).also {
+                            img_profile.setImageBitmap(it)
+                        }
+                    } else {
+                        img_profile.setImageToDefault()
+                    }
+                }
             }
         }
 
         if (activityType == PrefUtils.ContactFragment)
         {
             val data = db.getFavouriteContactsByNumber(number)
-            if (data.isFavourites) {
+            if (data?.isFavourites == true) {
                 img_Favourite.isVisible = false
                 img_Favouritefilled.isVisible = true
             } else {

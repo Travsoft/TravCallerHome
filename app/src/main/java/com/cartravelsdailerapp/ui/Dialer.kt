@@ -31,6 +31,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.MainActivity
+import com.cartravelsdailerapp.PrefUtils.TelegramAppPackage
+import com.cartravelsdailerapp.PrefUtils.WhatsAppPackage
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
 import com.cartravelsdailerapp.dialerstates.CallManager
@@ -38,7 +40,6 @@ import com.cartravelsdailerapp.dialerstates.GsmCall
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.service.MyConnectionService
 import com.cartravelsdailerapp.ui.adapters.ContactsAdapter
-import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.utils.isPackageInstalled
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -404,7 +405,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
         when (v?.id) {
             R.id.img_telegram -> {
 
-                if (this.isPackageInstalled(this, CarTravelsDialer.TelegramAppPackage)) {
+                if (this.isPackageInstalled(this, TelegramAppPackage)) {
                     if (number.length >= 10) {
                         openTelegramAppByNumber(number)
                     }
@@ -418,7 +419,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
             }
             R.id.img_whatsapp -> {
                 if (number.length >= 10) {
-                    if (this.isPackageInstalled(this, CarTravelsDialer.WhatsAppPackage)) {
+                    if (this.isPackageInstalled(this, WhatsAppPackage)) {
                         openWhatsAppByNumber(number)
                     } else {
                         Snackbar.make(

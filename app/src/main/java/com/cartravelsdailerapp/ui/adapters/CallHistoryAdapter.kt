@@ -36,7 +36,7 @@ class CallHistoryAdapter(
 ) :
     RecyclerView.Adapter<CallHistoryAdapter.CallHistoryVm>() {
     private var isLoadingAdded = false
-     var listCallHistory= ArrayList<CallHistory>()
+    var listCallHistory = ArrayList<CallHistory>()
 
     class CallHistoryVm(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name = itemView.findViewById<TextView>(R.id.txt_Contact_name)
@@ -141,7 +141,9 @@ class CallHistoryAdapter(
                 selectedData.name!!,
                 selectedData.number,
                 selectedData.photouri,
-                PrefUtils.CallHistoryFragment
+                PrefUtils.CallHistoryFragment,
+                ""
+
             )
         }
         holder.card_whatsapp.setOnClickListener {
@@ -260,6 +262,7 @@ class CallHistoryAdapter(
     fun addLoadingFooter() {
         isLoadingAdded = true
     }
+
     fun removeLoadingFooter() {
         isLoadingAdded = false
         val position: Int = listCallHistory.size - 1
@@ -267,6 +270,7 @@ class CallHistoryAdapter(
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, itemCount)
     }
+
     fun add(callHistory: CallHistory) {
         listCallHistory.add(callHistory)
         notifyItemInserted(listCallHistory.size - 1)

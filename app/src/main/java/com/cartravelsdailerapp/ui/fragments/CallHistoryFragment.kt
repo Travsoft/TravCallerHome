@@ -28,10 +28,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.alexstyl.contactstore.ContactStore
-import com.alexstyl.contactstore.thumbnailUri
+import com.alexstyl.contactstore.*
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.ActivityType
+import com.cartravelsdailerapp.PrefUtils.ContactId
+import com.cartravelsdailerapp.PrefUtils.ContactName
+import com.cartravelsdailerapp.PrefUtils.ContactNumber
+import com.cartravelsdailerapp.PrefUtils.ContactUri
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
@@ -43,10 +46,8 @@ import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.ui.adapters.*
-import com.cartravelsdailerapp.utils.CarTravelsDialer
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -163,16 +164,39 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             val listOfContactStore = ContactStore.newInstance(requireContext())
             val list = ArrayList<Contact>()
 
-            listOfContactStore.fetchContacts().collect { it ->
+            listOfContactStore.fetchContacts(
+/*
+                columnsToFetch = listOf(
+                    ContactColumn.Phones,
+                    ContactColumn.Names,
+                    ContactColumn.Image,
+                    ContactColumn.Events,
+                    ContactColumn.ImAddresses,
+                    ContactColumn.Mails
+                )
+*/
+            ).collect { it ->
                 it.forEach {
+                    /*var number = ""
+                    if (!it.phones.isNullOrEmpty()) {
+                        number = it.phones.get(0).value.raw
+                    }*/
                     list.add(
                         Contact(
                             it.displayName,
                             "",
                             it.thumbnailUri.toString(),
+                            contactId = it.contactId.toString(),
                             isFavourites = false
                         )
                     )
+                    if (it.containsColumn(ContactColumn.Phones)) {
+                        if (!it.phones.isNullOrEmpty()) {
+                            Log.d(
+                                "phones->", it.phones.get(0).value.raw
+                            )
+                        }
+                    }
                 }
                 launch(Dispatchers.Main) {
                     contactsAdapter.addAll(list.filterNotNull().sortedBy { i -> i.name }
@@ -392,18 +416,33 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         name: String,
         number: String,
         photoUri: String,
-        activityType: String
+        activityType: String,
+        contactId: String
     ) {
         val data = Bundle()
-        if (name.isBlank()) {
-            data.putString(CarTravelsDialer.ContactName, number)
+
+        if (activityType.equals(PrefUtils.CallHistoryFragment)) {
+            if (name.isBlank()) {
+                data.putString(ContactName, number)
+            } else {
+                data.putString(ContactName, name)
+            }
+            data.putString(ContactNumber, number)
+            data.putString(ContactUri, photoUri)
+            data.putString(ContactId, contactId)
+            data.putString(ActivityType, activityType)
+
+            if (!number.isNullOrBlank() || !name.isNullOrBlank()) {
+                val intent = Intent(context, ProfileActivity::class.java)
+                intent.putExtras(data)
+                context?.startActivity(intent)
+            }
         } else {
-            data.putString(CarTravelsDialer.ContactName, name)
-        }
-        data.putString(CarTravelsDialer.ContactNumber, number)
-        data.putString(CarTravelsDialer.ContactUri, photoUri)
-        data.putString(ActivityType, activityType)
-        if (!number.isNullOrBlank()) {
+            data.putString(ContactId, contactId)
+            data.putString(ContactUri, photoUri)
+            data.putString(ContactName, name)
+            data.putString(ActivityType, activityType)
+
             val intent = Intent(context, ProfileActivity::class.java)
             intent.putExtras(data)
             context?.startActivity(intent)
@@ -431,8 +470,8 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     override fun openPhoneNumberHistory(number: String, name: String) {
         val data = Bundle()
-        data.putString(CarTravelsDialer.ContactNumber, number)
-        data.putString(CarTravelsDialer.ContactName, name)
+        data.putString(ContactNumber, number)
+        data.putString(ContactName, name)
         val intent = Intent(context, CallHistroyActivity::class.java)
         intent.putExtras(data)
         context?.startActivity(intent)
