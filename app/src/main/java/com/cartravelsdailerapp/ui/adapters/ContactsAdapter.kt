@@ -59,7 +59,7 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                 "",
                 listOfContacts.photoUri,
                 PrefUtils.ContactFragment,
-                listOfContacts.id.toString()
+                listOfContacts.contactId
             )
 
 

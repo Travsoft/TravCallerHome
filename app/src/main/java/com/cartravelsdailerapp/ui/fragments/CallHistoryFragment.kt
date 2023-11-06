@@ -163,46 +163,24 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
             val listOfContactStore = ContactStore.newInstance(requireContext())
             val list = ArrayList<Contact>()
-
-            listOfContactStore.fetchContacts(
-/*
-                columnsToFetch = listOf(
-                    ContactColumn.Phones,
-                    ContactColumn.Names,
-                    ContactColumn.Image,
-                    ContactColumn.Events,
-                    ContactColumn.ImAddresses,
-                    ContactColumn.Mails
-                )
-*/
-            ).collect { it ->
+            listOfContactStore.fetchContacts().collect { it ->
                 it.forEach {
-                    /*var number = ""
-                    if (!it.phones.isNullOrEmpty()) {
-                        number = it.phones.get(0).value.raw
-                    }*/
                     list.add(
                         Contact(
                             it.displayName,
                             "",
                             it.thumbnailUri.toString(),
                             contactId = it.contactId.toString(),
-                            isFavourites = false
+                            isFavourites = it.isStarred
                         )
                     )
-                    if (it.containsColumn(ContactColumn.Phones)) {
-                        if (!it.phones.isNullOrEmpty()) {
-                            Log.d(
-                                "phones->", it.phones.get(0).value.raw
-                            )
-                        }
-                    }
                 }
                 launch(Dispatchers.Main) {
                     contactsAdapter.addAll(list.filterNotNull().sortedBy { i -> i.name }
                         .distinctBy { i -> i.name })
                     contactsAdapter.notifyDataSetChanged()
                 }
+
             }
 
 
@@ -337,6 +315,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
     fun initFavouritesContact() {
 
+
         val listOfFavouritesContacts =
             DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
                 .getAllFavouriteContacts(true)
@@ -426,10 +405,10 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
                 data.putString(ContactName, number)
             } else {
                 data.putString(ContactName, name)
+                data.putString(ContactId, contactId)
             }
             data.putString(ContactNumber, number)
             data.putString(ContactUri, photoUri)
-            data.putString(ContactId, contactId)
             data.putString(ActivityType, activityType)
 
             if (!number.isNullOrBlank() || !name.isNullOrBlank()) {

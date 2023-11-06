@@ -10,6 +10,8 @@ interface CallHistoryDao {
     fun getAllCallLogs(): List<CallHistory>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(listofCallHistory: List<CallHistory>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAllContacts(listofContacts: List<Contact>)
     @Insert
     fun insertCallHistory(callHistory: CallHistory)
 

@@ -27,7 +27,11 @@ import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
+import com.alexstyl.contactstore.ContactPredicate
+import com.alexstyl.contactstore.ContactStore
+import com.alexstyl.contactstore.allContactColumns
 import com.cartravelsdailerapp.PrefUtils
+import com.cartravelsdailerapp.PrefUtils.ContactId
 import com.cartravelsdailerapp.PrefUtils.ContactName
 import com.cartravelsdailerapp.PrefUtils.ContactNumber
 import com.cartravelsdailerapp.PrefUtils.ContactUri
@@ -62,11 +66,24 @@ class ProfileActivity : AppCompatActivity() {
         img_Favouritefilled = findViewById(R.id.img_Favourite_filled)
 
         val d = intent.extras
-        name =  d?.getString(ContactName).toString()
+        name = d?.getString(ContactName).toString()
         number = d?.getString(ContactNumber).toString()
         photoUri = d?.getString(ContactUri).toString()
         activityType = d?.getString(PrefUtils.ActivityType).toString()
         txt_name.text = name
+        val store = ContactStore.newInstance(application)
+        val cid = d?.getString(ContactId).toString()
+        if (cid!="null") {
+            val foundContacts = store.fetchContacts(
+                predicate = ContactPredicate.ContactLookup(cid.toLong()),
+                allContactColumns()
+            )
+            foundContacts.collect {
+                Log.d("80-> ${cid}", "${it.first().phones[0].value.raw}")
+                number = it.first().phones[0].value.raw
+            }
+
+        }
         val imageUri = getPhotoFromContacts(number)
         if (!imageUri.isNullOrBlank()) {
             if (!TextUtils.isEmpty(imageUri)) {
@@ -76,8 +93,8 @@ class ProfileActivity : AppCompatActivity() {
             } else {
                 img_profile.setImageToDefault()
             }
-        }else{
-            if(!photoUri.isNullOrBlank()){
+        } else {
+            if (!photoUri.isNullOrBlank()) {
                 if (!TextUtils.isEmpty(photoUri)) {
                     loadContactPhotoThumbnail(photoUri).also {
                         img_profile.setImageBitmap(it)
@@ -126,22 +143,30 @@ class ProfileActivity : AppCompatActivity() {
                 } else {
                     img_profile.setImageToDefault()
                 }
-            }else{
-                if(!photoUri.isNullOrBlank())
-                {
-                    if (!TextUtils.isEmpty(photoUri)) {
-                        loadContactPhotoThumbnail(photoUri).also {
-                            img_profile.setImageBitmap(it)
-                        }
-                    } else {
-                        img_profile.setImageToDefault()
-                    }
-                }
-            }
+            } else
+
+             if (!imageUri.isNullOrBlank()) {
+                 if (!TextUtils.isEmpty(imageUri)) {
+                     loadContactPhotoThumbnail(imageUri).also {
+                         img_profile.setImageBitmap(it)
+                     }
+                 } else {
+                     img_profile.setImageToDefault()
+                 }
+             } else {
+                 if (!photoUri.isNullOrBlank()) {
+                     if (!TextUtils.isEmpty(photoUri)) {
+                         loadContactPhotoThumbnail(photoUri).also {
+                             img_profile.setImageBitmap(it)
+                         }
+                     } else {
+                         img_profile.setImageToDefault()
+                     }
+                 }
+             }
         }
 
-        if (activityType == PrefUtils.ContactFragment)
-        {
+        if (activityType == PrefUtils.ContactFragment) {
             val data = db.getFavouriteContactsByNumber(number)
             if (data?.isFavourites == true) {
                 img_Favourite.isVisible = false
@@ -165,7 +190,7 @@ class ProfileActivity : AppCompatActivity() {
                     .show()
                 db.updateContacts(false, data.id)
             }
-        } 
+        }
 
     }
 
