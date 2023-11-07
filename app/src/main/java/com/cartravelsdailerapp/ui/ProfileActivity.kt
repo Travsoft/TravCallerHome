@@ -27,6 +27,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
+import com.alexstyl.contactstore.ContactColumn
 import com.alexstyl.contactstore.ContactPredicate
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.allContactColumns
@@ -73,14 +74,16 @@ class ProfileActivity : AppCompatActivity() {
         txt_name.text = name
         val store = ContactStore.newInstance(application)
         val cid = d?.getString(ContactId).toString()
-        if (cid!="null") {
+        if (cid != "" && cid != "null") {
             val foundContacts = store.fetchContacts(
                 predicate = ContactPredicate.ContactLookup(cid.toLong()),
                 allContactColumns()
             )
             foundContacts.collect {
-                Log.d("80-> ${cid}", "${it.first().phones[0].value.raw}")
-                number = it.first().phones[0].value.raw
+                if (it.first().phones.any()) {
+                    Log.d("80-> ${cid}", "${it.first().phones[0].value.raw}")
+                    number = it.first().phones[0].value.raw
+                }
             }
 
         }
@@ -138,32 +141,38 @@ class ProfileActivity : AppCompatActivity() {
             if (!imageUri.isNullOrBlank()) {
                 if (!TextUtils.isEmpty(imageUri)) {
                     loadContactPhotoThumbnail(imageUri).also {
-                        img_profile.setImageBitmap(it)
+                        binding.previewProfilePic.setImageBitmap(it)
                     }
                 } else {
-                    img_profile.setImageToDefault()
+                    binding.previewProfilePic.setImageToDefault()
                 }
             } else
 
-             if (!imageUri.isNullOrBlank()) {
-                 if (!TextUtils.isEmpty(imageUri)) {
-                     loadContactPhotoThumbnail(imageUri).also {
-                         img_profile.setImageBitmap(it)
-                     }
-                 } else {
-                     img_profile.setImageToDefault()
-                 }
-             } else {
-                 if (!photoUri.isNullOrBlank()) {
-                     if (!TextUtils.isEmpty(photoUri)) {
-                         loadContactPhotoThumbnail(photoUri).also {
-                             img_profile.setImageBitmap(it)
-                         }
-                     } else {
-                         img_profile.setImageToDefault()
-                     }
-                 }
-             }
+                if (!imageUri.isNullOrBlank()) {
+                    if (!TextUtils.isEmpty(imageUri)) {
+                        loadContactPhotoThumbnail(imageUri).also {
+                            binding.previewProfilePic.setImageBitmap(it)
+                        }
+                    } else {
+                        binding.previewProfilePic.setImageToDefault()
+                    }
+                } else {
+                    if (!photoUri.isNullOrBlank()) {
+                        if (!TextUtils.isEmpty(photoUri)) {
+                            loadContactPhotoThumbnail(photoUri).also {
+                                binding.previewProfilePic.setImageBitmap(it)
+                                Toast.makeText(
+                                    this@ProfileActivity,
+                                    "187--->" + it.toString(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                            }
+                        } else {
+                            binding.previewProfilePic.setImageToDefault()
+                        }
+                    }
+                }
         }
 
         if (activityType == PrefUtils.ContactFragment) {
