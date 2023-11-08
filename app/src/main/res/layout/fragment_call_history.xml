@@ -187,6 +187,16 @@
                     android:orientation="vertical"
                     android:background="@color/white"
                     android:padding="5dp">
+                    <TextView
+                        android:id="@+id/tx_favourite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="Ravourite"
+                        android:layout_margin="5dp"
+                        android:textColor="@color/black" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recy_list_favourites_contacts"

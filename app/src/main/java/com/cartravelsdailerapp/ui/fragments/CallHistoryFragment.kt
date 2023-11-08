@@ -39,6 +39,7 @@ import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
+import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
@@ -69,6 +70,8 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     private var currentPage = PAGE_START
     lateinit var contactsAdapter: ContactsAdapter
     lateinit var favcontactsAdapter: FavouritesContactAdapter
+    lateinit var db: AppDatabase
+
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
         launch {
             viewModel.getNewCallLogsHistory()
@@ -102,6 +105,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        db = DatabaseBuilder.getInstance(requireContext())
         calendar = Calendar.getInstance()
         val dayOfWeekString =
             calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH)
@@ -158,7 +162,6 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             binding.recyListContacts.itemAnimator = DefaultItemAnimator()
             binding.recyListContacts.layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-
             binding.recyListContacts.adapter = contactsAdapter
 
             val listOfContactStore = ContactStore.newInstance(requireContext())
@@ -176,19 +179,21 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
                             )
                         )
                     }
+
                 }
                 launch(Dispatchers.Main) {
                     contactsAdapter.addAll(list.filterNotNull().sortedBy { i -> i.name }
                         .distinctBy { i -> i.name })
                     contactsAdapter.notifyDataSetChanged()
+                    val staredContacts = list.takeWhile { it.isFavourites == true }
+
                 }
-
             }
-
-
+            viewModel.getAllFavouriteContacts()
         }
-        initFavouritesContact()
-
+        viewModel.AllFavouriteContacts.observe(this) {
+            initFavouritesContact(it)
+        }
         binding.cardHistory.performClick()
         return binding.root
     }
@@ -315,11 +320,9 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
     }
 
 
-    fun initFavouritesContact() {
+    fun initFavouritesContact(listOfFavouritesContacts: List<Contact>) {
 
-        val listOfFavouritesContacts =
-            DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-                .getAllFavouriteContacts(true)
+        Toast.makeText(context, listOfFavouritesContacts.size.toString(), Toast.LENGTH_SHORT).show()
         binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
 
         favcontactsAdapter = FavouritesContactAdapter()
@@ -521,6 +524,12 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             ).show()
         } catch (exception: NullPointerException) {
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (binding.recyListContacts.isVisible)
+            viewModel.getAllFavouriteContacts()
     }
 
     private fun openTelegramAppByNumber(toNumber: String) {

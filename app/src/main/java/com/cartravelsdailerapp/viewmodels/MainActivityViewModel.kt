@@ -32,6 +32,10 @@ class MainActivityViewModel(
     val newCallLogs: LiveData<CallHistory>
         get() = _newCallLogs
 
+    private val _AllFavouriteContacts = MutableLiveData<List<Contact>>()
+    val AllFavouriteContacts: LiveData<List<Contact>>
+        get() = _AllFavouriteContacts
+
     var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
     lateinit var listOfContactStore: ContactStore
 
@@ -50,6 +54,12 @@ class MainActivityViewModel(
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
             _newCallLogs.value?.let { db.insertCallHistory(it) }
+        }
+    }
+
+    fun getAllFavouriteContacts() {
+        viewModelScope.launch {
+            _AllFavouriteContacts.value = db.getAllFavouriteContacts(true)
         }
     }
 }

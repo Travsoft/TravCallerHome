@@ -26,6 +26,12 @@ class MyViewModelFactory(private val application: Application) :
                     application, CallLogsRepository(source, Dispatchers.Default)
                 ) as T
             }
+            ProfileViewModel::class.java -> {
+                ProfileViewModel(
+                    application
+                ) as T
+
+            }
             else -> {
                 throw IllegalArgumentException("Unknown ViewModel class")
             }

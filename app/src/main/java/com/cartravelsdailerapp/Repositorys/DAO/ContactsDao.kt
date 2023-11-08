@@ -3,15 +3,16 @@ package com.cartravelsdailerapp.Repositorys.DAO
 import androidx.room.*
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
+import com.cartravelsdailerapp.models.FavouritesContacts
 
 @Dao
 interface CallHistoryDao {
     @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC")
     fun getAllCallLogs(): List<CallHistory>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(listofCallHistory: List<CallHistory>)
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAllContacts(listofContacts: List<Contact>)
+
     @Insert
     fun insertCallHistory(callHistory: CallHistory)
 
@@ -27,10 +28,14 @@ interface CallHistoryDao {
     @Query("SELECT * FROM Contact WHERE number || name LIKE '%' || :searchQuery || '%'")
     fun searchContactCall(searchQuery: String): List<Contact>
 
-    @Query("UPDATE Contact SET isFavourites =:isFavourites WHERE id =:id")
-    fun updateContacts(isFavourites: Boolean, id: Int)
 
-    @Query("SELECT * FROM Contact WHERE isFavourites =:isFavourites")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertFavouriteContact(fcontact: Contact)
+
+    @Query("UPDATE Contact SET isFavourites=:isFavourites WHERE id = :id")
+    fun updateFavouriteContact(isFavourites: Boolean, id: Int)
+
+    @Query("SELECT * FROM Contact WHERE isFavourites = :isFavourites group by number ORDER BY name DESC")
     fun getAllFavouriteContacts(isFavourites: Boolean): List<Contact>
 
     @Query("SELECT * FROM Contact WHERE number =:number")
