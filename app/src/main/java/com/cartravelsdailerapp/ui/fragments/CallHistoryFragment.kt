@@ -142,7 +142,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             binding.recyclerViewCallHistory.isVisible = true
             binding.recyListContacts.isVisible = false
             binding.recyListFavouritesContacts.isVisible = false
-            binding.txFavourite.isVisible=false
+            binding.txFavourite.isVisible = false
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.orange))
             binding.txtContacts.setTextColor(resources.getColor(R.color.black))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
@@ -153,7 +153,7 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             binding.recyclerViewCallHistory.isVisible = false
             binding.recyListContacts.isVisible = true
             binding.recyListFavouritesContacts.isVisible = false
-            binding.txFavourite.isVisible=true
+            binding.txFavourite.isVisible = true
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.black))
             binding.txtContacts.setTextColor(resources.getColor(R.color.orange))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
@@ -322,17 +322,14 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
 
 
     fun initFavouritesContact(listOfFavouritesContacts: List<Contact>) {
-
-        Toast.makeText(context, listOfFavouritesContacts.size.toString(), Toast.LENGTH_SHORT).show()
         binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
-
+        binding.txFavourite.isVisible = listOfFavouritesContacts.isNotEmpty()
         favcontactsAdapter = FavouritesContactAdapter()
         favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
         binding.recyListFavouritesContacts.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.recyListFavouritesContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListFavouritesContacts.adapter = favcontactsAdapter
-
     }
 
     private fun loadFirstPage() {
@@ -343,10 +340,6 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             true
     }
 
-    private fun loadContactsFirstPage() {
-        loadContactsData()
-
-    }
 
     private fun registerBroadCastReceiver() {
         context?.let {
