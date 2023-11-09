@@ -142,17 +142,18 @@ class CallHistoryFragment : Fragment(), CoroutineScope, OnClickListeners {
             binding.recyclerViewCallHistory.isVisible = true
             binding.recyListContacts.isVisible = false
             binding.recyListFavouritesContacts.isVisible = false
+            binding.txFavourite.isVisible=false
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.orange))
             binding.txtContacts.setTextColor(resources.getColor(R.color.black))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.orange))
             binding.viewContacts.setBackgroundColor(resources.getColor(R.color.white))
             loadData()
-            binding.recyListFavouritesContacts.isVisible = false
         }
         binding.cardContacts.setOnClickListener {
             binding.recyclerViewCallHistory.isVisible = false
             binding.recyListContacts.isVisible = true
             binding.recyListFavouritesContacts.isVisible = false
+            binding.txFavourite.isVisible=true
             binding.txtCallHistory.setTextColor(resources.getColor(R.color.black))
             binding.txtContacts.setTextColor(resources.getColor(R.color.orange))
             binding.viewHistory.setBackgroundColor(resources.getColor(R.color.white))
