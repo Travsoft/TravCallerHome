@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 
 object PrefUtils {
     const val ContactName = "contactName"
+    const val EnteredNumber = "entered_number"
     const val ContactProfile = "imageUri"
     const val ContactNumber = "contactNumber"
     const val ContactUri = "contactUri"

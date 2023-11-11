@@ -9,15 +9,17 @@ import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 class MainActivityViewModel(
     var context: Application,
     private val callLogsRepository: CallLogsRepository
-) : AndroidViewModel(context) {
+) : AndroidViewModel(context), CoroutineScope {
+    private lateinit var job: Job
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
+
     private val _isCallLogsdb = MutableLiveData<Boolean>()
     val IsCallLogsdb: LiveData<Boolean>
         get() = _isCallLogsdb
@@ -36,8 +38,12 @@ class MainActivityViewModel(
     val AllFavouriteContacts: LiveData<List<Contact>>
         get() = _AllFavouriteContacts
 
+    private val _AllContacts = MutableLiveData<List<Contact>>()
+    val AllContacts: LiveData<List<Contact>>
+        get() = _AllContacts
+
     var db = DatabaseBuilder.getInstance(context).CallHistoryDao()
-    lateinit var listOfContactStore: ContactStore
+    val listOfContactStore = ContactStore.newInstance(context)
 
     suspend fun getCallLogsHistory() {
         viewModelScope.launch {
@@ -57,10 +63,40 @@ class MainActivityViewModel(
         }
     }
 
+    fun getCallLogsHistoryDb() {
+        _callLogsdb.value = db.getAllCallLogs()
+    }
+
     fun getAllFavouriteContacts() {
         viewModelScope.launch {
             _AllFavouriteContacts.value = db.getAllFavouriteContacts(true)
         }
     }
+
+    fun getContacts():List<Contact> {
+        job = Job()
+        val list = ArrayList<Contact>()
+        viewModelScope.launch(Dispatchers.Main) {
+            listOfContactStore.fetchContacts().collect { it ->
+                it.forEach {
+                    if (!it.displayName.isNullOrBlank()) {
+                        list.add(
+                            Contact(
+                                it.displayName,
+                                "",
+                                it.thumbnailUri.toString(),
+                                contactId = it.contactId.toString(),
+                                isFavourites = it.isStarred
+                            )
+                        )
+                    }
+
+                }
+            }
+        }
+        return list
+
+    }
+
 }
 

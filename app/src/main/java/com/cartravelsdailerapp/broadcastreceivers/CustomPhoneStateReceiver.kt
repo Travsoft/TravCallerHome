@@ -8,22 +8,29 @@ import android.os.CancellationSignal
 import android.provider.CallLog
 import android.provider.ContactsContract
 import android.telephony.TelephonyManager
+import android.util.Log
 import android.widget.Toast
 
-class CustomPhoneStateReceiver(private val onResult: (String, String?, Uri?) -> Unit) :
+class CustomPhoneStateReceiver(private val onResult: (String, String?, Uri?) -> Unit,val number: String) :
     BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
-        println("CustomPhoneStateReceiver onReceive")
+        println("CustomPhoneStateReceiver 17 onReceive")
 
         val state = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
         val incomingNumber = intent?.getStringExtra("incoming_number")
         Toast.makeText(context, state, Toast.LENGTH_SHORT).show()
         if (state == TelephonyManager.EXTRA_STATE_RINGING || state == TelephonyManager.EXTRA_STATE_OFFHOOK) {
             println("TelephonyManager.CALL_STATE_RINGING onReceive -> $incomingNumber")
+/*
             incomingNumber?.let { number ->
                 val (name, photoUri) = getCallerInfo(context, number)
                 onResult(number, name, photoUri)
             }
+*/
+            Log.d("30--",number)
+            val (name, photoUri) = getCallerInfo(context, number)
+            onResult(number, name, photoUri)
+            Log.d("33--",number)
         }
     }
 

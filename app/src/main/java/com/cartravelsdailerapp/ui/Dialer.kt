@@ -31,6 +31,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.MainActivity
+import com.cartravelsdailerapp.PrefUtils.EnteredNumber
 import com.cartravelsdailerapp.PrefUtils.TelegramAppPackage
 import com.cartravelsdailerapp.PrefUtils.WhatsAppPackage
 import com.cartravelsdailerapp.R
@@ -113,7 +114,13 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
 
                 if (edtInput.length() > 0) {
                     callTheEnteredNumber()
-                    finish()
+                    val intent = Intent(
+                        this,
+                        MainActivity::class.java
+                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    intent.putExtra(EnteredNumber, edtInput.toString())
+                    startActivity(intent)
                 }
             }
 
@@ -500,7 +507,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
             ).readContacts()
         }
 */
-      //  contactsAdapter = ContactsAdapter(this)
+        //  contactsAdapter = ContactsAdapter(this)
         val layoutInflater = LinearLayoutManager(this)
         recy_list_contacts.layoutManager = layoutInflater
         recy_list_contacts.adapter = contactsAdapter
