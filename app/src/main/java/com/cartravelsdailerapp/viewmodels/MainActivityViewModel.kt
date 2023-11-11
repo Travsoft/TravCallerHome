@@ -59,7 +59,22 @@ class MainActivityViewModel(
     suspend fun getNewCallLogsHistory() {
         viewModelScope.launch {
             _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
-            _newCallLogs.value?.let { db.insertCallHistory(it) }
+            _newCallLogs.value?.let {
+                val callHistory = it
+                val isContactsFind =
+                    db.getAllCallLogs().any { it.number.equals(callHistory.number) }
+                if (!isContactsFind) {
+                    db.insertCallHistory(it)
+                    Log.d("inserted 68",it.number)
+                } else {
+                    db.updateCallHistory(
+                        it.date, it.id
+                    )
+                    Log.d("updated 73",it.number)
+
+                }
+
+            }
         }
     }
 
@@ -73,7 +88,7 @@ class MainActivityViewModel(
         }
     }
 
-    fun getContacts():List<Contact> {
+    fun getContacts(): List<Contact> {
         job = Job()
         val list = ArrayList<Contact>()
         viewModelScope.launch(Dispatchers.Main) {
