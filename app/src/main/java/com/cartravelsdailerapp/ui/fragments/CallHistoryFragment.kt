@@ -19,6 +19,7 @@ import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
+import com.cartravelsdailerapp.ui.Dialer
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
@@ -33,12 +34,6 @@ class CallHistoryFragment : Fragment() {
         "Call Histroy",
         "Contacts"
     )
-    val callHistorytabicon = context?.resources?.let {
-        arrayOf(
-            it.getDrawable(R.drawable.ic_history),
-            it.getDrawable(R.drawable.ic_chat)
-        )
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -116,6 +111,13 @@ class CallHistoryFragment : Fragment() {
 
 
         }.attach()
+        binding.cardDialerBt.setOnClickListener {
+            startActivity(
+                Intent(requireContext(), Dialer::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            )
+        }
+
 
     }
 
@@ -135,21 +137,5 @@ class CallHistoryFragment : Fragment() {
 
     }
 
-/*
-    class CustomPagerAdapter(private val mContext: Context) : PagerAdapter() {
-        override fun getCount(): Int {
-            return 0
-        }
-
-        override fun isViewFromObject(view: View, `object`: Any): Boolean {
-            return view === `object`
-        }
-
-        override fun getPageTitle(position: Int): CharSequence {
-
-            return ""
-        }
-    }
-*/
 }
 
