@@ -21,17 +21,17 @@ class CustomPhoneStateReceiver(private val onResult: (String, String?, Uri?) -> 
         Toast.makeText(context, state, Toast.LENGTH_SHORT).show()
         if (state == TelephonyManager.EXTRA_STATE_RINGING || state == TelephonyManager.EXTRA_STATE_OFFHOOK) {
             println("TelephonyManager.CALL_STATE_RINGING onReceive -> $incomingNumber")
-/*
             incomingNumber?.let { number ->
                 val (name, photoUri) = getCallerInfo(context, number)
                 onResult(number, name, photoUri)
             }
-*/
-            Log.d("30--",number)
+
+        }else{
             val (name, photoUri) = getCallerInfo(context, number)
             onResult(number, name, photoUri)
-            Log.d("33--",number)
+            Log.d("32 Not rining",number)
         }
+
     }
 
     private fun getCallerInfo(context: Context, phoneNumber: String): Pair<String?, Uri?> {

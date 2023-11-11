@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cartravelsdailerapp.MainActivity
@@ -36,12 +37,15 @@ import com.cartravelsdailerapp.PrefUtils.TelegramAppPackage
 import com.cartravelsdailerapp.PrefUtils.WhatsAppPackage
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
+import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.dialerstates.CallManager
 import com.cartravelsdailerapp.dialerstates.GsmCall
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.service.MyConnectionService
 import com.cartravelsdailerapp.ui.adapters.ContactsAdapter
 import com.cartravelsdailerapp.utils.isPackageInstalled
+import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
+import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.disposables.Disposables
@@ -77,7 +81,14 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
     lateinit var add_user: ImageView
     lateinit var contactIntent: Intent
     lateinit var launcherContact: ActivityResultLauncher<Intent>
+    lateinit var viewModel: MainActivityViewModel
+    lateinit var receiver: CustomPhoneStateReceiver
 
+    private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
+        launch {
+            viewModel.getNewCallLogsHistory()
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         job = Job()
@@ -99,6 +110,15 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
         img_telegram.setOnClickListener(this)
         cancel_button.setOnClickListener(this)
         add_user.setOnClickListener(this)
+
+        val myViewModelFactory =
+            MyViewModelFactory(this.application)
+
+        viewModel = ViewModelProvider(
+            this,
+            myViewModelFactory
+        )[MainActivityViewModel::class.java]
+
         launcherContact =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
@@ -121,6 +141,13 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     intent.putExtra(EnteredNumber, edtInput.toString())
                     startActivity(intent)
+                    receiver = CustomPhoneStateReceiver(onResult, edtInput.toString())
+                    ContextCompat.registerReceiver(
+                        this,
+                        receiver,
+                        IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED),
+                        ContextCompat.RECEIVER_EXPORTED
+                    )
                 }
             }
 

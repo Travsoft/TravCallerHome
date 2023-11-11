@@ -33,12 +33,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     lateinit var vm: MainActivityViewModel
-    private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
-        launch {
-            vm.getNewCallLogsHistory()
-        }
-    }
-    lateinit var receiver : CustomPhoneStateReceiver
     private lateinit var job: Job
 
 
@@ -60,21 +54,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
 
     }
-
-    override fun onResume() {
-        super.onResume()
-        val d = intent.extras
-        val  number = d?.getString(PrefUtils.EnteredNumber).toString()
-        receiver= CustomPhoneStateReceiver(onResult,number)
-        ContextCompat.registerReceiver(
-            this,
-            receiver,
-            IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED),
-            ContextCompat.RECEIVER_EXPORTED
-        )
-
-    }
-
     private fun setUpBottomNavigation() {
         val bottomNavigationItems = mutableListOf(
             CurvedBottomNavigation.Model(

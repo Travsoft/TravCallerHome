@@ -3,6 +3,7 @@ package com.cartravelsdailerapp.ui.fragments
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -10,6 +11,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,12 +20,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
+import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.FragmentCallLogsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
@@ -38,6 +42,7 @@ import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
@@ -45,6 +50,12 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     private lateinit var job: Job
     lateinit var callLogsAdapter: CallHistoryAdapter
+    lateinit var receiver: CustomPhoneStateReceiver
+    private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
+        launch {
+            viewModel.getNewCallLogsHistory()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -105,6 +116,13 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         ) {
             telecomManager?.placeCall(uri, bundle)
         }
+        receiver = CustomPhoneStateReceiver(onResult, number)
+        ContextCompat.registerReceiver(
+            requireContext(),
+            receiver,
+            IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED),
+            ContextCompat.RECEIVER_EXPORTED
+        )
     }
 
     override fun navigateToProfilePage(
@@ -253,5 +271,6 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main
+
 
 }
