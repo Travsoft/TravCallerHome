@@ -74,7 +74,6 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     override fun onResume() {
         super.onResume()
         viewModel.callLogsdb.observe(this) {
-            callLogsAdapter.addAll(listOf())
             callLogsAdapter.addAll(it)
             val linearLayoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)

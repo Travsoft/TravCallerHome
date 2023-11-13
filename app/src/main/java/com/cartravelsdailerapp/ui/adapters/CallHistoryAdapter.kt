@@ -277,6 +277,7 @@ class CallHistoryAdapter(
     }
 
     fun addAll(list: List<CallHistory>) {
+        listCallHistory.clear()
         listCallHistory.addAll(list)
     }
 
