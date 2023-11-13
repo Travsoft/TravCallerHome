@@ -68,6 +68,11 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         binding = FragmentCallLogsBinding.inflate(layoutInflater)
         callLogsAdapter = CallHistoryAdapter(requireContext(), this)
         viewModel.getCallLogsHistoryDb()
+        return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewModel.callLogsdb.observe(this) {
             callLogsAdapter.addAll(listOf())
             callLogsAdapter.addAll(it)
@@ -78,7 +83,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             binding.recyclerViewCallHistory.adapter = callLogsAdapter
             callLogsAdapter.notifyDataSetChanged()
         }
-        return binding.root
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -104,6 +104,7 @@ class MainActivityViewModel(
     }
 
     fun getCallLogsHistoryDb() {
+/*
         _callLogsdb.value = db.getAllCallLogs().sortedByDescending {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 LocalDate.parse(it.date, DateTimeFormatter.ofPattern(PrefUtils.DataFormate))
@@ -111,38 +112,46 @@ class MainActivityViewModel(
                 TODO("VERSION.SDK_INT < O")
             }
         }
-    }
-
-    fun getAllFavouriteContacts() {
-        viewModelScope.launch {
-            _AllFavouriteContacts.value = db.getAllFavouriteContacts(true)
-        }
-    }
-
-    fun getContacts(): List<Contact> {
-        job = Job()
-        val list = ArrayList<Contact>()
-        viewModelScope.launch(Dispatchers.Main) {
-            listOfContactStore.fetchContacts().collect { it ->
-                it.forEach {
-                    if (!it.displayName.isNullOrBlank()) {
-                        list.add(
-                            Contact(
-                                it.displayName,
-                                "",
-                                it.thumbnailUri.toString(),
-                                contactId = it.contactId.toString(),
-                                isFavourites = it.isStarred
-                            )
-                        )
-                    }
-
-                }
+*/
+        _callLogsdb.value = db.getAllCallLogs().sortedByDescending {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
+            } else {
+                TODO("VERSION.SDK_INT < N")
             }
         }
-        return list
-
     }
 
-}
+        fun getAllFavouriteContacts() {
+            viewModelScope.launch {
+                _AllFavouriteContacts.value = db.getAllFavouriteContacts(true)
+            }
+        }
+
+        fun getContacts(): List<Contact> {
+            job = Job()
+            val list = ArrayList<Contact>()
+            viewModelScope.launch(Dispatchers.Main) {
+                listOfContactStore.fetchContacts().collect { it ->
+                    it.forEach {
+                        if (!it.displayName.isNullOrBlank()) {
+                            list.add(
+                                Contact(
+                                    it.displayName,
+                                    "",
+                                    it.thumbnailUri.toString(),
+                                    contactId = it.contactId.toString(),
+                                    isFavourites = it.isStarred
+                                )
+                            )
+                        }
+
+                    }
+                }
+            }
+            return list
+
+        }
+
+    }
 
