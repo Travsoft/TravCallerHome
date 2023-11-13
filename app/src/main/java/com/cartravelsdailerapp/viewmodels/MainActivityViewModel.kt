@@ -1,15 +1,24 @@
 package com.cartravelsdailerapp.viewmodels
 
 import android.app.Application
+import android.icu.text.SimpleDateFormat
+import android.os.Build
+import android.provider.CallLog
 import android.util.Log
 import androidx.lifecycle.*
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import kotlinx.coroutines.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class MainActivityViewModel(
@@ -56,30 +65,52 @@ class MainActivityViewModel(
         }
     }
 
-    suspend fun getNewCallLogsHistory() {
+    fun getNewCallLogsHistory(number: String) {
+
         viewModelScope.launch {
-            _newCallLogs.value = callLogsRepository.fetchCallLogSignle()
-            _newCallLogs.value?.let {
-                val callHistory = it
-                val isContactsFind =
-                    db.getAllCallLogs().any { it.number.equals(callHistory.number) }
-                if (!isContactsFind) {
-                    db.insertCallHistory(it)
-                    Log.d("inserted 68",it.number)
-                } else {
+            val callhistoryData = db.getAllCallLogs()
+            val callHistory =
+                callhistoryData.find { it.number.equals(number) }
+            if (callHistory == null) {
+                // db.insertCallHistory()
+                Log.d("inserted 68", number)
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
+                    val date = Date()
+                    val current = simpDate.format(date)
                     db.updateCallHistory(
-                        it.date, it.id
+                        current, callHistory.id
                     )
-                    Log.d("updated 73",it.number)
+                    Log.d(
+                        "updated 84", " ${callHistory.id} ${
+                            callHistory
+                                .number
+                        }"
+                    )
+
+                } else {
+                    val d = Date()
+                    db.updateCallHistory(
+                        d.toString(), callHistory.id
+                    )
+                    Log.d("updated 91", " ${callHistory.id}")
 
                 }
 
             }
+            getCallLogsHistoryDb()
         }
     }
 
     fun getCallLogsHistoryDb() {
-        _callLogsdb.value = db.getAllCallLogs()
+        _callLogsdb.value = db.getAllCallLogs().sortedByDescending {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LocalDate.parse(it.date, DateTimeFormatter.ofPattern(PrefUtils.DataFormate))
+            } else {
+                TODO("VERSION.SDK_INT < O")
+            }
+        }
     }
 
     fun getAllFavouriteContacts() {

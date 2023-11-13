@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telephony.TelephonyManager
@@ -35,8 +34,6 @@ import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
 import com.cartravelsdailerapp.ui.adapters.OnClickListeners
-import com.cartravelsdailerapp.ui.adapters.PaginationScrollListener
-import com.cartravelsdailerapp.viewmodels.CallHistoryViewmodel
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -53,7 +50,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var receiver: CustomPhoneStateReceiver
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
         launch {
-            viewModel.getNewCallLogsHistory()
+            viewModel.getNewCallLogsHistory(phone)
         }
     }
 
@@ -72,12 +69,14 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         callLogsAdapter = CallHistoryAdapter(requireContext(), this)
         viewModel.getCallLogsHistoryDb()
         viewModel.callLogsdb.observe(this) {
+            callLogsAdapter.addAll(listOf())
             callLogsAdapter.addAll(it)
             val linearLayoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
             binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
             binding.recyclerViewCallHistory.adapter = callLogsAdapter
+            callLogsAdapter.notifyDataSetChanged()
         }
         return binding.root
     }

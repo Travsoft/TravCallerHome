@@ -26,7 +26,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,7 +35,6 @@ import com.cartravelsdailerapp.PrefUtils.EnteredNumber
 import com.cartravelsdailerapp.PrefUtils.TelegramAppPackage
 import com.cartravelsdailerapp.PrefUtils.WhatsAppPackage
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.Repositorys.DAO.CallLogsDataSource
 import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.dialerstates.CallManager
 import com.cartravelsdailerapp.dialerstates.GsmCall
@@ -86,7 +84,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
 
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
         launch {
-            viewModel.getNewCallLogsHistory()
+            viewModel.getNewCallLogsHistory(phone)
         }
     }
     @RequiresApi(Build.VERSION_CODES.P)
