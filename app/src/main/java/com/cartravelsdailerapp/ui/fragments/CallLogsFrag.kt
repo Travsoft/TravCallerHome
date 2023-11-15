@@ -47,10 +47,10 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     private lateinit var job: Job
     lateinit var callLogsAdapter: CallHistoryAdapter
-    lateinit var receiver: CustomPhoneStateReceiver
+    var receiver: CustomPhoneStateReceiver? = null
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
         launch {
-            viewModel.getNewCallLogsHistory(phone)
+            viewModel.getNewCallLogsHistory(phone,"")
         }
     }
 
@@ -265,6 +265,13 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             Intent(Intent.ACTION_VIEW, Uri.parse(PrefUtils.TelegramUri + toNumber))
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        if (receiver != null)
+            context?.unregisterReceiver(receiver)
+
     }
 
     override fun onDestroy() {

@@ -13,7 +13,8 @@ import android.widget.Toast
 
 class CustomPhoneStateReceiver(private val onResult: (String, String?, Uri?) -> Unit,val number: String) :
     BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent?)
+    {
         println("CustomPhoneStateReceiver 17 onReceive")
 
         val state = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
@@ -33,6 +34,7 @@ class CustomPhoneStateReceiver(private val onResult: (String, String?, Uri?) -> 
         }
 
     }
+
 
     private fun getCallerInfo(context: Context, phoneNumber: String): Pair<String?, Uri?> {
         val uri = Uri.withAppendedPath(

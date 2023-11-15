@@ -5,6 +5,7 @@ import android.icu.text.SimpleDateFormat
 import android.os.Build
 import android.provider.CallLog
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
@@ -65,15 +66,50 @@ class MainActivityViewModel(
         }
     }
 
-    fun getNewCallLogsHistory(number: String) {
+    fun getNewCallLogsHistory(number: String, simName: String) {
 
         viewModelScope.launch {
             val callhistoryData = db.getAllCallLogs()
             val callHistory =
-                callhistoryData.find { it.number.equals(number) }
+                callhistoryData.find { it.number == number }
             if (callHistory == null) {
-                // db.insertCallHistory()
-                Log.d("inserted 68", number)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
+                    val date = Date()
+                    val current = simpDate.format(date)
+                    db.insertCallHistory(
+                        CallHistory(
+                            "OUTGOING",
+                            number,
+                            "",
+                            0,
+                            current.toString(),
+                            "",
+                            "",
+                            "",
+                            simName
+                        )
+                    )
+                    Log.d("92", "inserted ${number}")
+                } else {
+                    val d = Date()
+                    db.insertCallHistory(
+                        CallHistory(
+                            "OUTGOING",
+                            number,
+                            "",
+                            0,
+                            d.toString(),
+                            "",
+                            "",
+                            "",
+                            simName
+                        )
+                    )
+                    Log.d("107", "inserted ${number}")
+
+                }
+                Log.d("inserted 108", number)
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
@@ -88,6 +124,7 @@ class MainActivityViewModel(
                                 .number
                         }"
                     )
+                    Log.d("updated 125", "inserted ${number}")
 
                 } else {
                     val d = Date()
@@ -97,6 +134,7 @@ class MainActivityViewModel(
                     Log.d("updated 91", " ${callHistory.id}")
 
                 }
+                Log.d("inserted 132", number)
 
             }
             getCallLogsHistoryDb()
@@ -104,15 +142,6 @@ class MainActivityViewModel(
     }
 
     fun getCallLogsHistoryDb() {
-/*
-        _callLogsdb.value = db.getAllCallLogs().sortedByDescending {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalDate.parse(it.date, DateTimeFormatter.ofPattern(PrefUtils.DataFormate))
-            } else {
-                TODO("VERSION.SDK_INT < O")
-            }
-        }
-*/
         _callLogsdb.value = db.getAllCallLogs().sortedByDescending {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
@@ -122,36 +151,36 @@ class MainActivityViewModel(
         }
     }
 
-        fun getAllFavouriteContacts() {
-            viewModelScope.launch {
-                _AllFavouriteContacts.value = db.getAllFavouriteContacts(true)
-            }
+    fun getAllFavouriteContacts() {
+        viewModelScope.launch {
+            _AllFavouriteContacts.value = db.getAllFavouriteContacts(true)
         }
+    }
 
-        fun getContacts(): List<Contact> {
-            job = Job()
-            val list = ArrayList<Contact>()
-            viewModelScope.launch(Dispatchers.Main) {
-                listOfContactStore.fetchContacts().collect { it ->
-                    it.forEach {
-                        if (!it.displayName.isNullOrBlank()) {
-                            list.add(
-                                Contact(
-                                    it.displayName,
-                                    "",
-                                    it.thumbnailUri.toString(),
-                                    contactId = it.contactId.toString(),
-                                    isFavourites = it.isStarred
-                                )
+    fun getContacts(): List<Contact> {
+        job = Job()
+        val list = ArrayList<Contact>()
+        viewModelScope.launch(Dispatchers.Main) {
+            listOfContactStore.fetchContacts().collect { it ->
+                it.forEach {
+                    if (!it.displayName.isNullOrBlank()) {
+                        list.add(
+                            Contact(
+                                it.displayName,
+                                "",
+                                it.thumbnailUri.toString(),
+                                contactId = it.contactId.toString(),
+                                isFavourites = it.isStarred
                             )
-                        }
-
+                        )
                     }
+
                 }
             }
-            return list
-
         }
+        return list
 
     }
+
+}
 

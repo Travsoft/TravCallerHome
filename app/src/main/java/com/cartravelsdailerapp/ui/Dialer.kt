@@ -81,12 +81,21 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
     lateinit var launcherContact: ActivityResultLauncher<Intent>
     lateinit var viewModel: MainActivityViewModel
     lateinit var receiver: CustomPhoneStateReceiver
-
+    var simName: String = "SIM1"
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
         launch {
-            viewModel.getNewCallLogsHistory(phone)
+            viewModel.getNewCallLogsHistory(phone, simName)
+            val intent = Intent(
+                this@Dialer,
+                MainActivity::class.java
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.putExtra(EnteredNumber, edtInput.toString())
+            startActivity(intent)
+
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         job = Job()
@@ -132,13 +141,6 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
 
                 if (edtInput.length() > 0) {
                     callTheEnteredNumber()
-                    val intent = Intent(
-                        this,
-                        MainActivity::class.java
-                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    intent.putExtra(EnteredNumber, edtInput.toString())
-                    startActivity(intent)
                     receiver = CustomPhoneStateReceiver(onResult, edtInput.toString())
                     ContextCompat.registerReceiver(
                         this,
@@ -199,10 +201,11 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                     if (txt_sim_type.text.equals("1")) {
                         txt_sim_type.text = subList[1].displayName.toString().replace("SIM", "")
                         bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, list[1])
-
+                        simName = subList[1].displayName.toString()
                     } else {
                         txt_sim_type.text = subList[0].displayName.toString().replace("SIM", "")
                         bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, list[0])
+                        simName = subList[0].displayName.toString()
                     }
                 }
             }
@@ -539,4 +542,5 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
         contactsAdapter.notifyDataSetChanged()
 
     }
+
 }
