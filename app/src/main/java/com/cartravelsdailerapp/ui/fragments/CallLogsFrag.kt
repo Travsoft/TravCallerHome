@@ -1,6 +1,7 @@
 package com.cartravelsdailerapp.ui.fragments
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -22,6 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.PrefUtils
@@ -82,7 +84,20 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             binding.recyclerViewCallHistory.adapter = callLogsAdapter
             callLogsAdapter.notifyDataSetChanged()
         }
+        // register broadcast manager
+        val localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
+        localBroadcastManager.registerReceiver(receiver_local, IntentFilter(PrefUtils.LOCAL_BROADCAST_KEY))
 
+
+    }
+    var receiver_local: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent != null) {
+                val phone = intent.getStringExtra(PrefUtils.ContactNumber)
+                phone?.let { viewModel.getNewCallLogsHistory(it,"") }
+                Log.e("98--phone", "Number is ,$phone")
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

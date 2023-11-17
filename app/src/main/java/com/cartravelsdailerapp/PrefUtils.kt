@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 
 object PrefUtils {
     const val ContactName = "contactName"
+    const val PhotoUri = "photoUri"
     const val EnteredNumber = "entered_number"
     const val ContactProfile = "imageUri"
     const val ContactNumber = "contactNumber"
@@ -17,7 +18,7 @@ object PrefUtils {
     const val ContactId = "contactid"
     const val CallTravelsSharedPref = "CallTravelsSharedPref"
     const val IsLogin = "IsLogin"
-    const val LOCAL_BROADCAST_KEY = "step_counter_local_broadcast"
+    const val LOCAL_BROADCAST_KEY = "insert_incomingCall_local_broadcast"
     const val ACTION_STEP_COUNTER_NOTIFICATION = "ACTION_STEP_COUNTER_NOTIFICATION"
     const val PERMISION_REQUEST = 100
     const val REQUESTED_CODE_READ_PHONE_STATE = 1003
