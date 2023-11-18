@@ -4,7 +4,9 @@
     tools:context=".ui.fragments.ContactsFrag"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,9 +66,9 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recy_list_favourites_contacts"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="300dp"
             android:padding="10dp"
-            android:visibility="gone"
+            android:overScrollMode="never"
             tools:listitem="@layout/item_favourites_contacts" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -75,6 +77,10 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:padding="10dp"
+            android:overScrollMode="never"
             tools:listitem="@layout/layout_item_contacts" />
     </LinearLayout>
+
+</ScrollView>
+
 </layout>

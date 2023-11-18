@@ -22,6 +22,7 @@ import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
@@ -162,17 +163,19 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
                 }
             }
-        }else {
-             contactsAdapter.filterList(list.filter { f->f.name.contains(text) }.distinctBy { u -> u.name } as ArrayList<Contact>)
+        } else {
+            contactsAdapter.filterList(list.filter { f -> f.name.contains(text) }
+                .distinctBy { u -> u.name } as ArrayList<Contact>)
         }
     }
+
     fun initFavouritesContact(listOfFavouritesContacts: List<Contact>) {
         binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
         binding.txFavourite.isVisible = listOfFavouritesContacts.isNotEmpty()
         favcontactsAdapter = FavouritesContactAdapter()
         favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
         binding.recyListFavouritesContacts.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            GridLayoutManager(requireContext(), 3)
         binding.recyListFavouritesContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListFavouritesContacts.adapter = favcontactsAdapter
     }
