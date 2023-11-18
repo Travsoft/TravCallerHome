@@ -40,23 +40,6 @@ class CallHistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentCallHistoryBinding.inflate(layoutInflater)
-        binding.searchContacts.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-            android.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(msg: String): Boolean {
-/*
-                if (binding.recyclerViewCallHistory.isVisible) {
-                    filter(msg)
-                } else {
-                    filterContacts(msg)
-                }
-*/
-                return false
-            }
-        })
         val myViewModelFactory =
             MyViewModelFactory(requireActivity().application)
         viewModel = ViewModelProvider(
@@ -73,29 +56,6 @@ class CallHistoryFragment : Fragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun filter(text: String) {
-        if (text.isEmpty()) {
-            //  loadData()
-        } else {
-            // creating a new array list to filter our data.
-            val filteredlist: ArrayList<CallHistory> =
-                DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-                    .searchCall(text) as ArrayList<CallHistory>
-            //adapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
-        }
-    }
-
-    private fun filterContacts(text: String) {
-        if (text.isEmpty()) {
-            // loadContactsData()
-        } else {
-            // creating a new array list to filter our data.
-            val filteredlist: ArrayList<Contact> =
-                DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
-                    .searchContactCall(text) as ArrayList<Contact>
-            // contactsAdapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<Contact>)
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

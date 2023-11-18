@@ -19,9 +19,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -32,6 +35,8 @@ import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.FragmentCallLogsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
+import com.cartravelsdailerapp.models.CallHistory
+import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
@@ -42,6 +47,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.Locale.filter
 import kotlin.coroutines.CoroutineContext
 
 class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
@@ -52,7 +58,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     var receiver: CustomPhoneStateReceiver? = null
     private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
         launch {
-            viewModel.getNewCallLogsHistory(phone,"")
+            viewModel.getNewCallLogsHistory(phone, "")
         }
     }
 
@@ -70,7 +76,55 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         binding = FragmentCallLogsBinding.inflate(layoutInflater)
         callLogsAdapter = CallHistoryAdapter(requireContext(), this)
         viewModel.getCallLogsHistoryDb()
+        binding.searchContacts.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(msg: String): Boolean {
+                if (binding.recyclerViewCallHistory.isVisible) {
+                    filter(msg)
+                } else {
+                    filterContacts(msg)
+                }
+                return false
+            }
+        })
+        binding.recyclerViewCallHistory.isNestedScrollingEnabled = false
+        ViewCompat.setNestedScrollingEnabled(binding.recyclerViewCallHistory, false)
+
         return binding.root
+    }
+
+    private fun filter(text: String) {
+        if (text.isEmpty()) {
+            viewModel.getCallLogsHistoryDb()
+        } else {
+            // creating a new array list to filter our data.
+            val filteredlist: ArrayList<CallHistory> =
+                DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                    .searchCall(text) as ArrayList<CallHistory>
+            callLogsAdapter.addAll(filteredlist.distinctBy { u -> u.number } as ArrayList<CallHistory>)
+            val linearLayoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
+            binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
+            binding.recyclerViewCallHistory.adapter = callLogsAdapter
+            callLogsAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun filterContacts(text: String) {
+        if (text.isEmpty()) {
+            // loadContactsData()
+        } else {
+            // creating a new array list to filter our data.
+            val filteredlist: ArrayList<Contact> =
+                DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+                    .searchContactCall(text) as ArrayList<Contact>
+            // contactsAdapter.filterList(filteredlist.distinctBy { u -> u.number } as ArrayList<Contact>)
+        }
     }
 
     override fun onResume() {
@@ -80,21 +134,28 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             val linearLayoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
+            binding.recyclerViewCallHistory.setHasFixedSize(false)
+            // binding.recyclerViewCallHistory.isNestedScrollingEnabled = false
             binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
             binding.recyclerViewCallHistory.adapter = callLogsAdapter
+
             callLogsAdapter.notifyDataSetChanged()
         }
         // register broadcast manager
         val localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
-        localBroadcastManager.registerReceiver(receiver_local, IntentFilter(PrefUtils.LOCAL_BROADCAST_KEY))
+        localBroadcastManager.registerReceiver(
+            receiver_local,
+            IntentFilter(PrefUtils.LOCAL_BROADCAST_KEY)
+        )
 
 
     }
+
     var receiver_local: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent != null) {
                 val phone = intent.getStringExtra(PrefUtils.ContactNumber)
-                phone?.let { viewModel.getNewCallLogsHistory(it,"") }
+                phone?.let { viewModel.getNewCallLogsHistory(it, "") }
                 Log.e("98--phone", "Number is ,$phone")
             }
         }
