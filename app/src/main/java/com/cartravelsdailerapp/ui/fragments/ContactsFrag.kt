@@ -84,7 +84,7 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         val listOfContactStore = ContactStore.newInstance(requireContext())
         listOfContactStore.fetchContacts().collect { it ->
             it.forEach {
-                if (!it.displayName.isNullOrBlank()) {
+                if (!it.displayName.isBlank()) {
                     list.add(
                         Contact(
                             it.displayName,

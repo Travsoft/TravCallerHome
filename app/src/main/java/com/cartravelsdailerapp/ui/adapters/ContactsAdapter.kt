@@ -11,9 +11,15 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.QuickContactBadge
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.alexstyl.contactstore.ContactPredicate
+import com.alexstyl.contactstore.ContactPredicate.Companion.ContactLookup
+import com.alexstyl.contactstore.ContactStore
+import com.alexstyl.contactstore.allContactColumns
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.LayoutItemContactsBinding
@@ -30,7 +36,15 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
         var txtContactName = itemView.findViewById<TextView>(R.id.txt_Contact_name)
         var txtContactNumber = itemView.findViewById<TextView>(R.id.txt_Contact_number)
         var profileImage = itemView.findViewById<QuickContactBadge>(R.id.profile_image)
-
+        var call = itemView.findViewById<LinearLayout>(R.id.layout_call)
+        var profile_contact = itemView.findViewById<LinearLayout>(R.id.profile_contact)
+        var layout_sub_item = itemView.findViewById<LinearLayout>(R.id.layout_sub_item)
+        var card_whatsapp = itemView.findViewById<CardView>(R.id.card_whatsapp)
+        var card_telegram = itemView.findViewById<CardView>(R.id.card_telegram)
+        var cardSms = itemView.findViewById<CardView>(R.id.card_sms)
+        var card_call = itemView.findViewById<CardView>(R.id.card_call)
+        var txt_Contact_number_count =
+            itemView.findViewById<TextView>(R.id.txt_Contact_number_count)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
@@ -61,7 +75,57 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                 PrefUtils.ContactFragment,
                 listOfContacts.contactId
             )
+        }
+        holder.itemView.setOnClickListener {
+            // Get the current state of the item
+            // Get the current state of the item
+            val expanded: Boolean = listOfContacts.IsExpand
+            // Change the state
+            // Change the state
+            listOfContacts.IsExpand = !expanded
+            // Notify the adapter that item has changed
+            // Notify the adapter that item has changed
+            notifyItemChanged(position)
+            val store = ContactStore.newInstance(context.applicationContext)
 
+            store.fetchContacts(
+                predicate = ContactLookup(listOfContacts.contactId.toLong()),
+                columnsToFetch = allContactColumns()
+            )
+                .collect { contacts ->
+                    val contact = contacts.firstOrNull()
+                    if (contact == null) {
+                        println("Contact not found")
+                    } else {
+                        println("Contact found: $contact")
+                        println("Contact found: ${contact.phones.get(0).value.raw}")
+                        // Use contact.phones, contact.mails, contact.customDataItems etc
+                        listOfConttacts[position].number =
+                            contact.phones.get(0).value.raw.toString()
+                    }
+                }
+        }
+        // Set the visibility based on state
+        // Set the visibility based on state
+        holder.layout_sub_item.visibility = if (listOfContacts.IsExpand) View.VISIBLE else View.GONE
+        holder.call.setOnClickListener {
+            onclick.callOnClick(listOfContacts.number, "")
+        }
+        holder.card_whatsapp.setOnClickListener {
+            onclick.openWhatsApp(listOfContacts.number)
+
+        }
+        holder.card_telegram.setOnClickListener {
+            onclick.openTelegramApp(listOfContacts.number)
+        }
+        holder.cardSms.setOnClickListener {
+            onclick.openSMSScreen(listOfContacts.number)
+        }
+        holder.card_call.setOnClickListener {
+            if (TextUtils.isEmpty(listOfContacts.name))
+                onclick.openPhoneNumberHistory(listOfContacts.number, listOfContacts.number!!)
+            else
+                onclick.openPhoneNumberHistory(listOfContacts.number, listOfContacts.name!!)
 
         }
     }

@@ -10,7 +10,7 @@ data class Contact(
     val name: String,
 
     @ColumnInfo
-    val number: String,
+    var number: String,
 
     @ColumnInfo
     val photoUri: String,
@@ -24,4 +24,6 @@ data class Contact(
 
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
+    var IsExpand: Boolean = false
+
 }

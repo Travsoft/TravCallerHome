@@ -87,22 +87,28 @@ class CallHistroyActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun getPhotoFromContacts(num: String): String? {
-        val uri =
-            Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
-        //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
-        val cursor: Cursor? = this.getContentResolver().query(uri, null, null, null, null)
+        if (num.isNotBlank()) {
+            val uri =
+                Uri.withAppendedPath(
+                    ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                    Uri.encode(num)
+                )
+            //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
+            val cursor: Cursor? = this.getContentResolver().query(uri, null, null, null, null)
 
-        if (cursor != null) {
-            if (cursor.moveToNext()) {
-                val id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
-                val name =
-                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
-                val image_uri =
-                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
-                Log.d("image_uri-->", "name $name id $id image_uri $image_uri")
-                return image_uri
+            if (cursor != null) {
+                if (cursor.moveToNext()) {
+                    val id =
+                        cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
+                    val name =
+                        cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                    val image_uri =
+                        cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
+                    Log.d("image_uri-->", "name $name id $id image_uri $image_uri")
+                    return image_uri
+                }
+                cursor.close()
             }
-            cursor.close()
         }
         return ""
     }
