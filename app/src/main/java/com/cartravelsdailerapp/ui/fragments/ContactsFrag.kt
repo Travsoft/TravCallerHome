@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
@@ -31,6 +32,7 @@ import com.cartravelsdailerapp.databinding.FragmentContactsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
+import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.ProfileActivity
@@ -54,6 +56,7 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     lateinit var favcontactsAdapter: FavouritesContactAdapter
     lateinit var db: AppDatabase
+    val list = ArrayList<Contact>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +82,6 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyListContacts.adapter = contactsAdapter
 
         val listOfContactStore = ContactStore.newInstance(requireContext())
-        val list = ArrayList<Contact>()
         listOfContactStore.fetchContacts().collect { it ->
             it.forEach {
                 if (!it.displayName.isNullOrBlank()) {
@@ -113,9 +115,57 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         viewModel.AllFavouriteContacts.observe(this) {
             initFavouritesContact(it)
         }
+        binding.searchContacts.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(msg: String): Boolean {
+                filterContacts(msg)
+                return false
+            }
+        })
+
         return binding.root
     }
 
+
+    private fun filterContacts(text: String) {
+        if (text.isEmpty()) {
+            list.clear()
+            val listOfContactStore = ContactStore.newInstance(requireContext())
+            listOfContactStore.fetchContacts().collect { it ->
+                it.forEach {
+                    if (!it.displayName.isNullOrBlank()) {
+                        list.add(
+                            Contact(
+                                it.displayName,
+                                "",
+                                it.thumbnailUri.toString(),
+                                contactId = it.contactId.toString(),
+                                isFavourites = it.isStarred
+                            )
+                        )
+                    }
+
+                }
+                launch(Dispatchers.Main) {
+                    contactsAdapter.addAll(list.toList().sortedBy { i -> i.name }
+                        .distinctBy { i -> i.name })
+                    contactsAdapter.notifyDataSetChanged()
+                    Toast
+                        .makeText(
+                            context, list
+                                .size.toString(), Toast.LENGTH_SHORT
+                        ).show()
+
+                }
+            }
+        }else {
+             contactsAdapter.filterList(list.filter { f->f.name.contains(text) }.distinctBy { u -> u.name } as ArrayList<Contact>)
+        }
+    }
     fun initFavouritesContact(listOfFavouritesContacts: List<Contact>) {
         binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
         binding.txFavourite.isVisible = listOfFavouritesContacts.isNotEmpty()

@@ -67,6 +67,7 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
     }
 
     fun addAll(list: List<Contact>) {
+        listOfConttacts.clear()
         listOfConttacts.addAll(list)
     }
 
