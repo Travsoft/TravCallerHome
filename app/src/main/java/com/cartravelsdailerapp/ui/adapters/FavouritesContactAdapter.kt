@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.databinding.ItemCallhistoryBinding
 import com.cartravelsdailerapp.databinding.ItemFavouritesContactsBinding
 import com.cartravelsdailerapp.models.CallHistory
@@ -19,7 +20,7 @@ import com.cartravelsdailerapp.models.Contact
 import java.io.FileNotFoundException
 import java.io.IOException
 
-class FavouritesContactAdapter :
+class FavouritesContactAdapter(val onclick: OnClickListeners) :
     RecyclerView.Adapter<FavouritesContactAdapter.FavouritesContactVM>() {
     lateinit var binding: ItemFavouritesContactsBinding
     lateinit var context: Context
@@ -53,6 +54,16 @@ class FavouritesContactAdapter :
             } else {
                 binding.quickProfileImage.setImageToDefault()
             }
+            binding.quickProfileImage.setOnClickListener {
+                onclick.navigateToProfilePage(
+                    this.name,
+                    "",
+                    this.photoUri,
+                    PrefUtils.ContactFragment,
+                    this.contactId
+                )
+            }
+
         }
     }
 

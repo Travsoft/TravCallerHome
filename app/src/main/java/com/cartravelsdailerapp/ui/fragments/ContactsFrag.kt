@@ -172,7 +172,7 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
     fun initFavouritesContact(listOfFavouritesContacts: List<Contact>) {
         binding.recyListFavouritesContacts.isVisible = listOfFavouritesContacts.isNotEmpty()
         binding.txFavourite.isVisible = listOfFavouritesContacts.isNotEmpty()
-        favcontactsAdapter = FavouritesContactAdapter()
+        favcontactsAdapter = FavouritesContactAdapter(this)
         favcontactsAdapter.updateFavouritesContactList(listOfFavouritesContacts)
         binding.recyListFavouritesContacts.layoutManager =
             GridLayoutManager(requireContext(), 3)
