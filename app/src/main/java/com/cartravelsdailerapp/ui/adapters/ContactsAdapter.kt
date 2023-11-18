@@ -98,10 +98,12 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                         println("Contact not found")
                     } else {
                         println("Contact found: $contact")
-                        println("Contact found: ${contact.phones.get(0).value.raw}")
-                        // Use contact.phones, contact.mails, contact.customDataItems etc
-                        listOfConttacts[position].number =
-                            contact.phones.get(0).value.raw.toString()
+                        if(contact.phones.isNotEmpty()) {
+                            println("Contact found: ${contact.phones.get(0).value.raw}")
+                            // Use contact.phones, contact.mails, contact.customDataItems etc
+                            listOfConttacts[position].number =
+                                contact.phones.get(0).value.raw.toString()
+                        }
                     }
                 }
         }
