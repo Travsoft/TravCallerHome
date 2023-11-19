@@ -55,10 +55,9 @@
             android:id="@+id/recycler_view_call_history"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
             android:overScrollMode="never"
-            android:padding="10dp"
+            android:layout_margin="5dp"
             android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/item_callhistory" />
+            tools:listitem="@layout/layout_item_call_history" />
 
     </LinearLayout></LinearLayout>

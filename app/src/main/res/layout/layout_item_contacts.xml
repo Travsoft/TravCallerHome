@@ -92,7 +92,7 @@
         android:layout_marginTop="10dp"
         android:layout_weight="2"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <LinearLayout
             android:id="@+id/layout2"
@@ -242,7 +242,7 @@
 
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/card_add_edit"
+                    android:id="@+id/card_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -254,7 +254,7 @@
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:src="@drawable/ic_add_circle"
+                        android:src="@drawable/ic_delete"
                         app:tint="@color/white" />
 
                 </androidx.cardview.widget.CardView>

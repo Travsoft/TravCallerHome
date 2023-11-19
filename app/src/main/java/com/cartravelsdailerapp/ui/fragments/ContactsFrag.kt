@@ -2,6 +2,7 @@ package com.cartravelsdailerapp.ui.fragments
 
 import android.Manifest
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -58,6 +59,19 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var favcontactsAdapter: FavouritesContactAdapter
     lateinit var db: AppDatabase
     val list = ArrayList<Contact>()
+    val positiveButtonClick = { dialog: DialogInterface, which: Int ->
+        val listOfContactStore = ContactStore.newInstance(requireContext())
+        listOfContactStore.execute {
+            delete(contactId = 5L)
+        }
+
+    }
+    val negativeButtonClick = { dialog: DialogInterface, which: Int ->
+        Toast.makeText(
+            requireContext(),
+            android.R.string.no, Toast.LENGTH_SHORT
+        ).show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -291,6 +305,11 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         context?.startActivity(intent)
     }
 
+    override fun deleteContact(contactId: String) {
+
+        basicAlert(binding.root, contactId)
+    }
+
     fun isAppInstalled(packageName: String?): Boolean {
         val pm = context?.packageManager
         try {
@@ -363,6 +382,36 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
             Intent(Intent.ACTION_VIEW, Uri.parse(PrefUtils.TelegramUri + toNumber))
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
+    }
+
+    fun basicAlert(view: View, contactid: String) {
+
+        val builder = AlertDialog.Builder(requireContext())
+
+        with(builder)
+        {
+            setTitle("Delete")
+            setMessage("Are you sure your want to delete? ")
+            setPositiveButton("Yes") { dialog: DialogInterface, which: Int ->
+
+                launch(Dispatchers.Main) {
+                    val listOfContactStore = ContactStore.newInstance(requireContext())
+                    listOfContactStore.execute {
+                        delete(
+                            contactid.toLong()
+                        )
+                    }
+                }
+
+
+            }
+            setNegativeButton("No" ){dialog: DialogInterface, which: Int ->
+                dialog.dismiss()
+            }
+            show()
+        }
+
+
     }
 
 }

@@ -7,4 +7,5 @@ interface OnClickListeners {
     fun openTelegramApp(number: String)
     fun openSMSScreen(number: String)
     fun openPhoneNumberHistory(number: String,name: String)
+    fun deleteContact(contactId: String)
 }

@@ -254,6 +254,10 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         context?.startActivity(intent)
     }
 
+    override fun deleteContact(contactId: String) {
+        TODO("Not yet implemented")
+    }
+
     fun isAppInstalled(packageName: String?): Boolean {
         val pm = context?.packageManager
         try {

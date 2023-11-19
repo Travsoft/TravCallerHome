@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SubscriptionManager
@@ -160,9 +161,16 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 })
 
         } else {
+            /*PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS
+        ).then(async (response) => {
+            await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
+        })*/
+
             runtimePermission.requestPermission(
                 listOf(
                     Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.WRITE_CONTACTS,
                     Manifest.permission.READ_CONTACTS,
                     Manifest.permission.READ_CALL_LOG,
                     Manifest.permission.READ_PHONE_NUMBERS,

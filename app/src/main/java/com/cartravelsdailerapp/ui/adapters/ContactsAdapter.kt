@@ -45,6 +45,8 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
         var card_call = itemView.findViewById<CardView>(R.id.card_call)
         var txt_Contact_number_count =
             itemView.findViewById<TextView>(R.id.txt_Contact_number_count)
+        var Contact_delete =
+            itemView.findViewById<CardView>(R.id.card_delete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
@@ -129,6 +131,11 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
             else
                 onclick.openPhoneNumberHistory(listOfContacts.number, listOfContacts.name!!)
 
+        }
+        holder.Contact_delete.setOnClickListener {
+            if (!listOfContacts.contactId.isBlank()){
+                onclick.deleteContact(listOfContacts.contactId)
+            }
         }
     }
 
