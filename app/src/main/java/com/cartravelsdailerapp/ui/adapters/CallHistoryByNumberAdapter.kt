@@ -39,7 +39,9 @@ class CallHistoryByNumberAdapter :
         binding.txtCallTypeName.setText(callhistoryItem.calType)
         binding.txtDateTime.setText(callhistoryItem.date)
         binding.txtSimType.setText(callhistoryItem.SimName)
-        binding.txtCallTime.setText(convertSeconds(Integer.parseInt(callhistoryItem.duration)))
+        if(callhistoryItem.duration.isNotBlank()) {
+            binding.txtCallTime.setText(convertSeconds(Integer.parseInt(callhistoryItem.duration)))
+        }
         when (callhistoryItem.calType) {
             OUTGOING -> {
                 binding.imgCallTypeImage.setImageDrawable(
