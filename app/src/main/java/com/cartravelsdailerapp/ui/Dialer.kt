@@ -25,6 +25,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -58,7 +59,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
 
     lateinit var dialerView: LinearLayout
     lateinit var tel: TelecomManager
-    lateinit var fab: FloatingActionButton
+    lateinit var fab: CardView
     lateinit var clear_img: ImageView
     private var updatesDisposable = Disposables.empty()
     private var timerDisposable = Disposables.empty()
@@ -136,7 +137,6 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
         fab.setOnClickListener { view ->
             if (dialerView.visibility == View.GONE) {
                 dialerView.visibility = View.VISIBLE
-                fab.setImageResource(R.drawable.ic_call)
             } else {
 
                 if (edtInput.length() > 0) {
