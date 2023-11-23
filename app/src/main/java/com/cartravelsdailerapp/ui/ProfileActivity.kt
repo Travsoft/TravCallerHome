@@ -1,330 +1,150 @@
 package com.cartravelsdailerapp.ui
 
-import android.Manifest
-import android.app.Dialog
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.res.AssetFileDescriptor
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.telecom.TelecomManager
-import android.text.TextUtils
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Window
-import android.widget.ImageView
-import android.widget.QuickContactBadge
-import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.getSystemService
-import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
-import com.alexstyl.contactstore.ContactColumn
-import com.alexstyl.contactstore.ContactPredicate
-import com.alexstyl.contactstore.ContactStore
-import com.alexstyl.contactstore.allContactColumns
-import com.cartravelsdailerapp.PrefUtils
-import com.cartravelsdailerapp.PrefUtils.ContactId
-import com.cartravelsdailerapp.PrefUtils.ContactName
-import com.cartravelsdailerapp.PrefUtils.ContactNumber
-import com.cartravelsdailerapp.PrefUtils.ContactUri
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.databinding.LayoutPreviewProfilePicBinding
-import com.cartravelsdailerapp.db.DatabaseBuilder
-import com.cartravelsdailerapp.models.Contact
-import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
-import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
-import com.cartravelsdailerapp.viewmodels.ProfileViewModel
-import kotlinx.coroutines.Job
-import java.io.FileNotFoundException
+import com.cartravelsdailerapp.databinding.ActivityProfileBinding
+import com.cartravelsdailerapp.databinding.PopupLayoutBinding
+import java.io.FileDescriptor
 import java.io.IOException
 
+
 class ProfileActivity : AppCompatActivity() {
-    var name: String = ""
-    var number: String = ""
-    var photoUri: String = ""
-    var activityType: String = ""
-    var contactId: String = ""
-    private lateinit var txt_name: TextView
-    private lateinit var img_profile: QuickContactBadge
-    private lateinit var card_call: CardView
-    private lateinit var card_whatsapp: CardView
-    private lateinit var img_Favourite: ImageView
-    private lateinit var img_Favouritefilled: ImageView
-    var db = DatabaseBuilder.getInstance(this).CallHistoryDao()
-    lateinit var viewModel: ProfileViewModel
+    private var galleryActivityResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (it.getResultCode() === RESULT_OK) {
+                image_uri = it.data?.data
+                val inputImage = uriToBitmap(image_uri!!)
+                val rotated = rotateBitmap(inputImage!!)
+                binding.imgProfile.setImageBitmap(rotated)
+            }
+        }
+
+    //TODO capture the image using camera and display it
+    private var cameraActivityResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (it.resultCode === RESULT_OK) {
+                val inputImage = uriToBitmap(image_uri!!)
+                val rotated = rotateBitmap(inputImage!!)
+                binding.imgProfile.setImageBitmap(rotated)
+            }
+        }
+
+
+    lateinit var binding: ActivityProfileBinding
+    var image_uri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile)
-        supportActionBar?.hide()
-        val myViewModelFactory =
-            MyViewModelFactory(this@ProfileActivity.application)
-        viewModel = ViewModelProvider(
-            this,
-            myViewModelFactory
-        )[ProfileViewModel::class.java]
-        txt_name = findViewById(R.id.txt_name)
-        img_profile = findViewById(R.id.img_profile)
-        card_call = findViewById(R.id.card_call)
-        card_whatsapp = findViewById(R.id.card_whatsapp)
-        img_Favourite = findViewById(R.id.img_Favourite)
-        img_Favouritefilled = findViewById(R.id.img_Favourite_filled)
+        binding = ActivityProfileBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        supportActionBar?.title = resources.getString(R.string.profile)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.imgProfile.setOnClickListener {
+            chooseImage()
+        }
+    }
 
-        val d = intent.extras
-        name = d?.getString(ContactName).toString()
-        number = d?.getString(ContactNumber).toString()
-        photoUri = d?.getString(ContactUri).toString()
-        activityType = d?.getString(PrefUtils.ActivityType).toString()
-        txt_name.text = name
-        val store = ContactStore.newInstance(application)
-        val cid = d?.getString(ContactId).toString()
-        if (cid != "" && cid != "null") {
-            viewModel.contactDetailsByContactId(cid)
-        } else {
-            img_Favouritefilled.isVisible = false
-            img_Favourite.isVisible = false
-        }
-        viewModel.contactDetailsByContactId.observe(this) {
-            val selectedContact = it
-            contactId = selectedContact.contactId
-            photoUri = selectedContact.photoUri
-            if (activityType == PrefUtils.ContactFragment) {
-                number = selectedContact.number
-                val data = db.getFavouriteContactsByNumber(selectedContact.number)
-                if (data?.isFavourites ?: false) {
-                    img_Favourite.isVisible = false
-                    img_Favouritefilled.isVisible = true
-                } else {
-                    img_Favourite.isVisible = true
-                    img_Favouritefilled.isVisible = false
-                }
-
-            } else {
-                img_Favouritefilled.isVisible = false
-                img_Favourite.isVisible = false
-            }
-
-        }
-
-        img_Favourite.setOnClickListener {
-            it.isVisible = false
-            img_Favouritefilled.isVisible = true
-            Toast.makeText(
-                this,
-                "Added $number as a your favorites",
-                Toast.LENGTH_SHORT
-            ).show()
-            val data = db.getFavouriteContactsByNumber(number)
-            if (data != null) {
-                db.updateFavouriteContact(true, data.id)
-            } else {
-                db.insertFavouriteContact(Contact(name, number, photoUri, contactId, true))
-            }
-        }
-        img_Favouritefilled.setOnClickListener {
-            it.isVisible = false
-            img_Favourite.isVisible = true
-            Toast.makeText(
-                this,
-                "Removed $number from your favorites list",
-                Toast.LENGTH_SHORT
-            )
-                .show()
-            val data = db.getFavouriteContactsByNumber(number)
-            if (data != null) {
-                db.updateFavouriteContact(false, data.id)
-            } else {
-                db.insertFavouriteContact(Contact(name, number, photoUri, contactId, false))
-            }
-        }
-        val imageUri = getPhotoFromContacts(number)
-        if (!imageUri.isNullOrBlank()) {
-            if (!TextUtils.isEmpty(imageUri)) {
-                loadContactPhotoThumbnail(imageUri).also {
-                    img_profile.setImageBitmap(it)
-                }
-            } else {
-                img_profile.setImageToDefault()
-            }
-        } else {
-            if (!photoUri.isNullOrBlank()) {
-                if (!TextUtils.isEmpty(photoUri)) {
-                    loadContactPhotoThumbnail(photoUri).also {
-                        img_profile.setImageBitmap(it)
-                    }
-                } else {
-                    img_profile.setImageToDefault()
-                }
-            }
-        }
-
-        card_call.setOnClickListener {
-            val uri = Uri.parse("tel:" + number)
-            val telecomManager = this.getSystemService<TelecomManager>()
-            val bundle = Bundle()
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.CALL_PHONE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    telecomManager?.placeCall(uri, bundle)
-                }
-            }
-        }
-        card_whatsapp.setOnClickListener {
-            openWhatsAppByNumber(number)
-        }
-        img_profile.setOnClickListener {
-            val dialog = Dialog(this, android.R.style.Theme_Light)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            val layoutInflater =
-                this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val binding = LayoutPreviewProfilePicBinding.inflate(layoutInflater)
-
-            dialog.setContentView(binding.root)
-            dialog.show()
-            dialog.setCancelable(false)
-            binding.imgClose.setOnClickListener {
-                dialog.dismiss()
-            }
-            if (!imageUri.isNullOrBlank()) {
-                if (!TextUtils.isEmpty(imageUri)) {
-                    loadContactPhotoThumbnail(imageUri).also {
-                        binding.previewProfilePic.setImageBitmap(it)
-                    }
-                } else {
-                    binding.previewProfilePic.setImageToDefault()
-                }
-            } else
-
-                if (!imageUri.isNullOrBlank()) {
-                    if (!TextUtils.isEmpty(imageUri)) {
-                        loadContactPhotoThumbnail(imageUri).also {
-                            binding.previewProfilePic.setImageBitmap(it)
-                        }
-                    } else {
-                        binding.previewProfilePic.setImageToDefault()
-                    }
-                } else {
-                    if (!photoUri.isNullOrBlank()) {
-                        if (!TextUtils.isEmpty(photoUri)) {
-                            loadContactPhotoThumbnail(photoUri).also {
-                                binding.previewProfilePic.setImageBitmap(it)
-                            }
-                        } else {
-                            binding.previewProfilePic.setImageToDefault()
-                        }
-                    }
-                }
-        }
+    private fun openCamera() {
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.TITLE, "New Picture")
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera")
+        image_uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri)
+        cameraActivityResultLauncher.launch(cameraIntent)
 
 
     }
 
-    private fun openWhatsAppByNumber(toNumber: String) {
-        val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("http://api.whatsapp.com/send?phone=" + toNumber))
-        intent.setPackage("com.whatsapp")
-        startActivity(intent)
+    private fun openGallery() {
+        val galleryIntent =
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryActivityResultLauncher.launch(galleryIntent)
 
     }
 
-    private fun getPhotoFromContacts(num: String): String? {
-        val uri =
-            Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
-        //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
-        val cursor: Cursor? = this.contentResolver.query(uri, null, null, null, null)
-
-        if (cursor != null) {
-            if (cursor.moveToNext()) {
-                val id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
-                val name =
-                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
-                val image_uri =
-                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
-                Log.d("image_uri-->", "name $name id $id image_uri $image_uri")
-                return image_uri
-            }
-            cursor.close()
+    //TODO takes URI of the image and returns bitmap
+    private fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
+        try {
+            val parcelFileDescriptor = contentResolver.openFileDescriptor(selectedFileUri, "r")
+            val fileDescriptor: FileDescriptor = parcelFileDescriptor!!.fileDescriptor
+            val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+            parcelFileDescriptor.close()
+            return image
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-        return ""
+        return null
     }
 
-    /**
-     * Load a contact photo thumbnail and return it as a Bitmap,
-     * resizing the image to the provided image dimensions as needed.
-     * @param photoData photo ID Prior to Honeycomb, the contact's _ID value.
-     * For Honeycomb and later, the value of PHOTO_THUMBNAIL_URI.
-     * @return A thumbnail Bitmap, sized to the provided width and height.
-     * Returns null if the thumbnail is not found.
-     */
-    private fun loadContactPhotoThumbnail(photoData: String): Bitmap? {
-        // Creates an asset file descriptor for the thumbnail file
-        var afd: AssetFileDescriptor? = null
-        // try-catch block for file not found
-        return try {
-            // Creates a holder for the URI
-            val thumbUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                // If Android 3.0 or later,
-                // sets the URI from the incoming PHOTO_THUMBNAIL_URI
-                Uri.parse(photoData)
-            } else {
-                // Prior to Android 3.0, constructs a photo Uri using _ID
-                /*
-                 * Creates a contact URI from the Contacts content URI
-                 * incoming photoData (_ID)
-                 */
-                val contactUri: Uri =
-                    Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, photoData)
-                /*
-                 * Creates a photo URI by appending the content URI of
-                 * Contacts.Photo
-                 */
-                Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
-            }
-
-            /*
-             * Retrieves an AssetFileDescriptor object for the thumbnail URI
-             * using ContentResolver.openAssetFileDescriptor
-             */
-            afd = this.contentResolver?.openAssetFileDescriptor(thumbUri, "r")
-            /*
-             * Gets a file descriptor from the asset file descriptor.
-             * This object can be used across processes.
-             */
-            return afd?.fileDescriptor?.let { fileDescriptor ->
-                // Decodes the photo file and returns the result as a Bitmap
-                // if the file descriptor is valid
-                BitmapFactory.decodeFileDescriptor(fileDescriptor, null, null)
-            }
-        } catch (e: FileNotFoundException) {
-            /*
-             * Handle file not found errors
-             */
-            null
-        } finally {
-            // In all cases, close the asset file descriptor
-            try {
-                afd?.close()
-            } catch (e: IOException) {
-            }
+    @SuppressLint("Range")
+    fun rotateBitmap(input: Bitmap): Bitmap? {
+        val orientationColumn =
+            arrayOf(MediaStore.Images.Media.ORIENTATION)
+        val cur: Cursor? = contentResolver.query(image_uri!!, orientationColumn, null, null, null)
+        var orientation = -1
+        if (cur != null && cur.moveToFirst()) {
+            orientation = cur.getInt(cur.getColumnIndex(orientationColumn[0]))
         }
-
+        Log.d("tryOrientation", orientation.toString() + "")
+        val rotationMatrix = Matrix()
+        rotationMatrix.setRotate(orientation.toFloat())
+        return Bitmap.createBitmap(input, 0, 0, input.width, input.height, rotationMatrix, true)
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
+
+    private fun chooseImage() {
+        val builder: AlertDialog.Builder? = this.let { AlertDialog.Builder(it) }
+        val layoutInflater =
+            this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val binding = PopupLayoutBinding.inflate(layoutInflater)
+        binding.imageWhatsapp.setImageResource(R.drawable.ic_gallery)
+        binding.imageWhatsappBussiness.setImageResource(R.drawable.ic_camera)
+        binding.txtTitle.text = resources.getString(R.string.choose_profile_picture)
+        binding.txtWhatsapp.text = resources.getString(R.string.gallery)
+        binding.txtWhatsappBussiness.text = resources.getString(R.string.camera)
+        builder?.setView(binding.root)
+
+        val dialog: AlertDialog = builder!!.create()
+        dialog.show()
+        binding.imageClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        binding.imageWhatsappBussiness.setOnClickListener {
+            openCamera()
+            dialog.dismiss()
+
+        }
+        binding.imageWhatsapp.setOnClickListener {
+            openGallery()
+            dialog.dismiss()
+
+        }
+    }
+
 }

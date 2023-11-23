@@ -110,7 +110,8 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                     Manifest.permission.WRITE_CALL_LOG,
                     Manifest.permission.READ_PHONE_STATE,
                     Manifest.permission.CALL_PHONE,
-                    Manifest.permission.GET_ACCOUNTS
+                    Manifest.permission.GET_ACCOUNTS,
+                    android.Manifest.permission.CAMERA
                 ),
                 object : RunTimePermission.PermissionCallback {
                     override fun onGranted() {
@@ -177,7 +178,8 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                     Manifest.permission.WRITE_CALL_LOG,
                     Manifest.permission.READ_PHONE_STATE,
                     Manifest.permission.CALL_PHONE,
-                    Manifest.permission.GET_ACCOUNTS
+                    Manifest.permission.GET_ACCOUNTS,
+                    android.Manifest.permission.CAMERA
                 ),
                 object : RunTimePermission.PermissionCallback {
                     override fun onGranted() {

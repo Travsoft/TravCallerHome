@@ -29,15 +29,14 @@ import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.databinding.FragmentContactsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
-import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.ProfileActivity
+import com.cartravelsdailerapp.ui.VisitingCardActivity
 import com.cartravelsdailerapp.ui.adapters.ContactsAdapter
 import com.cartravelsdailerapp.ui.adapters.FavouritesContactAdapter
 import com.cartravelsdailerapp.ui.adapters.OnClickListeners
@@ -141,6 +140,10 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
                 return false
             }
         })
+        binding.imgProfile.setOnClickListener {
+            val intent = Intent(context, ProfileActivity::class.java)
+            context?.startActivity(intent)
+        }
 
         return binding.root
     }
@@ -261,7 +264,7 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
             data.putString(PrefUtils.ActivityType, activityType)
 
             if (!number.isNullOrBlank() || !name.isNullOrBlank()) {
-                val intent = Intent(context, ProfileActivity::class.java)
+                val intent = Intent(context, VisitingCardActivity::class.java)
                 intent.putExtras(data)
                 context?.startActivity(intent)
             }
@@ -271,7 +274,7 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
             data.putString(PrefUtils.ContactName, name)
             data.putString(PrefUtils.ActivityType, activityType)
 
-            val intent = Intent(context, ProfileActivity::class.java)
+            val intent = Intent(context, VisitingCardActivity::class.java)
             intent.putExtras(data)
             context?.startActivity(intent)
         }

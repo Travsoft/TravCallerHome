@@ -26,8 +26,8 @@ class MyViewModelFactory(private val application: Application) :
                     application, CallLogsRepository(source, Dispatchers.Default)
                 ) as T
             }
-            ProfileViewModel::class.java -> {
-                ProfileViewModel(
+            VisitingCardViewModel::class.java -> {
+                VisitingCardViewModel(
                     application
                 ) as T
 

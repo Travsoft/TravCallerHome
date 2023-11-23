@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,18 +17,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import androidx.core.graphics.BlendModeColorFilterCompat
-import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -42,9 +35,9 @@ import com.cartravelsdailerapp.databinding.FragmentCallLogsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
-import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.ProfileActivity
+import com.cartravelsdailerapp.ui.VisitingCardActivity
 import com.cartravelsdailerapp.ui.adapters.CallHistoryAdapter
 import com.cartravelsdailerapp.ui.adapters.OnClickListeners
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
@@ -53,7 +46,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.util.Locale.filter
 import kotlin.coroutines.CoroutineContext
 
 class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
@@ -96,6 +88,10 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyclerViewCallHistory.isNestedScrollingEnabled = false
         ViewCompat.setNestedScrollingEnabled(binding.recyclerViewCallHistory, false)
 
+        binding.imgProfile.setOnClickListener {
+            val intent = Intent(context, ProfileActivity::class.java)
+            context?.startActivity(intent)
+        }
         return binding.root
     }
 
@@ -216,7 +212,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             data.putString(PrefUtils.ActivityType, activityType)
 
             if (!number.isNullOrBlank() || !name.isNullOrBlank()) {
-                val intent = Intent(context, ProfileActivity::class.java)
+                val intent = Intent(context, VisitingCardActivity::class.java)
                 intent.putExtras(data)
                 context?.startActivity(intent)
             }
@@ -226,7 +222,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             data.putString(PrefUtils.ContactName, name)
             data.putString(PrefUtils.ActivityType, activityType)
 
-            val intent = Intent(context, ProfileActivity::class.java)
+            val intent = Intent(context, VisitingCardActivity::class.java)
             intent.putExtras(data)
             context?.startActivity(intent)
         }

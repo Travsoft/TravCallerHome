@@ -8,7 +8,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         tools:context=".ui.SignUpActivity">
+        <ImageView
+            android:id="@+id/img_profile"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/userprofile"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_name"
@@ -21,8 +30,10 @@
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/img_profile">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_name"

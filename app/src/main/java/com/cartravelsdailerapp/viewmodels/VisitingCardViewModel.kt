@@ -2,8 +2,6 @@ package com.cartravelsdailerapp.viewmodels
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,13 +10,11 @@ import com.alexstyl.contactstore.ContactPredicate
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.allContactColumns
 import com.alexstyl.contactstore.thumbnailUri
-import com.cartravelsdailerapp.PrefUtils
-import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ProfileViewModel(
+class VisitingCardViewModel(
     var context: Application,
 ) : AndroidViewModel(context) {
     private val _contactDetailsByContactId = MutableLiveData<Contact>()

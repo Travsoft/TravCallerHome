@@ -29,4 +29,8 @@
     <string name="call_history">Call History</string>
     <string name="contacts">Contacts</string>
     <string name="favourite">Favourite</string>
+    <string name="profile">Profile</string>
+    <string name="choose_profile_picture">Choose Profile Picture</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
 </resources>
