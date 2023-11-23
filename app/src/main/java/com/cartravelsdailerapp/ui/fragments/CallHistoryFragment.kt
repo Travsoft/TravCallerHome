@@ -46,6 +46,9 @@ class CallHistoryFragment : Fragment() {
             this,
             myViewModelFactory
         )[MainActivityViewModel::class.java]
+
+
+
         return binding.root
     }
 

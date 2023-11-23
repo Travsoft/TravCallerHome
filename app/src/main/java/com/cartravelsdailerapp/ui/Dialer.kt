@@ -278,40 +278,40 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
 
     fun buttonClickEvent(v: View) {
         when (v.id) {
-            R.id.btnOne -> {
+            R.id.dialpad_1_holder -> {
                 edtInput.append("1")
             }
-            R.id.btnTwo -> {
+            R.id.dialpad_2_holder -> {
                 edtInput.append("2")
             }
-            R.id.btnThree -> {
+            R.id.dialpad_3_holder -> {
                 edtInput.append("3")
             }
-            R.id.btnFour -> {
+            R.id.dialpad_4_holder -> {
                 edtInput.append("4")
             }
-            R.id.btnFive -> {
+            R.id.dialpad_5_holder -> {
                 edtInput.append("5")
             }
-            R.id.btnSix -> {
+            R.id.dialpad_6_holder -> {
                 edtInput.append("6")
             }
-            R.id.btnSeven -> {
+            R.id.dialpad_7_holder -> {
                 edtInput.append("7")
             }
-            R.id.btnEight -> {
+            R.id.dialpad_8_holder -> {
                 edtInput.append("8")
             }
-            R.id.btnNine -> {
+            R.id.dialpad_9_holder -> {
                 edtInput.append("9")
             }
-            R.id.btnZero -> {
+            R.id.dialpad_0_holder -> {
                 edtInput.append("0")
             }
-            R.id.btnAterisk -> {
+            R.id.dialpad_asterisk_holder -> {
                 edtInput.append("*")
             }
-            R.id.btnHash -> {
+            R.id.dialpad_hashtag_holder -> {
                 edtInput.append("#")
             }
 

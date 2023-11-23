@@ -4,14 +4,14 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryVariant">@color/orange</item>
-        <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/orange</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/orange</item>
+        <item name="android:textColorHint">@color/orange</item>
+
     </style>
 
     <style name="callerBt">
@@ -22,8 +22,30 @@
         <item name="android:background">@drawable/dialer_btn_ripple</item>
         <item name="android:gravity">center</item>
     </style>
+
     <style name="popup_window_animation">
         <item name="android:windowEnterAnimation">@anim/popup_anim</item>
         <item name="android:windowExitAnimation">@anim/popdown_anim</item>
+    </style>
+
+    <style name="DialpadButtonStyle">
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">80dp</item>
+    </style>
+
+    <style name="DialpadNumberStyle">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_centerInParent">true</item>
+    </style>
+
+    <style name="DialpadLetterStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:alpha">0.8</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_centerHorizontal">true</item>
     </style>
 </resources>

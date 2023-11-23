@@ -54,6 +54,7 @@
                 android:drawablePadding="4dp"
                 android:editable="true"
                 android:gravity="center"
+                android:textColor="@color/black"
                 android:inputType="none|phone"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
@@ -70,127 +71,132 @@
 
         </LinearLayout>
 
-        <androidx.gridlayout.widget.GridLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:alignmentMode="alignMargins"
-            app:columnCount="3"
-            app:layout_gravity="center">
+        <!--
+                <androidx.gridlayout.widget.GridLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:alignmentMode="alignMargins"
+                    app:columnCount="3"
+                    app:layout_gravity="center">
 
-            <Button
-                android:id="@+id/btnOne"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="1"
-                app:fontFamily="sans-serif-condensed"
-                app:layout_column="0"
-                app:layout_gravity="center"
-                app:layout_row="0" />
+                    <Button
+                        android:id="@+id/btnOne"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="1"
+                        app:fontFamily="sans-serif-condensed"
+                        app:layout_column="0"
+                        app:layout_gravity="center"
+                        app:layout_row="0" />
 
-            <Button
-                android:id="@+id/btnTwo"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="2"
-                android:textColor="@color/black"
-                app:fontFamily="sans-serif-condensed"
-                app:layout_column="1"
-                app:layout_row="0" />
+                    <Button
+                        android:id="@+id/btnTwo"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="2"
+                        android:textColor="@color/black"
+                        app:fontFamily="sans-serif-condensed"
+                        app:layout_column="1"
+                        app:layout_row="0" />
 
-            <Button
-                android:id="@+id/btnThree"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="3"
-                app:fontFamily="sans-serif-condensed"
-                app:layout_column="2"
-                app:layout_row="0" />
+                    <Button
+                        android:id="@+id/btnThree"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="3"
+                        app:fontFamily="sans-serif-condensed"
+                        app:layout_column="2"
+                        app:layout_row="0" />
 
 
-            <Button
-                android:id="@+id/btnFour"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="4"
+                    <Button
+                        android:id="@+id/btnFour"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="4"
 
-                app:fontFamily="sans-serif-condensed" />
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnFive"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="5"
+                    <Button
+                        android:id="@+id/btnFive"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="5"
 
-                app:fontFamily="sans-serif-condensed" />
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnSix"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="6"
-                app:fontFamily="sans-serif-condensed" />
+                    <Button
+                        android:id="@+id/btnSix"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="6"
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnSeven"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="7"
-                app:fontFamily="sans-serif-condensed" />
+                    <Button
+                        android:id="@+id/btnSeven"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="7"
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnEight"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="8"
+                    <Button
+                        android:id="@+id/btnEight"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="8"
 
-                app:fontFamily="sans-serif-condensed" />
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnNine"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="9"
+                    <Button
+                        android:id="@+id/btnNine"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="9"
 
-                app:fontFamily="sans-serif-condensed" />
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnAterisk"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:background="@drawable/dialer_btn_ripple"
-                android:onClick="buttonClickEvent"
-                android:text="*"
+                    <Button
+                        android:id="@+id/btnAterisk"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:background="@drawable/dialer_btn_ripple"
+                        android:onClick="buttonClickEvent"
+                        android:text="*"
 
-                app:fontFamily="sans-serif-condensed" />
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnZero"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="0"
+                    <Button
+                        android:id="@+id/btnZero"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="0"
 
-                app:fontFamily="sans-serif-condensed" />
+                        app:fontFamily="sans-serif-condensed" />
 
-            <Button
-                android:id="@+id/btnHash"
-                style="@style/callerBt"
-                android:layout_width="wrap_content"
-                android:onClick="buttonClickEvent"
-                android:text="#"
-                app:fontFamily="sans-serif-condensed" />
-        </androidx.gridlayout.widget.GridLayout>
-
+                    <Button
+                        android:id="@+id/btnHash"
+                        style="@style/callerBt"
+                        android:layout_width="wrap_content"
+                        android:onClick="buttonClickEvent"
+                        android:text="#"
+                        app:fontFamily="sans-serif-condensed" />
+                </androidx.gridlayout.widget.GridLayout>
+        -->
+        <include
+            layout="@layout/dialpad"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
     <LinearLayout
@@ -216,8 +222,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:layout_weight="1"
-            app:backgroundTint="@color/white"
             app:fabSize="normal"
+            android:background="@color/orange"
             app:srcCompat="@drawable/ic_call" />
 
         <ImageView

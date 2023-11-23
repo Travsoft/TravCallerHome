@@ -41,7 +41,10 @@
                 android:textSize="20sp"
                 app:iconifiedByDefault="false"
                 app:queryHint="@string/app_name"
-                app:searchHintIcon="@null" />
+                app:searchHintIcon="@null"
+                app:closeIcon="@null"
+                app:searchIcon="@drawable/ic_search"
+                android:textStyle="bold"/>
 
             <ImageView
                 android:layout_width="50dp"
