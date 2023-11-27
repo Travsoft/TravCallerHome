@@ -33,4 +33,11 @@
     <string name="choose_profile_picture">Choose Profile Picture</string>
     <string name="gallery">Gallery</string>
     <string name="camera">Camera</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="designation_or_job_title">Designation or Job Title</string>
+    <string name="phonenuber">PhoneNuber</string>
+    <string name="company_name_or_shop_name">Company Name or Shop Name</string>
+    <string name="expand">Expand</string>
+    <string name="create_your_business">Create Your Business</string>
 </resources>

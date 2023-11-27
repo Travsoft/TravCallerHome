@@ -9,15 +9,19 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.WindowManager
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityProfileBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
@@ -58,10 +62,44 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.title = resources.getString(R.string.profile)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.hide()
+        intClickListener()
+    }
+
+    private fun intClickListener() {
         binding.imgProfile.setOnClickListener {
             chooseImage()
+        }
+        binding.imgBack.setOnClickListener {
+            onBackPressed()
+        }
+        binding.imgEdit.setOnClickListener {
+            binding.layoutName.isEnabled = true
+            binding.layourCompanyName.isEnabled = true
+            binding.layourEmail.isEnabled = true
+            binding.layourJobtitle.isEnabled = true
+            binding.layourState.isEnabled = true
+            binding.layourJobtitle.isEnabled = true
+            binding.layourPinCode.isEnabled = true
+            binding.layourCityname.isEnabled = true
+            binding.imgSave.isVisible = true
+            binding.imgEdit.isVisible = false
+        }
+        binding.imgSave.setOnClickListener {
+            binding.layoutName.isEnabled = false
+            binding.layourCompanyName.isEnabled = false
+            binding.layourEmail.isEnabled = false
+            binding.layourJobtitle.isEnabled = false
+            binding.layourState.isEnabled = false
+            binding.layourJobtitle.isEnabled = false
+            binding.layourPinCode.isEnabled = false
+            binding.layourCityname.isEnabled = false
+            binding.imgSave.isVisible = false
+            binding.imgEdit.isVisible = true
+        }
+        binding.etPost.doOnTextChanged { text, start, before, count ->
+            binding.btPostButton.isVisible = text?.length!! > 0
+            binding.imGallery.isVisible = text?.length!! == 0
         }
     }
 

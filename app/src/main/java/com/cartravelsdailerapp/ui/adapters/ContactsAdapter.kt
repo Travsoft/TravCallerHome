@@ -104,7 +104,7 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                             println("Contact found: ${contact.phones.get(0).value.raw}")
                             // Use contact.phones, contact.mails, contact.customDataItems etc
                             listOfConttacts[position].number =
-                                contact.phones.get(0).value.raw.toString()
+                                contact.phones[0].value.raw.toString()
                         }
                     }
                 }
@@ -113,7 +113,27 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
         // Set the visibility based on state
         holder.layout_sub_item.visibility = if (listOfContacts.IsExpand) View.VISIBLE else View.GONE
         holder.call.setOnClickListener {
-            onclick.callOnClick(listOfContacts.number, "")
+            val store = ContactStore.newInstance(context.applicationContext)
+
+            store.fetchContacts(
+                predicate = ContactLookup(listOfContacts.contactId.toLong()),
+                columnsToFetch = allContactColumns()
+            )
+                .collect { contacts ->
+                    val contact = contacts.firstOrNull()
+                    if (contact == null) {
+                        println("Contact not found")
+                    } else {
+                        println("Contact found: $contact")
+                        if(contact.phones.isNotEmpty()) {
+                            println("Contact found: ${contact.phones.get(0).value.raw}")
+                            // Use contact.phones, contact.mails, contact.customDataItems etc
+                            listOfConttacts[position].number =
+                                contact.phones[0].value.raw.toString()
+                            onclick.callOnClick(listOfConttacts[position].number, "")
+                        }
+                    }
+                }
         }
         holder.card_whatsapp.setOnClickListener {
             onclick.openWhatsApp(listOfContacts.number)

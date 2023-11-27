@@ -7,7 +7,6 @@
         <package android:name="com.whatsapp.w4b" />
         <package android:name="org.telegram.messenger" />
     </queries> <!-- permissions to write contacts -->
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -43,6 +42,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CarTravelsDailerApp"
         tools:targetApi="31">
+        <activity
+            android:name=".PostYouBusinessActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.ProfileActivity"
             android:exported="false" />
