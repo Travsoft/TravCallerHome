@@ -43,6 +43,13 @@
         android:theme="@style/Theme.CarTravelsDailerApp"
         tools:targetApi="31">
         <activity
+            android:name=".SearchActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".PostYouBusinessActivity"
             android:exported="false" />
         <activity

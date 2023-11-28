@@ -20,6 +20,7 @@ import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.Dialer
+import com.cartravelsdailerapp.ui.SearchActivity
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
@@ -31,7 +32,7 @@ class CallHistoryFragment : Fragment() {
     lateinit var db: AppDatabase
     val listofPages = mutableListOf<Fragment>(CallLogsFrag(), ContactsFrag())
     val callHistorytabtitle = arrayOf(
-        "Call Histroy",
+        "Call History",
         "Contacts"
     )
 
@@ -47,7 +48,10 @@ class CallHistoryFragment : Fragment() {
             myViewModelFactory
         )[MainActivityViewModel::class.java]
 
-
+        binding.layoutSearch.setOnClickListener {
+            val goToSearchScreen = Intent(requireContext(), SearchActivity::class.java)
+            startActivity(goToSearchScreen)
+        }
 
         return binding.root
     }
