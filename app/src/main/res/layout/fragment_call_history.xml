@@ -12,10 +12,12 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/layout_search"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            app:cardCornerRadius="10dp"
-            android:layout_margin="10dp"
+            android:layout_height="50dp"
+            android:layout_margin="15dp"
             android:elevation="5dp"
+
+            app:cardElevation="20dp"
+            app:contentPadding="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -23,26 +25,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
+
                 <ImageView
-                    android:src="@drawable/ic_search"
                     android:layout_width="24dp"
-                    android:layout_marginStart="10dp"
+                    android:layout_height="24dp"
                     android:layout_gravity="center"
-                    android:layout_height="24dp"/>
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_search" />
+
                 <TextView
-                    android:text="Search your contacts and more..."
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="5dp"
-                    android:layout_height="wrap_content"/>
-                <ImageView
-                    android:src="@drawable/ic_setting"
-                    android:layout_width="24dp"
-                    android:rotation="270"
-                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="Search your contacts and more..." />
 
-                    android:layout_height="24dp"/>
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:rotation="270"
+
+                    android:src="@drawable/ic_setting" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
