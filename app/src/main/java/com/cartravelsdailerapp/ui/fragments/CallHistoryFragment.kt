@@ -20,6 +20,7 @@ import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.Dialer
+import com.cartravelsdailerapp.ui.ProfileActivity
 import com.cartravelsdailerapp.ui.SearchActivity
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -53,6 +54,10 @@ class CallHistoryFragment : Fragment() {
             startActivity(goToSearchScreen)
         }
 
+        binding.imgProfile.setOnClickListener {
+            var intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }
         return binding.root
     }
 

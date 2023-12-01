@@ -123,9 +123,8 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
 
             callLogsAdapter.notifyDataSetChanged()
         }
-        binding.imgProfile.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
+        binding.imgBack.setOnClickListener {
+            finish()
         }
 
     }
@@ -182,7 +181,9 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
                 }
             }
         } else {
-            contactsAdapter.filterList(list.filter { f -> f.name.contains(text) }
+            contactsAdapter.filterList(list.filter { f ->
+                f.name.toLowerCase().contains(text.toLowerCase())
+            }
                 .distinctBy { u -> u.name } as ArrayList<Contact>)
         }
     }
