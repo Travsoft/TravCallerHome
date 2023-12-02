@@ -76,6 +76,7 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
         binding.recyListContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListContacts.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerViewCallHistory.isNestedScrollingEnabled = false
         binding.recyListContacts.adapter = contactsAdapter
 
         val listOfContactStore = ContactStore.newInstance(this)
@@ -102,8 +103,11 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filterContacts(s.toString())
-                filter(s.toString())
+                launch(Dispatchers.Main) {
+                    filterContacts(s.toString())
+                    filter(s.toString())
+                }
+
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -120,19 +124,17 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
             binding.recyclerViewCallHistory.setHasFixedSize(false)
             binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
             binding.recyclerViewCallHistory.adapter = callLogsAdapter
+            binding.recyclerViewCallHistory.isNestedScrollingEnabled = false
 
             callLogsAdapter.notifyDataSetChanged()
         }
         binding.imgBack.setOnClickListener {
             finish()
         }
-
     }
 
     private fun filter(text: String) {
-        if (text.isEmpty()) {
-            viewModel.getCallLogsHistoryDb()
-        } else {
+        if (text.isNotBlank()) {
             // creating a new array list to filter our data.
             val filteredlist: ArrayList<CallHistory> =
                 DatabaseBuilder.getInstance(this).CallHistoryDao()
@@ -143,6 +145,10 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
             binding.recyclerViewCallHistory.itemAnimator = DefaultItemAnimator()
             binding.recyclerViewCallHistory.layoutManager = linearLayoutManager
             binding.recyclerViewCallHistory.adapter = callLogsAdapter
+            binding.recyclerViewCallHistory.isNestedScrollingEnabled = false
+            callLogsAdapter.notifyDataSetChanged()
+        } else {
+            callLogsAdapter.addAll(emptyList())
             callLogsAdapter.notifyDataSetChanged()
         }
     }
@@ -156,35 +162,18 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
         get() = job + Dispatchers.Main
 
     private fun filterContacts(text: String) {
-        if (text.isEmpty()) {
-            list.clear()
-            val listOfContactStore = ContactStore.newInstance(this)
-            listOfContactStore.fetchContacts().collect { it ->
-                it.forEach {
-                    if (!it.displayName.isNullOrBlank()) {
-                        list.add(
-                            Contact(
-                                it.displayName,
-                                "",
-                                it.thumbnailUri.toString(),
-                                contactId = it.contactId.toString(),
-                                isFavourites = it.isStarred
-                            )
-                        )
-                    }
+        try {
+            if (text.isNotBlank() && list.isNotEmpty()) {
+                contactsAdapter.filterList(list.filter { f -> f.name.equals(text) }
+                    .distinctBy { u -> u.name } as ArrayList<Contact>)
+            }else{
+                contactsAdapter.addAll(listOf())
+                contactsAdapter.notifyDataSetChanged()
 
-                }
-                launch(Dispatchers.Main) {
-                    contactsAdapter.addAll(list.toList().sortedBy { i -> i.name }
-                        .distinctBy { i -> i.name })
-                    contactsAdapter.notifyDataSetChanged()
-                }
             }
-        } else {
-            contactsAdapter.filterList(list.filter { f ->
-                f.name.toLowerCase().contains(text.toLowerCase())
-            }
-                .distinctBy { u -> u.name } as ArrayList<Contact>)
+
+        } catch (ex: Exception) {
+            print(ex.message)
         }
     }
 
