@@ -169,9 +169,9 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
     private fun filterContacts(text: String) {
         try {
             if (text.isNotBlank() && list.isNotEmpty()) {
-                contactsAdapter.filterList(list.filter { f -> f.name.equals(text) }
+                contactsAdapter.filterList(list.filter { f -> f.name.startsWith(text, true) }
                     .distinctBy { u -> u.name } as ArrayList<Contact>)
-            }else{
+            } else {
                 contactsAdapter.addAll(listOf())
                 contactsAdapter.notifyDataSetChanged()
 
@@ -384,10 +384,12 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
             show()
         }
     }
+
     // hide keyboard
     fun dismissKeyboard(view: View?) {
         if (view != null) {
-            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm =
+                view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }

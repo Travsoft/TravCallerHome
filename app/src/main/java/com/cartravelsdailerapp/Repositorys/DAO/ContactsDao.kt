@@ -22,7 +22,7 @@ interface CallHistoryDao {
     @Query("SELECT * FROM CallHistory WHERE number = :number")
     fun callDataByNumber(number: String): List<CallHistory>
 
-    @Query("SELECT * FROM CallHistory WHERE number || name LIKE '%' || :searchQuery || '%'")
+    @Query("SELECT * FROM CallHistory WHERE name || number LIKE :searchQuery || '%'")
     fun searchCall(searchQuery: String): List<CallHistory>
 
     @Query("SELECT * FROM Contact WHERE number || name LIKE '%' || :searchQuery || '%'")
