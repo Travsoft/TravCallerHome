@@ -93,7 +93,11 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyListContacts.itemAnimator = DefaultItemAnimator()
         binding.recyListContacts.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.recyListContacts.isNestedScrollingEnabled = true
+        binding.recyListFavouritesContacts.isNestedScrollingEnabled = false
         binding.recyListContacts.adapter = contactsAdapter
+        binding.scrollConacts.isNestedScrollingEnabled = true
+        binding.scrollConacts.isSmoothScrollingEnabled=true
 
         val listOfContactStore = ContactStore.newInstance(requireContext())
         listOfContactStore.fetchContacts().collect { it ->
@@ -408,7 +412,7 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
 
             }
-            setNegativeButton("No" ){dialog: DialogInterface, which: Int ->
+            setNegativeButton("No") { dialog: DialogInterface, which: Int ->
                 dialog.dismiss()
             }
             show()

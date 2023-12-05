@@ -1,92 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.fragments.ContactsFrag"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
-<ScrollView
-    android:layout_width="match_parent"
-    android:background="@color/white"
-    android:layout_height="wrap_content">
-    <LinearLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.fragments.ContactsFrag">
+
+    <ScrollView
+        android:fillViewport="true"
+        android:id="@+id/scroll_conacts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="vertical"
-        android:padding="5dp">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:background="@color/white">
+
         <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/layout_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:background="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:orientation="vertical"
+            android:padding="5dp">
 
-            <ImageView
-                android:id="@+id/img_profile"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:padding="5dp"
-                android:src="@drawable/userprofile" />
-
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/search_contacts"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/layout_toolbar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/white"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/img_profile"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="5dp"
+                    android:src="@drawable/userprofile" />
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/search_contacts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:background="@drawable/bg_shape_rect_orange"
+                    android:padding="5dp"
+                    android:searchSuggestThreshold="2"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:closeIcon="@null"
+                    app:iconifiedByDefault="false"
+                    app:queryHint="@string/app_name"
+                    app:searchHintIcon="@null"
+                    app:searchIcon="@drawable/ic_search" />
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="5dp"
+                    android:rotation="270"
+                    android:src="@drawable/ic_setting" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tx_favourite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginStart="5dp"
+                android:fontFamily="sans-serif-black"
+                android:text="@string/favourite"
+                android:textAlignment="textStart"
+                android:textColor="@color/black" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recy_list_favourites_contacts"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:overScrollMode="never"
+                android:padding="10dp"
+                tools:listitem="@layout/item_favourites_contacts" />
+
+            <TextView
+                android:id="@+id/txt_contacts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginStart="5dp"
+                android:fontFamily="sans-serif-black"
+                android:text="@string/contacts"
+                android:textAlignment="textStart"
+                android:textColor="@color/black" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recy_list_contacts"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="3"
-                android:background="@drawable/bg_shape_rect_orange"
-                android:padding="5dp"
-                android:searchSuggestThreshold="2"
-                android:textSize="20sp"
-                app:iconifiedByDefault="false"
-                app:queryHint="@string/app_name"
-                app:searchHintIcon="@null"
-                app:closeIcon="@null"
-                app:searchIcon="@drawable/ic_search"
-                android:textStyle="bold"/>
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:padding="5dp"
-                android:rotation="270"
-                android:src="@drawable/ic_setting" />
-
-
+                android:background="@color/white"
+                android:overScrollMode="never"
+                android:padding="10dp"
+                tools:listitem="@layout/layout_item_contacts" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tx_favourite"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_marginStart="5dp"
-            android:textAlignment="textStart"
-            android:fontFamily="sans-serif-black"
-            android:text="@string/favourite"
-            android:textColor="@color/black" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recy_list_favourites_contacts"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:padding="10dp"
-            android:overScrollMode="never"
-            tools:listitem="@layout/item_favourites_contacts" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recy_list_contacts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:padding="10dp"
-            android:overScrollMode="never"
-            tools:listitem="@layout/layout_item_contacts" />
-    </LinearLayout>
-
-</ScrollView>
+    </ScrollView>
 
 </layout>

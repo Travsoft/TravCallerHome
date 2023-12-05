@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.text.TextUtils
 import android.util.Log
@@ -53,6 +54,9 @@ class VisitingCardActivity : AppCompatActivity() {
     private lateinit var img_profile: QuickContactBadge
     private lateinit var card_call: CardView
     private lateinit var card_whatsapp: CardView
+    private lateinit var card_chat: CardView
+    private lateinit var card_call_one: CardView
+    private lateinit var card_call_two: CardView
     private lateinit var img_Favourite: ImageView
     private lateinit var img_Favouritefilled: ImageView
     var db = DatabaseBuilder.getInstance(this).CallHistoryDao()
@@ -72,6 +76,9 @@ class VisitingCardActivity : AppCompatActivity() {
         img_profile = findViewById(R.id.img_profile)
         card_call = findViewById(R.id.card_call)
         card_whatsapp = findViewById(R.id.card_whatsapp)
+        card_chat = findViewById(R.id.card_chat)
+        card_call_one = findViewById(R.id.card_call_one)
+        card_call_two = findViewById(R.id.card_call_two)
         img_Favourite = findViewById(R.id.img_Favourite)
         img_Favouritefilled = findViewById(R.id.img_Favourite_filled)
 
@@ -223,8 +230,52 @@ class VisitingCardActivity : AppCompatActivity() {
                     }
                 }
         }
+        card_chat.setOnClickListener {
+            openDefaultSmsAppByNumber(number)
+        }
+        card_call_one.setOnClickListener {
+            callToNumber(number, "")
+        }
+        card_call_two.setOnClickListener {
+            callToNumber(number, "")
+        }
+    }
+
+    fun callToNumber(number: String, subscriberId: String) {
+        val uri = Uri.parse("tel:$number")
+        val telecomManager = getSystemService<TelecomManager>()
+        val callCapablePhoneAccounts = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            telecomManager?.callCapablePhoneAccounts
+        } else {
+            TODO("VERSION.SDK_INT < M")
+        }
+        val bundle = Bundle()
+        if (callCapablePhoneAccounts != null) {
+            callCapablePhoneAccounts.find {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    it.id == subscriberId
+                } else {
+                    TODO("VERSION.SDK_INT < M")
+                }
+            }
+                ?.let { handle: PhoneAccountHandle ->
+                    bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
+                }
+        }
+        if (ActivityCompat.checkSelfPermission(
+                this@VisitingCardActivity, Manifest.permission.CALL_PHONE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            telecomManager?.placeCall(uri, bundle)
+        }
+    }
 
 
+    private fun openDefaultSmsAppByNumber(toNumber: String) {
+        val intent =
+            Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:$toNumber"))
+        intent.addCategory(Intent.CATEGORY_DEFAULT)
+        startActivity(intent)
     }
 
     private fun openWhatsAppByNumber(toNumber: String) {
