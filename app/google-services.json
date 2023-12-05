@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "290362082006",
+    "project_id": "travcaller-781bd",
+    "storage_bucket": "travcaller-781bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290362082006:android:3a07abb82de80fe9387f77",
+        "android_client_info": {
+          "package_name": "com.cartravelsdailerapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDd9o6Lnoo9XgkygFpI0dPJqEOIGsas3sM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
