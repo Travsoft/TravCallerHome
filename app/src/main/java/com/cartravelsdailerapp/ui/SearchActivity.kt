@@ -169,7 +169,7 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
     private fun filterContacts(text: String) {
         try {
             if (text.isNotBlank() && list.isNotEmpty()) {
-                contactsAdapter.filterList(list.filter { f -> f.name.startsWith(text, true) }
+                contactsAdapter.filterList(list.filter { f -> f.name.contains(text, true) }
                     .distinctBy { u -> u.name } as ArrayList<Contact>)
             } else {
                 contactsAdapter.addAll(listOf())
