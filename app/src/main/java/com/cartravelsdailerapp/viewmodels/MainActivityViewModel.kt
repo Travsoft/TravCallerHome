@@ -60,84 +60,77 @@ class MainActivityViewModel(
             _callLogs.value = callLogsRepository.fetchCallLogs()
             withContext(Dispatchers.Main) {
                 db.insertAll(_callLogs.value!!)
-                Log.d("insert data-->", _callLogs.value!!.count().toString())
                 _isCallLogsdb.value = true
             }
         }
     }
 
     fun getNewCallLogsHistory(number: String, simName: String) {
+        if (number.isNotBlank() && simName.isNotBlank()) {
+            viewModelScope.launch {
+                val callLogs = db.getAllCallLogs()
 
-        viewModelScope.launch {
-            val callhistoryData = db.getAllCallLogs()
-            val callHistory =
-                callhistoryData.find { it.number == number }
-            if (callHistory == null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
-                    val date = Date()
-                    val current = simpDate.format(date)
-                    db.insertCallHistory(
-                        CallHistory(
-                            "OUTGOING",
-                            number,
-                            "",
-                            0,
-                            current.toString(),
-                            "",
-                            "",
-                            "",
-                            simName
-                        )
-                    )
-                    Log.d("92", "inserted ${number}")
-                } else {
-                    val d = Date()
-                    db.insertCallHistory(
-                        CallHistory(
-                            "OUTGOING",
-                            number,
-                            "",
-                            0,
-                            d.toString(),
-                            "",
-                            "",
-                            "",
-                            simName
-                        )
-                    )
-                    Log.d("107", "inserted ${number}")
-
+                val callHistory = callLogs.find {
+                    it.number.equals(number)
                 }
-                Log.d("inserted 108", number)
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
-                    val date = Date()
-                    val current = simpDate.format(date)
-                    db.updateCallHistory(
-                        current, callHistory.id
-                    )
-                    Log.d(
-                        "updated 84", " ${callHistory.id} ${
-                            callHistory
-                                .number
-                        }"
-                    )
-                    Log.d("updated 125", "inserted ${number}")
-
+                if (callHistory == null) {
+                    val callhistoryData = callLogsRepository.fetchCallLogSignle(number)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
+                        val date = Date()
+                        val current = simpDate.format(date)
+                        var name = ""
+                        if (callhistoryData.name.isNullOrEmpty()) {
+                            name = callhistoryData.number
+                        } else {
+                            name = callhistoryData.name!!
+                        }
+                        db.insertCallHistory(
+                            CallHistory(
+                                callhistoryData.calType,
+                                callhistoryData.number,
+                                name,
+                                callhistoryData.type,
+                                current.toString(),
+                                callhistoryData.duration,
+                                callhistoryData.subscriberId,
+                                callhistoryData.photouri,
+                                simName
+                            )
+                        )
+                    } else {
+                        val d = Date()
+                        db.insertCallHistory(
+                            CallHistory(
+                                callhistoryData.calType,
+                                callhistoryData.number,
+                                callhistoryData.name,
+                                callhistoryData.type,
+                                d.toString(),
+                                callhistoryData.duration,
+                                callhistoryData.subscriberId,
+                                callhistoryData.photouri,
+                                simName
+                            )
+                        )
+                    }
                 } else {
-                    val d = Date()
-                    db.updateCallHistory(
-                        d.toString(), callHistory.id
-                    )
-                    Log.d("updated 91", " ${callHistory.id}")
-
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
+                        val date = Date()
+                        val current = simpDate.format(date)
+                        db.updateCallHistory(
+                            current, simName, callHistory.id
+                        )
+                    } else {
+                        val d = Date()
+                        db.updateCallHistory(
+                            d.toString(), simName, callHistory.id
+                        )
+                    }
                 }
-                Log.d("inserted 132", number)
-
+                getCallLogsHistoryDb()
             }
-            getCallLogsHistoryDb()
         }
     }
 

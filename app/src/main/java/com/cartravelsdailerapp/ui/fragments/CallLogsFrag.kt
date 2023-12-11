@@ -54,9 +54,9 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     private lateinit var job: Job
     lateinit var callLogsAdapter: CallHistoryAdapter
     var receiver: CustomPhoneStateReceiver? = null
-    private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
+    private val onResult: (String, String?, Uri?,String) -> Unit = { phone, name, photoUri,simIndex ->
         launch {
-            viewModel.getNewCallLogsHistory(phone, "")
+            viewModel.getNewCallLogsHistory(phone,simIndex)
         }
     }
 
@@ -142,8 +142,8 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent != null) {
                 val phone = intent.getStringExtra(PrefUtils.ContactNumber)
-                phone?.let { viewModel.getNewCallLogsHistory(it, "") }
-                Log.e("98--phone", "Number is ,$phone")
+                val simIndex = intent.getIntExtra(PrefUtils.SIMIndex,0)
+                phone?.let { viewModel.getNewCallLogsHistory(it, simIndex.toString()) }
             }
         }
     }

@@ -70,7 +70,7 @@ class CallHistoryAdapter(
 
     override fun onBindViewHolder(holder: CallHistoryVm, position: Int) {
         val selectedData = listCallHistory[position]
-
+        Log.e("73-> call history data", "${selectedData}")
         if (selectedData.name.isNullOrBlank()) {
             holder.name.text = selectedData.number
         } else {

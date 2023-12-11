@@ -24,8 +24,8 @@ class CallLogsRepository(
 
     }*/
 
-    suspend fun fetchCallLogSignle(): CallHistory {
-        return withContext(myDispatcher) { source.fetchCallLogSingle() }
+    suspend fun fetchCallLogSignle(number: String): CallHistory {
+        return withContext(myDispatcher) { source.fetchCallLogSingle(number) }
 
     }
 }

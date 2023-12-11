@@ -1,23 +1,17 @@
 package com.cartravelsdailerapp.Repositorys.DAO
 
 import android.content.ContentResolver
-import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
-import android.net.Uri
 import android.os.Build
 import android.provider.CallLog
-import android.provider.ContactsContract
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.models.CallHistory
-import java.io.ByteArrayInputStream
 import java.util.*
 
 
@@ -146,12 +140,13 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun fetchCallLogSingle(): CallHistory {
+    fun fetchCallLogSingle(number: String): CallHistory {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             cursor = contentResolver.query(
                 CallLog.Calls.CONTENT_URI.buildUpon()
                     .appendQueryParameter(CallLog.Calls.LIMIT_PARAM_KEY, "1")
-                    .build(), arrayOf(
+                    .build(),
+                arrayOf(
                     CallLog.Calls.TYPE,
                     CallLog.Calls.NUMBER,
                     CallLog.Calls.CACHED_NAME,
@@ -161,8 +156,8 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.PHONE_ACCOUNT_ID,
                     CallLog.Calls.CACHED_PHOTO_URI
                 ),
-                null,
-                null, CallLog.Calls.DATE + " DESC"
+                CallLog.Calls.NUMBER + " = ?",
+                arrayOf(number), CallLog.Calls.DATE + " DESC"
             )!!
         } else {
             cursor = contentResolver.query(

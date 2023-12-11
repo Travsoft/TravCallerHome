@@ -83,9 +83,9 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
     lateinit var viewModel: MainActivityViewModel
     lateinit var receiver: CustomPhoneStateReceiver
     var simName: String = "SIM1"
-    private val onResult: (String, String?, Uri?) -> Unit = { phone, name, photoUri ->
+    private val onResult: (String, String?, Uri?,String) -> Unit = { phone, name, photoUri,simIndex ->
         launch {
-            viewModel.getNewCallLogsHistory(phone, simName)
+            viewModel.getNewCallLogsHistory(phone, simIndex)
             val intent = Intent(
                 this@Dialer,
                 MainActivity::class.java

@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
-
     >
 
     <ImageView
@@ -59,17 +58,18 @@
         android:id="@+id/buttonHangup"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_margin="80dp"
-        android:layout_marginStart="40dp"
-        app:fabSize="normal"
-        app:backgroundTint="@color/orange"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginBottom="80dp"
         android:clickable="true"
         android:focusable="true"
         android:scaleType="center"
         android:src="@android:drawable/sym_call_incoming"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        />
+        app:backgroundTint="@color/orange"
+        app:fabSize="normal" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonAnswer"

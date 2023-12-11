@@ -40,9 +40,10 @@ interface CallHistoryDao {
 
     @Query("SELECT * FROM Contact WHERE number =:number")
     fun getFavouriteContactsByNumber(number: String): Contact
+
     @Query("SELECT * FROM CallHistory WHERE number =:number")
     fun getCallHistoryByNumber(number: String): CallHistory
 
-    @Query("UPDATE CallHistory SET date=:date WHERE id = :id")
-    fun updateCallHistory(date: String, id: Int)
+    @Query("UPDATE CallHistory SET date=:date,SimName=:SimName WHERE id = :id")
+    fun updateCallHistory(date: String, SimName: String, id: Int)
 }

@@ -3,83 +3,141 @@ package com.cartravelsdailerapp.broadcastreceivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.CancellationSignal
 import android.provider.CallLog
 import android.provider.ContactsContract
+import android.telecom.PhoneAccount
+import android.telecom.PhoneAccountHandle
+import android.telecom.TelecomManager
+import android.telephony.SubscriptionInfo
+import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.content.getSystemService
+import com.cartravelsdailerapp.models.CallHistory
 
-class CustomPhoneStateReceiver(private val onResult: (String, String?, Uri?) -> Unit,val number: String) :
-    BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent?)
-    {
-        println("CustomPhoneStateReceiver 17 onReceive")
-
+class CustomPhoneStateReceiver(
+    private val onResult: (String, String?, Uri?, String) -> Unit,
+    val number: String
+) : BroadcastReceiver() {
+    var c: Context? = null
+    var simSlotIndex: Int = 0
+    var simName: String = ""
+    override fun onReceive(context: Context, intent: Intent?) {
         val state = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
-        val incomingNumber = intent?.getStringExtra("incoming_number")
-        Toast.makeText(context, state, Toast.LENGTH_SHORT).show()
-        if (state == TelephonyManager.EXTRA_STATE_RINGING || state == TelephonyManager.EXTRA_STATE_OFFHOOK) {
-            println("TelephonyManager.CALL_STATE_RINGING onReceive -> $incomingNumber")
-            incomingNumber?.let { number ->
-                val (name, photoUri) = getCallerInfo(context, number)
-                onResult(number, name, photoUri)
-            }
-
-        }else{
-            val (name, photoUri) = getCallerInfo(context, number)
-            onResult(number, name, photoUri)
-            Log.d("32 Not rining",number)
+        var phoneNumer = ""
+        val a = intent?.action
+        if (a == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
+            phoneNumer = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER) ?: ""
         }
+        if (a == Intent.ACTION_NEW_OUTGOING_CALL) {
+            phoneNumer = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER) ?: ""
+        }
+        if (phoneNumer.isBlank()){
+            return
+        }
+        Log.e("e 28", phoneNumer.toString())
+        val subscriptionManager: SubscriptionManager =
+            context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+
+        val subscriptionInfoList: List<SubscriptionInfo> =
+            subscriptionManager.getActiveSubscriptionInfoList()
+        if (subscriptionInfoList != null) {
+            // Loop through the list of active subscriptions
+            for (subscriptionInfo in subscriptionInfoList) {
+                // Retrieve the phone number of the SIM card
+                if (phoneNumer != null && subscriptionInfo.number.equals(phoneNumer)) {
+                    // The incoming call belongs to this SIM card
+                    simSlotIndex = subscriptionInfo.simSlotIndex
+                    simName = subscriptionInfo.displayName.toString()
+
+                    break
+                }
+            }
+        }
+        if (state == TelephonyManager.EXTRA_STATE_RINGING || state == TelephonyManager.EXTRA_STATE_OFFHOOK) {
+            phoneNumer?.let { number ->
+                val callHistory = getCallerInfo(context, number)
+                onResult(
+                    number,
+                    callHistory.name,
+                    Uri.parse(callHistory.photouri),
+                    simSlotIndex.toString()
+                )
+            }
+        } else {
+            val callHistory = getCallerInfo(context, number)
+            onResult(
+                number,
+                callHistory.name,
+                Uri.parse(callHistory.photouri),
+                simSlotIndex.toString()
+            )
+        }
+
 
     }
 
-
-    private fun getCallerInfo(context: Context, phoneNumber: String): Pair<String?, Uri?> {
-        val uri = Uri.withAppendedPath(
-            ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
-            Uri.encode(phoneNumber)
-        )
-        val projection = arrayOf(
-            ContactsContract.PhoneLookup.DISPLAY_NAME,
-            ContactsContract.PhoneLookup.PHOTO_URI
-        )
-
-        context.contentResolver.query(uri, projection, null, null, null).use { cursor ->
-            if (cursor?.moveToFirst() == true) {
-                val nameIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)
-                val photoIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI)
-
-                val name = cursor.getString(nameIndex)
-                val photoUri = cursor.getString(photoIndex)?.let { Uri.parse(it) }
-                return Pair(name, photoUri)
-            }
-        }
-        val cancellationSignal = CancellationSignal()
-        val cursor = context.contentResolver.query(
+    private fun getCallerInfo(context: Context, phoneNumber: String): CallHistory {
+        val cursor: Cursor? = context.contentResolver.query(
             CallLog.Calls.CONTENT_URI,
             null,
-            CallLog.Calls.TYPE + " = ?",
-            arrayOf(CallLog.Calls.INCOMING_TYPE.toString()),
-            CallLog.Calls.DATE + " DESC",
-            cancellationSignal
+            CallLog.Calls.NUMBER + " = ? OR " + CallLog.Calls.NUMBER + " = ?",
+            arrayOf(phoneNumber),
+            CallLog.Calls.DATE + " DESC"
         )
         if (cursor != null && cursor.moveToFirst()) {
-            val indexName = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME)
-            val name = cursor.getString(if (indexName < 0) 0 else indexName)
-            println(indexName)
             val indexUri = cursor.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI)
+            val indexName = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME)
+            val indexType = cursor.getColumnIndex(CallLog.Calls.TYPE)
+            val simIdColumnIndex = cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID)
+            val accountId: String = cursor.getString(simIdColumnIndex)
+            val simCardSlotIndex =
+                getSimSlotIndexFromAccountId(context.applicationContext, accountId)
+            val name = cursor.getString(indexName)
+            val type = cursor.getType(indexType)
+
             val photoUri =
-                cursor.getString(if (indexUri < 0) 0 else indexUri)?.let { Uri.parse(it) }
+                cursor.getString(indexUri)?.let { Uri.parse(it) }
 
-            cancellationSignal.cancel()
-            cursor.close()
-
-            return Pair(name, photoUri)
+            return CallHistory(
+                "",
+                phoneNumber,
+                name,
+                type,
+                "",
+                "",
+                "",
+                photoUri.toString(),
+                simCardSlotIndex.toString()
+            )
         }
-
-
-        return Pair(null, null)
+        return CallHistory(
+            "", phoneNumber, "", 0, "", "", "", "", ""
+        )
     }
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun getSimSlotIndexFromAccountId(context: Context, accountIdToFind: String): Int {
+        // This is actually the official data that should be found, as on the emulator, but sadly not all phones return here a proper value
+        val telecomManager = context.getSystemService<TelecomManager>()
+        telecomManager?.callCapablePhoneAccounts?.forEachIndexed { index, account: PhoneAccountHandle ->
+            val phoneAccount: PhoneAccount = telecomManager?.getPhoneAccount(account)!!
+            val accountId: String = phoneAccount.accountHandle
+                .id
+            if (accountIdToFind == accountId) {
+                return index
+            }
+        }
+        accountIdToFind.toIntOrNull()?.let {
+            if (it >= 0)
+                return it
+        }
+        return -1
+    }
+
 }
