@@ -3,9 +3,6 @@ package com.cartravelsdailerapp.viewmodels
 import android.app.Application
 import android.icu.text.SimpleDateFormat
 import android.os.Build
-import android.provider.CallLog
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.*
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
@@ -15,11 +12,7 @@ import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import kotlinx.coroutines.*
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class MainActivityViewModel(
@@ -116,11 +109,10 @@ class MainActivityViewModel(
                     }
                 } else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
-                        val date = Date()
-                        val current = simpDate.format(date)
+                        val simpleDateFormat = SimpleDateFormat(PrefUtils.DataFormate)
+                        val date = simpleDateFormat.format(Date())
                         db.updateCallHistory(
-                            current, simName, callHistory.id
+                            date, simName, callHistory.id
                         )
                     } else {
                         val d = Date()

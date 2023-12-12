@@ -157,7 +157,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.CACHED_PHOTO_URI
                 ),
                 CallLog.Calls.NUMBER + " = ?",
-                arrayOf(number), CallLog.Calls.DATE + " DESC"
+                arrayOf(number), null
             )!!
         } else {
             cursor = contentResolver.query(

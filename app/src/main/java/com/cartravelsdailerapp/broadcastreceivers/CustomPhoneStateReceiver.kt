@@ -29,14 +29,23 @@ class CustomPhoneStateReceiver(
     var simSlotIndex: Int = 0
     var simName: String = ""
     override fun onReceive(context: Context, intent: Intent?) {
+        Toast.makeText(context,"CustomPhoneStateReceiver",Toast.LENGTH_SHORT).show()
+
         val state = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
         var phoneNumer = ""
         val a = intent?.action
         if (a == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
             phoneNumer = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER) ?: ""
+            if (phoneNumer.isNotBlank()){
+                getCallLogsByNumber(phoneNumer)
+            }
         }
         if (a == Intent.ACTION_NEW_OUTGOING_CALL) {
             phoneNumer = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER) ?: ""
+            if (phoneNumer.isNotBlank())
+            {
+                getCallLogsByNumber(phoneNumer)
+            }
         }
         if (phoneNumer.isBlank()){
             return
@@ -139,5 +148,25 @@ class CustomPhoneStateReceiver(
         }
         return -1
     }
+    fun getCallLogsByNumber(phoneNumber: String) {
+        val cursor: Cursor? = c?.contentResolver?.query(
+            CallLog.Calls.CONTENT_URI,
+            null,
+            CallLog.Calls.NUMBER + " = ? ",
+            arrayOf(phoneNumber),
+            ""
+        )
+
+        if (cursor?.moveToFirst() == true) {
+            while (cursor.moveToNext()) {
+                val id = cursor.getString(cursor.getColumnIndex(CallLog.Calls._ID))
+                val number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER))
+                val name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME))
+                Log.e("call Logs -> ${phoneNumber}", "${id} ${number} ${name}")
+                Log.d("call Logs -> ${phoneNumber}", "${id} ${number} ${name}")
+            }
+        }
+    }
+
 
 }

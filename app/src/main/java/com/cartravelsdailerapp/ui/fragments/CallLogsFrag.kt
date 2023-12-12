@@ -54,10 +54,17 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     private lateinit var job: Job
     lateinit var callLogsAdapter: CallHistoryAdapter
     var receiver: CustomPhoneStateReceiver? = null
-    private val onResult: (String, String?, Uri?,String) -> Unit = { phone, name, photoUri,simIndex ->
-        launch {
-            viewModel.getNewCallLogsHistory(phone,simIndex)
+    lateinit var localBroadcastManager: LocalBroadcastManager
+    private val onResult: (String, String?, Uri?, String) -> Unit =
+        { phone, name, photoUri, simIndex ->
+            launch {
+                viewModel.getNewCallLogsHistory(phone, simIndex)
+            }
         }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
     }
 
     override fun onCreateView(
@@ -129,12 +136,10 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             callLogsAdapter.notifyDataSetChanged()
         }
         // register broadcast manager
-        val localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
         localBroadcastManager.registerReceiver(
             receiver_local,
             IntentFilter(PrefUtils.LOCAL_BROADCAST_KEY)
         )
-
 
     }
 
@@ -142,7 +147,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent != null) {
                 val phone = intent.getStringExtra(PrefUtils.ContactNumber)
-                val simIndex = intent.getIntExtra(PrefUtils.SIMIndex,0)
+                val simIndex = intent.getStringExtra(PrefUtils.SIMIndex)
                 phone?.let { viewModel.getNewCallLogsHistory(it, simIndex.toString()) }
             }
         }
@@ -336,9 +341,9 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
     override fun onDetach() {
         super.onDetach()
-        if (receiver != null)
-            context?.unregisterReceiver(receiver)
-
+        localBroadcastManager.unregisterReceiver(
+            receiver_local
+        )
     }
 
     override fun onDestroy() {
