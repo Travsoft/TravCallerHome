@@ -29,12 +29,9 @@ import java.util.*
 
 class CallEndReceiver : BroadcastReceiver() {
     var c: Context? = null
-    var simSlotIndex: Int = 0
-    var simName: String = ""
     override fun onReceive(context: Context, intent: Intent?) {
         try {
             c = context
-            val state = intent!!.getStringExtra(TelephonyManager.EXTRA_STATE)
             var phoneNumer = ""
             val a = intent?.action
             if (a == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
