@@ -5,34 +5,44 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.icu.text.SimpleDateFormat
-import android.net.Uri
+import android.media.MediaRecorder
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.provider.CallLog
-import android.telecom.PhoneAccount
-import android.telecom.PhoneAccountHandle
-import android.telecom.TelecomManager
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.content.getSystemService
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.LOCAL_BROADCAST_KEY
+import com.cartravelsdailerapp.broadcastreceivers.workers.NotifyWorker
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.CallActivity
+import java.io.File
+import java.io.IOException
 import java.util.*
 
 
 class CallEndReceiver : BroadcastReceiver() {
     var c: Context? = null
+    var receiver: CustomPhoneStateReceiver? = null
+    private var isRecording = false;
+    private lateinit var mediaRecorder : MediaRecorder
+
+    private lateinit var workManager: WorkManager
+
     override fun onReceive(context: Context, intent: Intent?) {
         try {
+
             c = context
             var phoneNumer = ""
+
             val a = intent?.action
             if (a == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
                 phoneNumer = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER) ?: ""
@@ -40,16 +50,38 @@ class CallEndReceiver : BroadcastReceiver() {
 
                 phoneNumer = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER) ?: ""
             }
+            val simid = intent?.getIntExtra("simId", -1)
+
+            Log.e("48 CallEndReceiver", "${phoneNumer} ${simid}")
 
             if (phoneNumer.isBlank())
                 return
+            val state = intent!!.getStringExtra(TelephonyManager.EXTRA_STATE)
+
+            if (state.equals(TelephonyManager.EXTRA_STATE_RINGING))
+                Toast.makeText(context, "Ringing...", Toast.LENGTH_SHORT).show();
+            if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK))
+                Toast.makeText(context, "Busy...", Toast.LENGTH_SHORT).show();
+            if (state.equals(TelephonyManager.EXTRA_STATE_IDLE))
+                Toast.makeText(context, "Free...", Toast.LENGTH_SHORT).show();
             val callLogsByNumber = getCallLogsByNumber(phoneNumer)
+            Log.e("56 CallEndReceiver", "---")
+            val data = Data.Builder()
+                .putString(PrefUtils.ContactNumber, phoneNumer)
+                .build()
+            workManager = WorkManager.getInstance(context)
+            val notificationBuilder = OneTimeWorkRequest.Builder(NotifyWorker::class.java)
+                .setInputData(data)
+                .build()
+            workManager.enqueue(notificationBuilder)
 
             val intent = Intent(LOCAL_BROADCAST_KEY)
             intent.putExtra(PrefUtils.ContactNumber, phoneNumer)
             intent.putExtra(PrefUtils.PhotoUri, callLogsByNumber.photouri)
             intent.putExtra(PrefUtils.SIMIndex, callLogsByNumber.SimName)
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            Log.e("63 CallEndReceiver", "${phoneNumer} ${simid}")
+
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -162,4 +194,38 @@ class CallEndReceiver : BroadcastReceiver() {
             }
         }
     }
+    private fun startRecording() {
+        mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) MediaRecorder() else MediaRecorder()
+        if(!isRecording){
+            mediaRecorder.apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                setOutputFile(getRecordingFilePath())
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB) }
+            try {
+                mediaRecorder.prepare()
+                mediaRecorder.start()
+            } catch (e : IOException){
+                Log.d("CallRec", e.toString())
+            }
+        }
+        isRecording = true
+
+    }
+
+    private fun getRecordingFilePath(): String {
+        val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+        val filePath = File(dir, "testing_${System.currentTimeMillis()}" + ".mp3")
+        return filePath.path
+    }
+
+    private fun stopRecording(){
+        if(isRecording){
+            mediaRecorder.stop()
+            mediaRecorder.reset()
+            mediaRecorder.reset()
+            isRecording = false
+        }
+    }
+
 }

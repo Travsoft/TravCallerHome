@@ -31,6 +31,8 @@ class CustomPhoneStateReceiver(
     var c: Context? = null
 
     override fun onReceive(context: Context, intent: Intent?) {
+        Log.e("34 CustomPhoneStateReceiver","started")
+
         var phoneNumer = ""
         val a = intent?.action
         if (a == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
@@ -45,8 +47,7 @@ class CustomPhoneStateReceiver(
 
         val callLogsByNumber = getCallLogsByNumber(phoneNumer)
 
-        phoneNumer?.let { number ->
-            val callHistory = getCallerInfo(context, number)
+        phoneNumer.let { number ->
             onResult(
                 phoneNumer,
                 callLogsByNumber.name,
@@ -56,64 +57,6 @@ class CustomPhoneStateReceiver(
         }
 
 
-    }
-
-    private fun getCallerInfo(context: Context, phoneNumber: String): CallHistory {
-        val cursor: Cursor? = context.contentResolver.query(
-            CallLog.Calls.CONTENT_URI,
-            null,
-            CallLog.Calls.NUMBER + " = ? OR " + CallLog.Calls.NUMBER + " = ?",
-            arrayOf(phoneNumber),
-            CallLog.Calls.DATE + " DESC"
-        )
-        if (cursor != null && cursor.moveToFirst()) {
-            val indexUri = cursor.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI)
-            val indexName = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME)
-            val indexType = cursor.getColumnIndex(CallLog.Calls.TYPE)
-            val simIdColumnIndex = cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID)
-            val accountId: String = cursor.getString(simIdColumnIndex)
-            val simCardSlotIndex =
-                getSimSlotIndexFromAccountId(context.applicationContext, accountId)
-            val name = cursor.getString(indexName)
-            val type = cursor.getType(indexType)
-
-            val photoUri =
-                cursor.getString(indexUri)?.let { Uri.parse(it) }
-
-            return CallHistory(
-                "",
-                phoneNumber,
-                name,
-                type,
-                "",
-                "",
-                "",
-                photoUri.toString(),
-                simCardSlotIndex.toString()
-            )
-        }
-        return CallHistory(
-            "", phoneNumber, "", 0, "", "", "", "", ""
-        )
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    fun getSimSlotIndexFromAccountId(context: Context, accountIdToFind: String): Int {
-        // This is actually the official data that should be found, as on the emulator, but sadly not all phones return here a proper value
-        val telecomManager = context.getSystemService<TelecomManager>()
-        telecomManager?.callCapablePhoneAccounts?.forEachIndexed { index, account: PhoneAccountHandle ->
-            val phoneAccount: PhoneAccount = telecomManager?.getPhoneAccount(account)!!
-            val accountId: String = phoneAccount.accountHandle
-                .id
-            if (accountIdToFind == accountId) {
-                return index
-            }
-        }
-        accountIdToFind.toIntOrNull()?.let {
-            if (it >= 0)
-                return it
-        }
-        return -1
     }
 
     private fun getCallLogsByNumber(phoneNumber: String): CallHistory {

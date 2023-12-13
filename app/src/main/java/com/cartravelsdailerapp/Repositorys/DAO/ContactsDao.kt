@@ -7,7 +7,8 @@ import com.cartravelsdailerapp.models.FavouritesContacts
 
 @Dao
 interface CallHistoryDao {
-    @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC")
+   // @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC")
+    @Query("SELECT * FROM CallHistory group by date ORDER BY id DESC")
     fun getAllCallLogs(): List<CallHistory>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -136,6 +136,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             callLogsAdapter.notifyDataSetChanged()
         }
         // register broadcast manager
+        Log.e("139 CallLogsFrag", "registerReceiver")
         localBroadcastManager.registerReceiver(
             receiver_local,
             IntentFilter(PrefUtils.LOCAL_BROADCAST_KEY)
@@ -145,7 +146,9 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
     var receiver_local: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            Log.e("148 CallLogsFrag", "inserting before")
             if (intent != null) {
+
                 val phone = intent.getStringExtra(PrefUtils.ContactNumber)
                 val simIndex = intent.getStringExtra(PrefUtils.SIMIndex)
                 phone?.let { viewModel.getNewCallLogsHistory(it, simIndex.toString()) }
@@ -341,14 +344,15 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
     override fun onDetach() {
         super.onDetach()
-        localBroadcastManager.unregisterReceiver(
-            receiver_local
-        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
+        localBroadcastManager.unregisterReceiver(
+            receiver_local
+        )
+
     }
 
     override val coroutineContext: CoroutineContext

@@ -85,8 +85,9 @@ class CallHistoryFragment : Fragment() {
         }.attach()
         binding.cardDialerBt.setOnClickListener {
             startActivity(
-                Intent(requireContext(), Dialer::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                Intent(requireContext(), Dialer::class.java)
+                    /*.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),*/
             )
         }
 

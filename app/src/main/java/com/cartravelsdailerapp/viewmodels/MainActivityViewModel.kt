@@ -3,6 +3,7 @@ package com.cartravelsdailerapp.viewmodels
 import android.app.Application
 import android.icu.text.SimpleDateFormat
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.*
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
@@ -59,12 +60,14 @@ class MainActivityViewModel(
     }
 
     fun getNewCallLogsHistory(number: String, simName: String) {
+        Log.e("63","inserting started")
+
         if (number.isNotBlank() && simName.isNotBlank()) {
             viewModelScope.launch {
                 val callLogs = db.getAllCallLogs()
 
                 val callHistory = callLogs.find {
-                    it.number.equals(number)
+                    it.number == number
                 }
                 if (callHistory == null) {
                     val callhistoryData = callLogsRepository.fetchCallLogSignle(number)
@@ -127,13 +130,18 @@ class MainActivityViewModel(
     }
 
     fun getCallLogsHistoryDb() {
-        _callLogsdb.value = db.getAllCallLogs().sortedByDescending {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
-            } else {
-                TODO("VERSION.SDK_INT < N")
+        viewModelScope.launch(Dispatchers.Main) {
+            _callLogsdb.value = db.getAllCallLogs().distinctBy {
+                it.number
+            }.sortedByDescending {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    SimpleDateFormat(PrefUtils.DataFormate).parse(it.date)
+                } else {
+                    TODO("VERSION.SDK_INT < N")
+                }
             }
         }
+
     }
 
     fun getAllFavouriteContacts() {

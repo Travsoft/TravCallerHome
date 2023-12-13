@@ -177,74 +177,77 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
             )!!
 
         }
-        while (cursor.moveToNext()) {
-            when (cursor.getColumnIndex(CallLog.Calls.TYPE).let { cursor.getString(it).toInt() }) {
-                CallLog.Calls.OUTGOING_TYPE -> dir = "OUTGOING"
-                CallLog.Calls.INCOMING_TYPE -> dir = "INCOMING"
-                CallLog.Calls.MISSED_TYPE -> dir = "MISSED"
-            }
-            cursor.getColumnIndex(CallLog.Calls.NUMBER)
-                .let { cursor.getString(it) }?.let {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
-                        callHistory = CallHistory(
-                            number = it,
-                            name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME))
-                                ?: null,
-                            type = cursor.getString(cursor.getColumnIndex(CallLog.Calls.TYPE))
-                                .toInt(),
-                            date = simpDate.format(
+        if(!cursor.isClosed) {
+            while (cursor.moveToNext()) {
+                when (cursor.getColumnIndex(CallLog.Calls.TYPE)
+                    .let { cursor.getString(it).toInt() }) {
+                    CallLog.Calls.OUTGOING_TYPE -> dir = "OUTGOING"
+                    CallLog.Calls.INCOMING_TYPE -> dir = "INCOMING"
+                    CallLog.Calls.MISSED_TYPE -> dir = "MISSED"
+                }
+                cursor.getColumnIndex(CallLog.Calls.NUMBER)
+                    .let { cursor.getString(it) }?.let {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
+                            callHistory = CallHistory(
+                                number = it,
+                                name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME))
+                                    ?: null,
+                                type = cursor.getString(cursor.getColumnIndex(CallLog.Calls.TYPE))
+                                    .toInt(),
+                                date = simpDate.format(
+                                    Date(
+                                        cursor.getLong(
+                                            cursor.getColumnIndex(
+                                                CallLog.Calls.DATE
+                                            )
+                                        )
+                                    )
+                                ).toString(),
+                                duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION))
+                                    .toString(),
+                                subscriberId = cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
+                                    ?: "",
+                                calType = dir.toString(),
+                                photouri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI))
+                                    ?: "",
+                                SimName = getSimCardInfosBySubscriptionId(
+                                    cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
+                                        ?: "0",
+                                )?.displayName?.toString() ?: "",
+                            )
+
+                        } else {
+                            callHistory = CallHistory(
+                                number = it,
+                                name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME))
+                                    ?: null,
+                                type = cursor.getString(cursor.getColumnIndex(CallLog.Calls.TYPE))
+                                    .toInt(),
+                                date =
                                 Date(
                                     cursor.getLong(
                                         cursor.getColumnIndex(
                                             CallLog.Calls.DATE
                                         )
                                     )
-                                )
-                            ).toString(),
-                            duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION))
-                                .toString(),
-                            subscriberId = cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
-                                ?: "",
-                            calType = dir.toString(),
-                            photouri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI))
-                                ?: "",
-                            SimName = getSimCardInfosBySubscriptionId(
-                                cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
-                                    ?: "0",
-                            )?.displayName?.toString() ?: "",
-                        )
+                                ).toString(),
+                                duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION))
+                                    .toString(),
+                                subscriberId = cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
+                                    ?: "",
+                                calType = dir.toString(),
+                                photouri = "",
+                                SimName = getSimCardInfosBySubscriptionId(
+                                    cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
+                                        ?: "0",
+                                )?.displayName?.toString() ?: "",
+                            )
 
-                    } else {
-                        callHistory = CallHistory(
-                            number = it,
-                            name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME))
-                                ?: null,
-                            type = cursor.getString(cursor.getColumnIndex(CallLog.Calls.TYPE))
-                                .toInt(),
-                            date =
-                            Date(
-                                cursor.getLong(
-                                    cursor.getColumnIndex(
-                                        CallLog.Calls.DATE
-                                    )
-                                )
-                            ).toString(),
-                            duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION))
-                                .toString(),
-                            subscriberId = cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
-                                ?: "",
-                            calType = dir.toString(),
-                            photouri = "",
-                            SimName = getSimCardInfosBySubscriptionId(
-                                cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
-                                    ?: "0",
-                            )?.displayName?.toString() ?: "",
-                        )
+                        }
 
                     }
-
-                }
+            }
         }
         cursor.close()
 

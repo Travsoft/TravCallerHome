@@ -1,23 +1,10 @@
 package com.cartravelsdailerapp
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.icu.text.SimpleDateFormat
-import android.net.Uri
 import android.os.Bundle
-import android.telephony.TelephonyManager
-import android.widget.Toast
-import android.window.OnBackInvokedDispatcher
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
-import androidx.navigation.NavigatorProvider
 import androidx.navigation.fragment.NavHostFragment
-import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.ActivityMainBinding
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -25,7 +12,6 @@ import com.qamar.curvedbottomnaviagtion.CurvedBottomNavigation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 
