@@ -1,6 +1,8 @@
 package com.cartravelsdailerapp.ui.adapters
 
 import android.content.Context
+import android.content.Context.TELECOM_SERVICE
+import android.content.Context.TELEPHONY_SERVICE
 import android.content.res.AssetFileDescriptor
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -8,6 +10,9 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.ContactsContract
+import android.telecom.TelecomManager
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -78,12 +83,29 @@ class CallHistoryAdapter(
         }
         holder.number.text = selectedData.number
         holder.date.text = selectedData.date
-        if (TextUtils.isEmpty(selectedData.SimName.replace("SIM", ""))) {
-            holder.simType.isVisible = false
+
+        if (Build.VERSION.SDK_INT > 22) {
+            val subscriptionManager =
+                context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+
+            val subList = subscriptionManager.activeSubscriptionInfoList.toList()
+            val simindex = subList.find {
+                it.subscriptionId == selectedData.subscriberId.toInt()
+            }?.simSlotIndex
+            val telecomManager = context
+                .getSystemService(TELECOM_SERVICE) as TelecomManager
+            val list = telecomManager.callCapablePhoneAccounts
+            if (simindex == 0) {
+                holder.simType.text = "1"
+            } else {
+                holder.simType.text = "2"
+            }
         } else {
-            holder.simType.text = selectedData.SimName.replace("SIM", "")
+            val tManager = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
 
         }
+
+
         holder.duration.text = "${selectedData.duration} See"
         holder.itemView.setOnClickListener {
             // Get the current state of the item

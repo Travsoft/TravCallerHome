@@ -190,14 +190,23 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
             subList = subscriptionManager.activeSubscriptionInfoList.toList()
 
             if (!subList.isEmpty()) {
-                subList[0].simSlotIndex
+                val simindex= subList[0].simSlotIndex
                 val telecomManager = getSystemService(TELECOM_SERVICE) as TelecomManager
                 val list = telecomManager.callCapablePhoneAccounts
-
-                txt_sim_type.text = subList[0].displayName.toString().replace("SIM", "")
+                if (simindex==0){
+                    txt_sim_type.text = "1"
+                }
+                else{
+                    txt_sim_type.text = "2"
+                }
                 bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, list[0])
 
                 img_sim.setOnClickListener {
+                    if(subList.size!=2){
+                        Toast
+                            .makeText(this,"you have only one Sim active",Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
                     if (txt_sim_type.text.equals("1")) {
                         txt_sim_type.text = subList[1].displayName.toString().replace("SIM", "")
                         bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, list[1])
