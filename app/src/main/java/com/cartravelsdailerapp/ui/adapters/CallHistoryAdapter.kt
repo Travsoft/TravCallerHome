@@ -50,6 +50,7 @@ class CallHistoryAdapter(
         var calltype = itemView.findViewById<ImageView>(R.id.txt_Contact_type)
         var profile_image = itemView.findViewById<QuickContactBadge>(R.id.profile_image)
         var simType = itemView.findViewById<TextView>(R.id.txt_Contact_simtype)
+        var img_simbg = itemView.findViewById<ImageView>(R.id.img_simbg)
         var duration = itemView.findViewById<TextView>(R.id.txt_Contact_duration)
         var call = itemView.findViewById<LinearLayout>(R.id.layout_call)
         var profile_contact = itemView.findViewById<LinearLayout>(R.id.profile_contact)
@@ -89,17 +90,23 @@ class CallHistoryAdapter(
                 context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
 
             val subList = subscriptionManager.activeSubscriptionInfoList.toList()
-            val simindex = subList.find {
-                it.subscriptionId == selectedData.subscriberId.toInt()
-            }?.simSlotIndex
-            val telecomManager = context
-                .getSystemService(TELECOM_SERVICE) as TelecomManager
-            val list = telecomManager.callCapablePhoneAccounts
-            if (simindex == 0) {
-                holder.simType.text = "1"
-            } else {
-                holder.simType.text = "2"
+            try {
+                val simindex = subList.find {
+                    it.subscriptionId == selectedData.subscriberId.toInt()
+                }?.simSlotIndex
+                val telecomManager = context
+                    .getSystemService(TELECOM_SERVICE) as TelecomManager
+                val list = telecomManager.callCapablePhoneAccounts
+                if (simindex == 0) {
+                    holder.simType.text = "1"
+                } else {
+                    holder.simType.text = "2"
+                }
+            } catch (ex: Exception) {
+                holder.simType.isVisible = false
+                holder.img_simbg.isVisible = false
             }
+
         } else {
             val tManager = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
 
@@ -138,6 +145,7 @@ class CallHistoryAdapter(
                     )
                 )
             }
+
             "INCOMING" -> {
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(
@@ -146,6 +154,7 @@ class CallHistoryAdapter(
                     )
                 )
             }
+
             "MISSED" -> {
                 holder.calltype.setImageDrawable(
                     AppCompatResources.getDrawable(

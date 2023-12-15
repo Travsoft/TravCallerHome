@@ -83,19 +83,20 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
     lateinit var viewModel: MainActivityViewModel
     lateinit var receiver: CustomPhoneStateReceiver
     var simName: String = "SIM1"
-    private val onResult: (String, String?, Uri?,String) -> Unit = { phone, name, photoUri,simIndex ->
-        launch {
-            viewModel.getNewCallLogsHistory(phone, simIndex)
-            val intent = Intent(
-                this@Dialer,
-                MainActivity::class.java
-            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            intent.putExtra(EnteredNumber, edtInput.toString())
-            startActivity(intent)
+    private val onResult: (String, String?, Uri?, String) -> Unit =
+        { phone, name, photoUri, simIndex ->
+            launch {
+                viewModel.getNewCallLogsHistory(phone, simIndex)
+                val intent = Intent(
+                    this@Dialer,
+                    MainActivity::class.java
+                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                intent.putExtra(EnteredNumber, edtInput.toString())
+                startActivity(intent)
 
+            }
         }
-    }
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -190,40 +191,59 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
             subList = subscriptionManager.activeSubscriptionInfoList.toList()
 
             if (!subList.isEmpty()) {
-                val simindex= subList[0].simSlotIndex
+                val simindex = subList[0].simSlotIndex
                 val telecomManager = getSystemService(TELECOM_SERVICE) as TelecomManager
                 val list = telecomManager.callCapablePhoneAccounts
-                if (simindex==0){
+                if (simindex == 0) {
                     txt_sim_type.text = "1"
-                }
-                else{
+                } else {
                     txt_sim_type.text = "2"
                 }
                 bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, list[0])
 
                 img_sim.setOnClickListener {
-                    if(subList.size!=2){
+                    if (subList.size != 2) {
                         Toast
-                            .makeText(this,"you have only one Sim active",Toast.LENGTH_SHORT).show()
+                            .makeText(this, "you have only one Sim active", Toast.LENGTH_SHORT)
+                            .show()
                         return@setOnClickListener
                     }
                     if (txt_sim_type.text.equals("1")) {
-                        txt_sim_type.text = subList[1].displayName.toString().replace("SIM", "")
+                        if (list.size!=2)
+                        {
+                            Toast
+                                .makeText(this, "you have only one Sim active", Toast.LENGTH_SHORT)
+                                .show()
+                            return@setOnClickListener
+                        }
                         bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, list[1])
                         simName = subList[1].displayName.toString()
+                        val simindex = subList[1].simSlotIndex
+                        if (simindex == 0) {
+                            txt_sim_type.text = "1"
+                        } else {
+                            txt_sim_type.text = "2"
+                        }
+
+
                     } else {
-                        txt_sim_type.text = subList[0].displayName.toString().replace("SIM", "")
                         bundle.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, list[0])
                         simName = subList[0].displayName.toString()
+                        val simindex = subList[0].simSlotIndex
+                        if (simindex == 0) {
+                            txt_sim_type.text = "1"
+                        } else {
+                            txt_sim_type.text = "2"
+                        }
                     }
                 }
             }
         }
-/*
-        launch {
-            freezePleaseIAmDoingHeavyWork()
-        }
-*/
+        /*
+                launch {
+                    freezePleaseIAmDoingHeavyWork()
+                }
+        */
     }
 
     override fun onResume() {
@@ -242,23 +262,28 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                     supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#375f91")))
 
                 }
+
                 GsmCall.Status.DIALING -> {
                     supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#5f6368")))
                 }
+
                 GsmCall.Status.RINGING -> {
                     //down green
                     supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#3d8c39")))
                 }
+
                 GsmCall.Status.ACTIVE -> {
                     //indigo
                     supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#5c00d2")))
 
                 }
+
                 GsmCall.Status.UNKNOWN -> {
                     //grey
                     supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#375f91")))
 
                 }
+
                 GsmCall.Status.CONNECTING -> {
                     //grey and blue
                     supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#375f91")))
@@ -290,36 +315,47 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
             R.id.dialpad_1_holder -> {
                 edtInput.append("1")
             }
+
             R.id.dialpad_2_holder -> {
                 edtInput.append("2")
             }
+
             R.id.dialpad_3_holder -> {
                 edtInput.append("3")
             }
+
             R.id.dialpad_4_holder -> {
                 edtInput.append("4")
             }
+
             R.id.dialpad_5_holder -> {
                 edtInput.append("5")
             }
+
             R.id.dialpad_6_holder -> {
                 edtInput.append("6")
             }
+
             R.id.dialpad_7_holder -> {
                 edtInput.append("7")
             }
+
             R.id.dialpad_8_holder -> {
                 edtInput.append("8")
             }
+
             R.id.dialpad_9_holder -> {
                 edtInput.append("9")
             }
+
             R.id.dialpad_0_holder -> {
                 edtInput.append("0")
             }
+
             R.id.dialpad_asterisk_holder -> {
                 edtInput.append("*")
             }
+
             R.id.dialpad_hashtag_holder -> {
                 edtInput.append("#")
             }
@@ -461,6 +497,7 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                     ).show()
                 }
             }
+
             R.id.img_whatsapp -> {
                 if (number.length >= 10) {
                     if (this.isPackageInstalled(this, WhatsAppPackage)) {
@@ -474,9 +511,11 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                     }
                 }
             }
+
             R.id.cancel_button -> {
                 onBackPressed()
             }
+
             R.id.add_user -> {
                 contactIntent = Intent(ContactsContract.Intents.Insert.ACTION)
                 contactIntent.type = ContactsContract.RawContacts.CONTENT_TYPE
@@ -487,12 +526,12 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
                 launcherContact.launch(contactIntent)
             }
 
-/*
-            R.id.call_list_rv -> {
-                Log.d("call_lis_rv", "clicked")
-                dialerView.visibility = View.GONE
-            }
-*/
+            /*
+                        R.id.call_list_rv -> {
+                            Log.d("call_lis_rv", "clicked")
+                            dialerView.visibility = View.GONE
+                        }
+            */
         }
     }
 
@@ -535,15 +574,15 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
         get() = job + Dispatchers.Main
 
     suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
-/*
-        val list = withContext(Dispatchers.Default) {
-            //pretend this is a big network call
-            CallLogsDataSource(
-                application.contentResolver,
-                this@Dialer
-            ).readContacts()
-        }
-*/
+        /*
+                val list = withContext(Dispatchers.Default) {
+                    //pretend this is a big network call
+                    CallLogsDataSource(
+                        application.contentResolver,
+                        this@Dialer
+                    ).readContacts()
+                }
+        */
         //  contactsAdapter = ContactsAdapter(this)
         val layoutInflater = LinearLayoutManager(this)
         recy_list_contacts.layoutManager = layoutInflater
