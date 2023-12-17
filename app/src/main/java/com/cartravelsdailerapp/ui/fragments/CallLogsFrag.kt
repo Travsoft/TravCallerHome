@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
-import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -21,7 +20,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
@@ -30,7 +28,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.databinding.FragmentCallLogsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.DatabaseBuilder
@@ -53,7 +50,6 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     private lateinit var job: Job
     lateinit var callLogsAdapter: CallHistoryAdapter
-    var receiver: CustomPhoneStateReceiver? = null
     lateinit var localBroadcastManager: LocalBroadcastManager
     private val onResult: (String, String?, Uri?, String) -> Unit =
         { phone, name, photoUri, simIndex ->
@@ -135,26 +131,8 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
             callLogsAdapter.notifyDataSetChanged()
         }
-        // register broadcast manager
-        Log.e("139 CallLogsFrag", "registerReceiver")
-        localBroadcastManager.registerReceiver(
-            receiver_local,
-            IntentFilter(PrefUtils.LOCAL_BROADCAST_KEY)
-        )
-
     }
 
-    var receiver_local: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.e("148 CallLogsFrag", "inserting before")
-            if (intent != null) {
-
-                val phone = intent.getStringExtra(PrefUtils.ContactNumber)
-                val simIndex = intent.getStringExtra(PrefUtils.SIMIndex)
-                phone?.let { viewModel.getNewCallLogsHistory(it, simIndex.toString()) }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -190,13 +168,6 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         ) {
             telecomManager?.placeCall(uri, bundle)
         }
-        receiver = CustomPhoneStateReceiver(onResult, number)
-        ContextCompat.registerReceiver(
-            requireContext(),
-            receiver,
-            IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED),
-            ContextCompat.RECEIVER_EXPORTED
-        )
     }
 
     override fun navigateToProfilePage(
@@ -341,18 +312,9 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
     }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
-        localBroadcastManager.unregisterReceiver(
-            receiver_local
-        )
-
     }
 
     override val coroutineContext: CoroutineContext

@@ -16,9 +16,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
+import androidx.work.*
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.LOCAL_BROADCAST_KEY
 import com.cartravelsdailerapp.broadcastreceivers.workers.NotifyWorker
@@ -31,15 +29,12 @@ import java.util.*
 
 class CallEndReceiver : BroadcastReceiver() {
     var c: Context? = null
-    var receiver: CustomPhoneStateReceiver? = null
     private var isRecording = false;
-    private lateinit var mediaRecorder : MediaRecorder
-
+    private lateinit var mediaRecorder: MediaRecorder
     private lateinit var workManager: WorkManager
 
     override fun onReceive(context: Context, intent: Intent?) {
         try {
-
             c = context
             var phoneNumer = ""
 
@@ -51,9 +46,6 @@ class CallEndReceiver : BroadcastReceiver() {
                 phoneNumer = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER) ?: ""
             }
             val simid = intent?.getIntExtra("simId", -1)
-
-            Log.e("48 CallEndReceiver", "${phoneNumer} ${simid}")
-
             if (phoneNumer.isBlank())
                 return
             val state = intent!!.getStringExtra(TelephonyManager.EXTRA_STATE)
@@ -65,29 +57,47 @@ class CallEndReceiver : BroadcastReceiver() {
             if (state.equals(TelephonyManager.EXTRA_STATE_IDLE))
                 Toast.makeText(context, "Free...", Toast.LENGTH_SHORT).show();
             val callLogsByNumber = getCallLogsByNumber(phoneNumer)
-            Log.e("56 CallEndReceiver", "---")
             val data = Data.Builder()
                 .putString(PrefUtils.ContactNumber, phoneNumer)
                 .build()
             workManager = WorkManager.getInstance(context)
-            val notificationBuilder = OneTimeWorkRequest.Builder(NotifyWorker::class.java)
-                .setInputData(data)
+            val uploadWorkRequest = OneTimeWorkRequestBuilder<NotifyWorker>()
+                .setInputData(
+                    createInputDataForUri(
+                        phoneNumer,
+                        callLogsByNumber.photouri,
+                        callLogsByNumber.SimName
+                    )
+                )
                 .build()
-            workManager.enqueue(notificationBuilder)
+            WorkManager.getInstance(c!!.applicationContext)
+                .enqueueUniqueWork(
+                    "", ExistingWorkPolicy.KEEP,
+                    uploadWorkRequest
+                )
 
-            val intent = Intent(LOCAL_BROADCAST_KEY)
-            intent.putExtra(PrefUtils.ContactNumber, phoneNumer)
-            intent.putExtra(PrefUtils.PhotoUri, callLogsByNumber.photouri)
-            intent.putExtra(PrefUtils.SIMIndex, callLogsByNumber.SimName)
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-            Log.e("63 CallEndReceiver", "${phoneNumer} ${simid}")
-
-
+            /* val intent = Intent(LOCAL_BROADCAST_KEY)
+             intent.putExtra(PrefUtils.ContactNumber, phoneNumer)
+             intent.putExtra(PrefUtils.PhotoUri, callLogsByNumber.photouri)
+             intent.putExtra(PrefUtils.SIMIndex, callLogsByNumber.SimName)
+             LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+             Log.d("74", "Call End")*/
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        //  callActionHandler.postDelayed(runRingingActivity, 0);
+    }
 
+    private fun createInputDataForUri(
+        phoneNumber: String,
+        photouri: String,
+        SimName: String
+    ): Data {
+        val builder = Data.Builder()
+        builder.putString(PrefUtils.ContactNumber, phoneNumber)
+        builder.putString(PrefUtils.PhotoUri, photouri)
+        builder.putString(PrefUtils.SIMIndex, SimName)
+
+        return builder.build()
     }
 
     var callActionHandler: Handler = Handler()
@@ -194,18 +204,21 @@ class CallEndReceiver : BroadcastReceiver() {
             }
         }
     }
+
     private fun startRecording() {
-        mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) MediaRecorder() else MediaRecorder()
-        if(!isRecording){
+        mediaRecorder =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) MediaRecorder() else MediaRecorder()
+        if (!isRecording) {
             mediaRecorder.apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
                 setOutputFile(getRecordingFilePath())
-                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB) }
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            }
             try {
                 mediaRecorder.prepare()
                 mediaRecorder.start()
-            } catch (e : IOException){
+            } catch (e: IOException) {
                 Log.d("CallRec", e.toString())
             }
         }
@@ -219,8 +232,8 @@ class CallEndReceiver : BroadcastReceiver() {
         return filePath.path
     }
 
-    private fun stopRecording(){
-        if(isRecording){
+    private fun stopRecording() {
+        if (isRecording) {
             mediaRecorder.stop()
             mediaRecorder.reset()
             mediaRecorder.reset()

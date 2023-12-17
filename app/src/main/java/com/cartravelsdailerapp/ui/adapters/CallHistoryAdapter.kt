@@ -125,16 +125,17 @@ class CallHistoryAdapter(
             // Notify the adapter that item has changed
             notifyItemChanged(position)
         }
-        // Set the visibility based on state
-        // Set the visibility based on state
         holder.layout_sub_item.visibility = if (selectedData.IsExpand) View.VISIBLE else View.GONE
-        val imageUri = getPhotoFromContacts(selectedData.number)
-        if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
-            loadContactPhotoThumbnail(imageUri).also {
-                holder.profile_image.setImageBitmap(it)
+
+        if (!selectedData.number.isBlank()) {
+            val imageUri = getPhotoFromContacts(selectedData.number)
+            if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
+                loadContactPhotoThumbnail(imageUri).also {
+                    holder.profile_image.setImageBitmap(it)
+                }
+            } else {
+                holder.profile_image.setImageToDefault()
             }
-        } else {
-            holder.profile_image.setImageToDefault()
         }
         when (selectedData.calType) {
             "OUTGOING" -> {

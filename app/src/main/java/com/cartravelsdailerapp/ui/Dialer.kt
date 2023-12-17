@@ -36,7 +36,6 @@ import com.cartravelsdailerapp.PrefUtils.EnteredNumber
 import com.cartravelsdailerapp.PrefUtils.TelegramAppPackage
 import com.cartravelsdailerapp.PrefUtils.WhatsAppPackage
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.broadcastreceivers.CustomPhoneStateReceiver
 import com.cartravelsdailerapp.dialerstates.CallManager
 import com.cartravelsdailerapp.dialerstates.GsmCall
 import com.cartravelsdailerapp.models.Contact
@@ -45,7 +44,6 @@ import com.cartravelsdailerapp.ui.adapters.ContactsAdapter
 import com.cartravelsdailerapp.utils.isPackageInstalled
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.disposables.Disposables
 import kotlinx.coroutines.*
@@ -81,7 +79,6 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
     lateinit var contactIntent: Intent
     lateinit var launcherContact: ActivityResultLauncher<Intent>
     lateinit var viewModel: MainActivityViewModel
-    lateinit var receiver: CustomPhoneStateReceiver
     var simName: String = "SIM1"
     private val onResult: (String, String?, Uri?, String) -> Unit =
         { phone, name, photoUri, simIndex ->
@@ -142,17 +139,15 @@ class Dialer : AppCompatActivity(), CoroutineScope, View.OnClickListener {
 
                 if (edtInput.length() > 0) {
                     callTheEnteredNumber()
-                    receiver = CustomPhoneStateReceiver(onResult, edtInput.toString())
+                    /*receiver = CustomPhoneStateReceiver(onResult, edtInput.toString())
                     ContextCompat.registerReceiver(
                         this,
                         receiver,
                         IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED),
                         ContextCompat.RECEIVER_EXPORTED
-                    )
+                    )*/
                 }
             }
-
-            Log.d("MyInCallService", "inFab")
         }
 
 

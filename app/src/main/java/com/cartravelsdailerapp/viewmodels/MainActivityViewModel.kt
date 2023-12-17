@@ -60,7 +60,6 @@ class MainActivityViewModel(
     }
 
     fun getNewCallLogsHistory(number: String, simName: String) {
-        Log.e("63","inserting started")
 
         if (number.isNotBlank() && simName.isNotBlank()) {
             viewModelScope.launch {
