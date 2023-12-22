@@ -1,35 +1,44 @@
 package com.cartravelsdailerapp.ui.fragments
 
 import android.Manifest
-import android.content.BroadcastReceiver
+import android.app.Activity
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.CallLog
+import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.text.TextUtils
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
+import com.cartravelsdailerapp.Repositorys.DAO.CallHistoryDao
 import com.cartravelsdailerapp.databinding.FragmentCallLogsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
+import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.CallHistroyActivity
@@ -45,12 +54,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
+
 class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var binding: FragmentCallLogsBinding
     lateinit var viewModel: MainActivityViewModel
     private lateinit var job: Job
     lateinit var callLogsAdapter: CallHistoryAdapter
     lateinit var localBroadcastManager: LocalBroadcastManager
+    lateinit var launcherContactAdd: ActivityResultLauncher<Intent>
+    lateinit var launcherContactEdit: ActivityResultLauncher<Intent>
+    lateinit var db: CallHistoryDao
     private val onResult: (String, String?, Uri?, String) -> Unit =
         { phone, name, photoUri, simIndex ->
             launch {
@@ -95,6 +108,50 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             val intent = Intent(context, ProfileActivity::class.java)
             context?.startActivity(intent)
         }
+        launcherContactAdd =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    // There are no request codes
+                    val contactData: Intent? = result.data
+                    val uri: Uri = contactData?.data!!
+                    var cNumber: String? = null
+                    var name: String? = null
+                    val c: Cursor? = context?.contentResolver?.query(uri, null, null, null, null)
+                    if (c?.moveToFirst() == true) {
+                        val id: String =
+                            c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                         name =
+                            c.getString(c.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                        val hasPhone: String =
+                            c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))
+                        if (hasPhone.equals("1", ignoreCase = true)) {
+                            val phones: Cursor = context?.contentResolver?.query(
+                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id,
+                                null, null
+                            )!!
+                            phones.moveToFirst()
+                            cNumber = phones.getString(phones.getColumnIndex("data1"))
+                        }
+
+                    }
+                    if (name != null) {
+                        db.updateNameCallHistory(name,id )
+                    }
+                    callLogsAdapter.notifyDataSetChanged()
+                }
+            }
+        launcherContactEdit =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    // There are no request codes
+                    val data: Intent? = result.data
+                    callLogsAdapter.notifyDataSetChanged()
+
+                }
+            }
+        db = DatabaseBuilder.getInstance(requireContext()).CallHistoryDao()
+
         return binding.root
     }
 
@@ -239,6 +296,35 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         TODO("Not yet implemented")
     }
 
+    override fun addContact(contactId: String, lookupKey: String, callHistory: CallHistory) {
+        val contactIntent = Intent(ContactsContract.Intents.Insert.ACTION)
+        contactIntent.type = ContactsContract.RawContacts.CONTENT_TYPE
+        contactIntent
+            .putExtra(ContactsContract.Intents.Insert.PHONE, callHistory.number)
+        launcherContactAdd.launch(contactIntent)
+    }
+
+    override fun editContact(contactId: String, lookupKey: String, callHistory: CallHistory) {
+        val contactIntent = Intent(Intent.ACTION_EDIT).apply {
+            val contactUri = getLookupUri(contactId.toLong(), lookupKey)
+            setDataAndType(contactUri, ContactsContract.Contacts.CONTENT_ITEM_TYPE)
+            putExtra(ContactsContract.Intents.Insert.NAME, callHistory.name)
+            putExtra(ContactsContract.Intents.Insert.PHONE, callHistory.number)
+        }
+        launcherContactEdit.launch(contactIntent)
+    }
+
+    fun getLookupUri(contactId: Long, lookupKey: String?): Uri? {
+        return if (TextUtils.isEmpty(lookupKey)) {
+            null
+        } else ContentUris.withAppendedId(
+            Uri.withAppendedPath(
+                ContactsContract.Contacts.CONTENT_LOOKUP_URI,
+                lookupKey
+            ), contactId
+        )
+    }
+
     fun isAppInstalled(packageName: String?): Boolean {
         val pm = context?.packageManager
         try {
@@ -312,6 +398,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         intent.setPackage(PrefUtils.TelegramMessage)
         context?.startActivity(intent)
     }
+
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
@@ -320,5 +407,21 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main
 
-
+    private fun updateCachedName(id: String, name: String) {
+        val contentValues = ContentValues()
+        contentValues.put(CallLog.Calls.CACHED_NAME, name)
+        if (ActivityCompat.checkSelfPermission(
+                activity!!,
+                Manifest.permission.WRITE_CALL_LOG
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            var updated = context?.contentResolver?.update(
+                CallLog.Calls.CONTENT_URI,
+                contentValues,
+                CallLog.Calls._ID + "=" + id,
+                null
+            )
+            Toast.makeText(context, "" + updated.toString(), Toast.LENGTH_SHORT).show()
+        }
+    }
 }

@@ -23,7 +23,9 @@ data class CallHistory(
     @ColumnInfo
     var photouri: String,
     @ColumnInfo
-    var SimName: String
+    var SimName: String,
+    @ColumnInfo
+    var lookUpUri: String
 ) {
     @ColumnInfo
     var IsExpand: Boolean = false

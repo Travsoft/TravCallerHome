@@ -15,7 +15,7 @@ import com.cartravelsdailerapp.models.CallHistory
 import java.util.*
 
 class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-    override suspend fun doWork(): Result  {
+    override suspend fun doWork(): Result {
         val number = inputData.getString(PrefUtils.ContactNumber)
         val simName = inputData.getString(PrefUtils.SIMIndex)
         var db = DatabaseBuilder.getInstance(applicationContext).CallHistoryDao()
@@ -26,7 +26,7 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
         }
         if (callHistory == null) {
             val callhistoryData = getCallLogsByNumber(applicationContext, number!!)
-            if (!callhistoryData.number.isNullOrBlank()){
+            if (!callhistoryData.number.isNullOrBlank()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val simpDate = SimpleDateFormat(PrefUtils.DataFormate)
                     val date = Date()
@@ -47,7 +47,8 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
                             callhistoryData.duration,
                             callhistoryData.subscriberId,
                             callhistoryData.photouri,
-                            simName!!
+                            simName!!,
+                            callhistoryData.lookUpUri
                         )
                     )
                 } else {
@@ -62,7 +63,8 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
                             callhistoryData.duration,
                             callhistoryData.subscriberId,
                             callhistoryData.photouri,
-                            simName!!
+                            simName!!,
+                            callhistoryData.lookUpUri
                         )
                     )
                 }
@@ -82,9 +84,10 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
                 )
             }
         }
-       return Result.success()
+        return Result.success()
     }
-    private fun getCallLogsByNumber(context:Context,phoneNumber: String): CallHistory {
+
+    private fun getCallLogsByNumber(context: Context, phoneNumber: String): CallHistory {
         var typeDisplayName = ""
         var date: String
         val cursor: Cursor? = context?.contentResolver?.query(
@@ -136,10 +139,14 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
                 val photouri =
                     cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_PHOTO_URI))
                         ?: ""
-                val simName = getSimCardInfosBySubscriptionId(context,
+                val simName = getSimCardInfosBySubscriptionId(
+                    context,
                     cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                         ?: "0",
                 )?.displayName?.toString() ?: ""
+                val lookUpUri =
+                    cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
+
                 val calLogs = CallHistory(
                     typeDisplayName,
                     number,
@@ -149,7 +156,8 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
                     duration.toString(),
                     subscriberId,
                     photouri,
-                    simName
+                    simName,
+                    lookUpUri
                 )
                 return calLogs
 
@@ -164,11 +172,16 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
             "",
             "",
             "",
+            "",
             ""
         )
 
     }
-    private fun getSimCardInfosBySubscriptionId(context: Context,subscriptionId: String): SubscriptionInfo? {
+
+    private fun getSimCardInfosBySubscriptionId(
+        context: Context,
+        subscriptionId: String
+    ): SubscriptionInfo? {
         val subscriptionManager: SubscriptionManager =
             context?.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
         return subscriptionManager.activeSubscriptionInfoList.find {

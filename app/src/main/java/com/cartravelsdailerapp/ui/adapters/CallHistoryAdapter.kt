@@ -59,6 +59,8 @@ class CallHistoryAdapter(
         var card_telegram = itemView.findViewById<CardView>(R.id.card_telegram)
         var cardSms = itemView.findViewById<CardView>(R.id.card_sms)
         var card_call = itemView.findViewById<CardView>(R.id.card_call)
+        var card_add_edit = itemView.findViewById<CardView>(R.id.card_add_edit)
+        var img_add_edit = itemView.findViewById<ImageView>(R.id.img_add_edit)
         var txt_Contact_number_count =
             itemView.findViewById<TextView>(R.id.txt_Contact_number_count)
     }
@@ -77,10 +79,18 @@ class CallHistoryAdapter(
     override fun onBindViewHolder(holder: CallHistoryVm, position: Int) {
         val selectedData = listCallHistory[position]
         Log.e("73-> call history data", "${selectedData}")
-        if (selectedData.name.isNullOrBlank()) {
+        val contactDisplayName = getDisplayNameByContacts(selectedData.number);
+        if (selectedData.name.isNullOrBlank() && contactDisplayName.isNullOrBlank()) {
             holder.name.text = selectedData.number
+            holder.img_add_edit.setImageResource(R.drawable.ic_add_circle)
         } else {
-            holder.name.text = selectedData.name
+            if (selectedData.name?.isEmpty() == true) {
+                holder.name.text = contactDisplayName
+                selectedData.name=contactDisplayName
+            } else {
+                holder.name.text = selectedData.name
+            }
+            holder.img_add_edit.setImageResource(R.drawable.ic_edit)
         }
         holder.number.text = selectedData.number
         holder.date.text = selectedData.date
@@ -127,7 +137,7 @@ class CallHistoryAdapter(
         }
         holder.layout_sub_item.visibility = if (selectedData.IsExpand) View.VISIBLE else View.GONE
 
-        if (!selectedData.number.isBlank()) {
+        if (selectedData.number.isNotBlank()) {
             val imageUri = getPhotoFromContacts(selectedData.number)
             if (!TextUtils.isEmpty(imageUri) && imageUri != null) {
                 loadContactPhotoThumbnail(imageUri).also {
@@ -195,6 +205,25 @@ class CallHistoryAdapter(
                 onclick.openPhoneNumberHistory(selectedData.number, selectedData.name!!)
 
         }
+        holder.card_add_edit.setOnClickListener {
+            if (TextUtils.isDigitsOnly(selectedData.name)) {
+                getContactIdByContacts(selectedData.number)?.let { it1 ->
+                    onclick.addContact(
+                        it1,
+                        getLookUpUriByContacts(selectedData.number)!!,
+                        selectedData
+                    )
+                }
+            } else {
+                getContactIdByContacts(selectedData.number)?.let { it1 ->
+                    onclick.editContact(
+                        it1,
+                        getLookUpUriByContacts(selectedData.number)!!,
+                        selectedData
+                    )
+                }
+            }
+        }
     }
 
     fun filterList(filterlist: ArrayList<CallHistory>) {
@@ -209,19 +238,106 @@ class CallHistoryAdapter(
 
     private fun getPhotoFromContacts(num: String): String? {
         val uri =
-            Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(num))
+            Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(num)
+            )
         //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
         val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
 
         if (cursor != null) {
             if (cursor.moveToNext()) {
-                val id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
+                /*val id =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))*/
+/*
                 val name =
                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
+*/
                 val image_uri =
                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
-                Log.d("image_uri-->", "name $name id $id image_uri $image_uri")
+                Log.d("image_uri-->", "image_uri $image_uri")
                 return image_uri
+            }
+            cursor.close()
+        }
+        return ""
+    }
+
+    private fun getDisplayNameByContacts(num: String): String? {
+        val uri =
+            Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(num)
+            )
+        //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
+        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
+
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                /*val id =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))*/
+                val name =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
+/*
+                val image_uri =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
+*/
+                Log.d("display name-->", "name  $name")
+                return name
+            }
+            cursor.close()
+        }
+        return ""
+    }
+
+    private fun getLookUpUriByContacts(num: String): String? {
+        val uri =
+            Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(num)
+            )
+        //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
+        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
+
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                /* val id =
+                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
+                 val name =
+                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                 val image_uri =
+                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
+                 Log.d("image_uri-->", "name $name id $id image_uri $image_uri")*/
+                val lookupUri =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.LOOKUP_KEY))
+                return lookupUri
+            }
+            cursor.close()
+        }
+        return ""
+    }
+
+    private fun getContactIdByContacts(num: String): String? {
+        val uri =
+            Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(num)
+            )
+        //  uri = if (phone_uri != null) Uri.parse(phone_uri) else uri
+        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
+
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                /* val id =
+                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID))
+                 val name =
+                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                 val image_uri =
+                     cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI))
+                 Log.d("image_uri-->", "name $name id $id image_uri $image_uri")*/
+                val contactsId =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.CONTACT_ID))
+                return contactsId
             }
             cursor.close()
         }
@@ -259,7 +375,10 @@ class CallHistoryAdapter(
                  * Creates a photo URI by appending the content URI of
                  * Contacts.Photo
                  */
-                Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+                Uri.withAppendedPath(
+                    contactUri,
+                    ContactsContract.Contacts.Photo.CONTENT_DIRECTORY
+                )
             }
 
             /*

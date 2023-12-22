@@ -29,7 +29,10 @@ class VisitingCardViewModel(
                 allContactColumns()
             )
             foundContacts.collect {
-                if (it.first().phones.any()) {
+                if (it.isEmpty()){
+                    return@collect
+                }
+                if (it?.first()?.phones?.any() == true) {
                     Log.d("80-> ${cid}", "${it.first().phones[0].value.raw}")
                     val number = it.first().phones[0].value.raw
                     val name = it.first().displayName
@@ -40,9 +43,9 @@ class VisitingCardViewModel(
                             number = number,
                             it.first().thumbnailUri.toString(),
                             cid.toString(),
-                            isFavourites = it.first().isStarred
+                            isFavourites = it.first().isStarred,
+                            contactsLookUp = it.first().lookupKey?.value.toString()
                         )
-                        Log.d("View model Profile 50-->", it.toString())
                     }
 
                 }

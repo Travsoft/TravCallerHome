@@ -90,7 +90,8 @@ class MainActivityViewModel(
                                 callhistoryData.duration,
                                 callhistoryData.subscriberId,
                                 callhistoryData.photouri,
-                                simName
+                                simName,
+                                callhistoryData.lookUpUri
                             )
                         )
                     } else {
@@ -105,7 +106,8 @@ class MainActivityViewModel(
                                 callhistoryData.duration,
                                 callhistoryData.subscriberId,
                                 callhistoryData.photouri,
-                                simName
+                                simName,
+                                callhistoryData.lookUpUri
                             )
                         )
                     }
@@ -162,7 +164,8 @@ class MainActivityViewModel(
                                 "",
                                 it.thumbnailUri.toString(),
                                 contactId = it.contactId.toString(),
-                                isFavourites = it.isStarred
+                                isFavourites = it.isStarred,
+                                contactsLookUp = it.lookupKey?.value.toString()
                             )
                         )
                     }

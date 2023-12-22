@@ -130,7 +130,7 @@ class VisitingCardActivity : AppCompatActivity() {
             if (data != null) {
                 db.updateFavouriteContact(true, data.id)
             } else {
-                db.insertFavouriteContact(Contact(name, number, photoUri, contactId, true))
+                db.insertFavouriteContact(Contact(name, number, photoUri, contactId, true,""))
             }
         }
         img_Favouritefilled.setOnClickListener {
@@ -146,7 +146,7 @@ class VisitingCardActivity : AppCompatActivity() {
             if (data != null) {
                 db.updateFavouriteContact(false, data.id)
             } else {
-                db.insertFavouriteContact(Contact(name, number, photoUri, contactId, false))
+                db.insertFavouriteContact(Contact(name, number, photoUri, contactId, false,""))
             }
         }
         val imageUri = getPhotoFromContacts(number)

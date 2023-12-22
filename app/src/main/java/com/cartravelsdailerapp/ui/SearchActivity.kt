@@ -29,6 +29,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alexstyl.contactstore.ContactStore
+import com.alexstyl.contactstore.LookupKey
 import com.alexstyl.contactstore.thumbnailUri
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
@@ -91,7 +92,8 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
                             "",
                             it.thumbnailUri.toString(),
                             contactId = it.contactId.toString(),
-                            isFavourites = it.isStarred
+                            isFavourites = it.isStarred,
+                            contactsLookUp = it.lookupKey?.value.toString()
                         )
                     )
                 }
@@ -283,6 +285,14 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
         basicAlert(binding.root, contactId)
     }
 
+    override fun addContact(contactId: String,lookupKey: String,callHistory: CallHistory) {
+        TODO("Not yet implemented")
+    }
+
+    override fun editContact(contactId: String,lookupKey: String,callHistory: CallHistory) {
+        TODO("Not yet implemented")
+    }
+
     fun isAppInstalled(packageName: String?): Boolean {
         val pm = packageManager
         try {
@@ -357,7 +367,7 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
         startActivity(intent)
     }
 
-    fun basicAlert(view: View, contactid: String) {
+    private fun basicAlert(view: View, contactid: String) {
 
         val builder = AlertDialog.Builder(this)
 
@@ -374,9 +384,11 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
                             contactid.toLong()
                         )
                     }
+                    filterContacts("")
+                    filter("")
+                    binding.etSearch.text.clear()
+
                 }
-
-
             }
             setNegativeButton("No") { dialog: DialogInterface, which: Int ->
                 dialog.dismiss()

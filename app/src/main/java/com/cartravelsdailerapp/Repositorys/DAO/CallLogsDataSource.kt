@@ -37,7 +37,8 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                         CallLog.Calls.DATE,
                         CallLog.Calls.DURATION,
                         CallLog.Calls.PHONE_ACCOUNT_ID,
-                        CallLog.Calls.CACHED_PHOTO_URI
+                        CallLog.Calls.CACHED_PHOTO_URI,
+                        CallLog.Calls.CACHED_LOOKUP_URI
                     ),
                     null,
                     null, null
@@ -57,7 +58,8 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.TYPE,
                     CallLog.Calls.DATE,
                     CallLog.Calls.DURATION,
-                    CallLog.Calls.PHONE_ACCOUNT_ID
+                    CallLog.Calls.PHONE_ACCOUNT_ID,
+                    CallLog.Calls.CACHED_LOOKUP_URI
                 ),
                 null,
                 null, null
@@ -100,6 +102,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                 cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                     ?: "0",
                             )?.displayName?.toString() ?: "",
+                            lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
                         )
 
                     } else {
@@ -126,6 +129,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                 cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                     ?: "0",
                             )?.displayName?.toString() ?: "",
+                            lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
                         )
                     }
 
@@ -154,7 +158,8 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.DATE,
                     CallLog.Calls.DURATION,
                     CallLog.Calls.PHONE_ACCOUNT_ID,
-                    CallLog.Calls.CACHED_PHOTO_URI
+                    CallLog.Calls.CACHED_PHOTO_URI,
+                    CallLog.Calls.CACHED_LOOKUP_URI
                 ),
                 CallLog.Calls.NUMBER + " = ?",
                 arrayOf(number), null
@@ -170,7 +175,8 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                     CallLog.Calls.TYPE,
                     CallLog.Calls.DATE,
                     CallLog.Calls.DURATION,
-                    CallLog.Calls.PHONE_ACCOUNT_ID
+                    CallLog.Calls.PHONE_ACCOUNT_ID,
+                    CallLog.Calls.CACHED_LOOKUP_URI
                 ),
                 null,
                 null, CallLog.Calls.DATE + " DESC"
@@ -215,6 +221,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                     cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                         ?: "0",
                                 )?.displayName?.toString() ?: "",
+                                lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
                             )
 
                         } else {
@@ -242,6 +249,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                     cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                         ?: "0",
                                 )?.displayName?.toString() ?: "",
+                                lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
                             )
 
                         }

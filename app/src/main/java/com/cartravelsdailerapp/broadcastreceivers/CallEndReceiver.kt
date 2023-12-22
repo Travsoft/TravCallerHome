@@ -164,6 +164,8 @@ class CallEndReceiver : BroadcastReceiver() {
                     cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                         ?: "0",
                 )?.displayName?.toString() ?: ""
+                val lookUpUri =
+                    cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
                 val calLogs = CallHistory(
                     typeDisplayName,
                     number,
@@ -173,7 +175,8 @@ class CallEndReceiver : BroadcastReceiver() {
                     duration.toString(),
                     subscriberId,
                     photouri,
-                    simName
+                    simName,
+                    lookUpUri
                 )
                 return calLogs
 
@@ -184,6 +187,7 @@ class CallEndReceiver : BroadcastReceiver() {
             "",
             "",
             0,
+            "",
             "",
             "",
             "",

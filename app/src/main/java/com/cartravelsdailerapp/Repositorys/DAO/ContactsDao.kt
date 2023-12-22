@@ -7,7 +7,7 @@ import com.cartravelsdailerapp.models.FavouritesContacts
 
 @Dao
 interface CallHistoryDao {
-   // @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC")
+    // @Query("SELECT * FROM CallHistory group by number ORDER BY id DESC")
     @Query("SELECT * FROM CallHistory group by date ORDER BY id DESC")
     fun getAllCallLogs(): List<CallHistory>
 
@@ -47,4 +47,7 @@ interface CallHistoryDao {
 
     @Query("UPDATE CallHistory SET date=:date,SimName=:SimName WHERE id = :id")
     fun updateCallHistory(date: String, SimName: String, id: Int)
+
+    @Query("UPDATE CallHistory SET name=:name WHERE id = :id")
+    fun updateNameCallHistory(name: String, id: Int)
 }

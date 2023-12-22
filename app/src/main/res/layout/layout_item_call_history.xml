@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
+    android:background="@color/white"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="10dp"
     app:cardElevation="5dp"
-    app:cardBackgroundColor="@color/white"
     app:cardMaxElevation="5dp"
-    android:background="@color/white"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
@@ -332,6 +332,7 @@
                             app:tint="@color/white" />
 
                     </androidx.cardview.widget.CardView>
+
                     <androidx.cardview.widget.CardView
                         android:id="@+id/card_add_edit"
                         android:layout_width="wrap_content"
@@ -343,6 +344,7 @@
                         app:contentPadding="10dp">
 
                         <ImageView
+                            android:id="@+id/img_add_edit"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/ic_add_circle"

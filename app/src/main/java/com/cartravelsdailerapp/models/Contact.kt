@@ -19,7 +19,9 @@ data class Contact(
     val contactId: String,
 
     @ColumnInfo
-    val isFavourites: Boolean
+    val isFavourites: Boolean,
+    @ColumnInfo
+    val contactsLookUp: String
 ) {
 
     @PrimaryKey(autoGenerate = true)

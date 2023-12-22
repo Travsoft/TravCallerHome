@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alexstyl.contactstore.ContactStore
+import com.alexstyl.contactstore.LookupKey
 import com.alexstyl.contactstore.thumbnailUri
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
@@ -33,6 +34,7 @@ import com.cartravelsdailerapp.databinding.FragmentContactsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
+import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.ui.CallHistroyActivity
 import com.cartravelsdailerapp.ui.ProfileActivity
@@ -57,20 +59,8 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var viewModel: MainActivityViewModel
     lateinit var favcontactsAdapter: FavouritesContactAdapter
     lateinit var db: AppDatabase
+    lateinit var  listOfContactStore:ContactStore
     val list = ArrayList<Contact>()
-    val positiveButtonClick = { dialog: DialogInterface, which: Int ->
-        val listOfContactStore = ContactStore.newInstance(requireContext())
-        listOfContactStore.execute {
-            delete(contactId = 5L)
-        }
-
-    }
-    val negativeButtonClick = { dialog: DialogInterface, which: Int ->
-        Toast.makeText(
-            requireContext(),
-            android.R.string.no, Toast.LENGTH_SHORT
-        ).show()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,19 +87,20 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         binding.recyListFavouritesContacts.isNestedScrollingEnabled = false
         binding.recyListContacts.adapter = contactsAdapter
         binding.scrollConacts.isNestedScrollingEnabled = true
-        binding.scrollConacts.isSmoothScrollingEnabled=true
+        binding.scrollConacts.isSmoothScrollingEnabled = true
 
-        val listOfContactStore = ContactStore.newInstance(requireContext())
+         listOfContactStore = ContactStore.newInstance(requireContext())
         listOfContactStore.fetchContacts().collect { it ->
             it.forEach {
-                if (!it.displayName.isBlank()) {
+                if (it.displayName.isNotBlank()) {
                     list.add(
                         Contact(
                             it.displayName,
                             "",
                             it.thumbnailUri.toString(),
                             contactId = it.contactId.toString(),
-                            isFavourites = it.isStarred
+                            isFavourites = it.isStarred,
+                            contactsLookUp = it.lookupKey?.value!!
                         )
                     )
                 }
@@ -119,12 +110,6 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
                 contactsAdapter.addAll(list.toList().sortedBy { i -> i.name }
                     .distinctBy { i -> i.name })
                 contactsAdapter.notifyDataSetChanged()
-                Toast
-                    .makeText(
-                        context, list
-                            .size.toString(), Toast.LENGTH_SHORT
-                    ).show()
-
             }
         }
 
@@ -159,14 +144,15 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
             val listOfContactStore = ContactStore.newInstance(requireContext())
             listOfContactStore.fetchContacts().collect { it ->
                 it.forEach {
-                    if (!it.displayName.isNullOrBlank()) {
+                    if (it.displayName.isNotBlank()) {
                         list.add(
                             Contact(
                                 it.displayName,
                                 "",
                                 it.thumbnailUri.toString(),
                                 contactId = it.contactId.toString(),
-                                isFavourites = it.isStarred
+                                isFavourites = it.isStarred,
+                                contactsLookUp = it.lookupKey?.value.toString()
                             )
                         )
                     }
@@ -317,6 +303,14 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         basicAlert(binding.root, contactId)
     }
 
+    override fun addContact(contactId: String,lookupKey: String,callHistory: CallHistory) {
+        TODO("Not yet implemented")
+    }
+
+    override fun editContact(contactId: String,lookupKey: String,callHistory: CallHistory) {
+        TODO("Not yet implemented")
+    }
+
     fun isAppInstalled(packageName: String?): Boolean {
         val pm = context?.packageManager
         try {
@@ -409,6 +403,30 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
                         )
                     }
                 }
+                list.clear()
+                listOfContactStore.fetchContacts().collect { it ->
+                    it.forEach {
+                        if (it.displayName.isNotBlank()) {
+                            list.add(
+                                Contact(
+                                    it.displayName,
+                                    "",
+                                    it.thumbnailUri.toString(),
+                                    contactId = it.contactId.toString(),
+                                    isFavourites = it.isStarred,
+                                    contactsLookUp = it.lookupKey?.value!!
+                                )
+                            )
+                        }
+
+                    }
+                    launch(Dispatchers.Main) {
+                        contactsAdapter.addAll(list.toList().sortedBy { i -> i.name }
+                            .distinctBy { i -> i.name })
+                        contactsAdapter.notifyDataSetChanged()
+                    }
+                }
+
 
 
             }
