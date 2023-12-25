@@ -2,15 +2,14 @@ package com.cartravelsdailerapp.ui.fragments
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentUris
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
+import android.content.*
+import android.content.Context.TELECOM_SERVICE
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.BlockedNumberContract.BlockedNumbers
 import android.provider.CallLog
 import android.provider.ContactsContract
 import android.telecom.PhoneAccountHandle
@@ -24,8 +23,10 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
@@ -38,7 +39,6 @@ import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.Repositorys.DAO.CallHistoryDao
 import com.cartravelsdailerapp.databinding.FragmentCallLogsBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
-import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.ui.CallHistroyActivity
@@ -120,7 +120,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
                     if (c?.moveToFirst() == true) {
                         val id: String =
                             c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-                         name =
+                        name =
                             c.getString(c.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
                         val hasPhone: String =
                             c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))
@@ -136,7 +136,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
                     }
                     if (name != null) {
-                        db.updateNameCallHistory(name,id )
+                        db.updateNameCallHistory(name, id)
                     }
                     callLogsAdapter.notifyDataSetChanged()
                 }
@@ -314,6 +314,12 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
         launcherContactEdit.launch(contactIntent)
     }
 
+    override fun block_number(number: String) {
+        //blockNumberAlert(number)
+        val telecomManager = context?.getSystemService(TELECOM_SERVICE) as TelecomManager
+        context?.startActivity(telecomManager.createManageBlockedNumbersIntent(), null);
+    }
+
     fun getLookupUri(contactId: Long, lookupKey: String?): Uri? {
         return if (TextUtils.isEmpty(lookupKey)) {
             null
@@ -424,4 +430,47 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
             Toast.makeText(context, "" + updated.toString(), Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun blockNumberAlert(number: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        with(builder)
+        {
+            setTitle("Block")
+            setMessage("Are you sure your want to block number? ")
+            setPositiveButton("Yes") { dialog: DialogInterface, which: Int ->
+
+                launch(Dispatchers.Main) {
+/*
+                    val c: Cursor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        context.contentResolver .query(
+                            BlockedNumbers.CONTENT_URI, arrayOf<String>(
+                                BlockedNumbers.COLUMN_ID,
+                                BlockedNumbers.COLUMN_ORIGINAL_NUMBER,
+                                BlockedNumbers.COLUMN_E164_NUMBER
+                            ), null, null, null
+                        )!!
+                    } else {
+                        TODO("VERSION.SDK_INT < N")
+                    }
+*/
+
+                    val values = ContentValues()
+                    values.put(BlockedNumbers.COLUMN_ORIGINAL_NUMBER, number)
+                    val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        context.contentResolver.insert(BlockedNumbers.CONTENT_URI, values)
+                    } else {
+                        TODO("VERSION.SDK_INT < N")
+                    }
+                }
+
+            }
+            setNegativeButton("No") { dialog: DialogInterface, which: Int ->
+                dialog.dismiss()
+            }
+            show()
+        }
+
+
+    }
+
 }

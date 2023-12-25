@@ -293,6 +293,10 @@ class SearchActivity : AppCompatActivity(), CoroutineScope, OnClickListeners {
         TODO("Not yet implemented")
     }
 
+    override fun block_number(nuumber: String) {
+        TODO("Not yet implemented")
+    }
+
     fun isAppInstalled(packageName: String?): Boolean {
         val pm = packageManager
         try {

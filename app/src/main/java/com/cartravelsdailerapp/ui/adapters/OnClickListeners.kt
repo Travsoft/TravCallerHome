@@ -19,4 +19,5 @@ interface OnClickListeners {
     fun deleteContact(contactId: String)
     fun addContact(contactId: String, lookupKey: String, callHistory: CallHistory)
     fun editContact(contactId: String, lookupKey: String, callHistory: CallHistory)
+    fun block_number(nuumber: String)
 }

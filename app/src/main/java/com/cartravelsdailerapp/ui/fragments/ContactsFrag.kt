@@ -311,6 +311,10 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
         TODO("Not yet implemented")
     }
 
+    override fun block_number(number: String) {
+        blockNumberAlert(number)
+    }
+
     fun isAppInstalled(packageName: String?): Boolean {
         val pm = context?.packageManager
         try {
@@ -428,6 +432,29 @@ class ContactsFrag : Fragment(), CoroutineScope, OnClickListeners {
                 }
 
 
+
+            }
+            setNegativeButton("No") { dialog: DialogInterface, which: Int ->
+                dialog.dismiss()
+            }
+            show()
+        }
+
+
+    }
+    fun blockNumberAlert(number: String) {
+
+        val builder = AlertDialog.Builder(requireContext())
+
+        with(builder)
+        {
+            setTitle("Block")
+            setMessage("Are you sure your want to block number? ")
+            setPositiveButton("Yes") { dialog: DialogInterface, which: Int ->
+
+                launch(Dispatchers.Main) {
+
+                }
 
             }
             setNegativeButton("No") { dialog: DialogInterface, which: Int ->

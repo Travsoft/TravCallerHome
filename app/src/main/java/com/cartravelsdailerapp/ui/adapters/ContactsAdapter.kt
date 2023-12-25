@@ -11,6 +11,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.QuickContactBadge
 import android.widget.TextView
@@ -47,6 +48,8 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
             itemView.findViewById<TextView>(R.id.txt_Contact_number_count)
         var Contact_delete =
             itemView.findViewById<CardView>(R.id.card_delete)
+        var card_block = itemView.findViewById<CardView>(R.id.card_block)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
@@ -100,7 +103,7 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                         println("Contact not found")
                     } else {
                         println("Contact found: $contact")
-                        if(contact.phones.isNotEmpty()) {
+                        if (contact.phones.isNotEmpty()) {
                             println("Contact found: ${contact.phones.get(0).value.raw}")
                             // Use contact.phones, contact.mails, contact.customDataItems etc
                             listOfConttacts[position].number =
@@ -125,7 +128,7 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
                         println("Contact not found")
                     } else {
                         println("Contact found: $contact")
-                        if(contact.phones.isNotEmpty()) {
+                        if (contact.phones.isNotEmpty()) {
                             println("Contact found: ${contact.phones.get(0).value.raw}")
                             // Use contact.phones, contact.mails, contact.customDataItems etc
                             listOfConttacts[position].number =
@@ -153,10 +156,14 @@ class ContactsAdapter(var context: Context, val onclick: OnClickListeners) :
 
         }
         holder.Contact_delete.setOnClickListener {
-            if (!listOfContacts.contactId.isBlank()){
+            if (!listOfContacts.contactId.isBlank()) {
                 onclick.deleteContact(listOfContacts.contactId)
             }
         }
+        holder.card_block.setOnClickListener {
+            onclick.block_number(listOfContacts.number)
+        }
+
     }
 
     fun addAll(list: List<Contact>) {

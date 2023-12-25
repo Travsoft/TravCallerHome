@@ -61,6 +61,7 @@ class CallHistoryAdapter(
         var card_call = itemView.findViewById<CardView>(R.id.card_call)
         var card_add_edit = itemView.findViewById<CardView>(R.id.card_add_edit)
         var img_add_edit = itemView.findViewById<ImageView>(R.id.img_add_edit)
+        var card_block = itemView.findViewById<CardView>(R.id.card_block)
         var txt_Contact_number_count =
             itemView.findViewById<TextView>(R.id.txt_Contact_number_count)
     }
@@ -223,6 +224,9 @@ class CallHistoryAdapter(
                     )
                 }
             }
+        }
+        holder.card_block.setOnClickListener {
+            onclick.block_number(selectedData.number)
         }
     }
 

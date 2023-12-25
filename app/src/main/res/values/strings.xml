@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TravCaller</string>
+    <string name="app_name">BusinessCaller</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="home">Home</string>
@@ -9,10 +9,10 @@
     <string name="call_2">Call 2</string>
     <string name="go_to">Go To</string>
     <string name="mobile_number">Mobile Number</string>
-    <string name="be_a_part_of_the_largest_indian_traval_community">Be a part of the largest Indian Traval Community</string>
+    <string name="be_a_part_of_the_largest_indian_traval_community">Be a part of the largest Indian Business Travel Community</string>
     <string name="email">Email</string>
     <string name="login">Login</string>
-    <string name="by_continuing_i_agree_to_cartravals_com_t_amp_c"><![CDATA[By Continuing,I agree to cartravals.com T & C]]></string>
+    <string name="by_continuing_i_agree_to_cartravals_com_t_amp_c"><![CDATA[By Continuing,I agree to cartravels.com T & C]]></string>
     <string name="personal">Personal</string>
     <string name="bussiness">Business</string>
     <string name="signup">Sign Up</string>
