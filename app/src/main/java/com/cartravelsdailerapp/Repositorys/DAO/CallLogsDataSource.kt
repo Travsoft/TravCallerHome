@@ -102,7 +102,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                 cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                     ?: "0",
                             )?.displayName?.toString() ?: "",
-                            lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
+                            lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))?:""
                         )
 
                     } else {
@@ -129,7 +129,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                 cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                     ?: "0",
                             )?.displayName?.toString() ?: "",
-                            lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
+                            lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))?:""
                         )
                     }
 
@@ -221,7 +221,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                     cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                         ?: "0",
                                 )?.displayName?.toString() ?: "",
-                                lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
+                                lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))?:""
                             )
 
                         } else {
@@ -249,7 +249,7 @@ class CallLogsDataSource(private val contentResolver: ContentResolver, val conte
                                     cursor.getString(cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID))
                                         ?: "0",
                                 )?.displayName?.toString() ?: "",
-                                lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))
+                                lookUpUri = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI))?:""
                             )
 
                         }

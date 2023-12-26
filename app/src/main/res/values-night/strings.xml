@@ -1,17 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Business Dialer</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="chat">Chat</string>
+    <string name="call_histroy">Call History</string>
     <string name="call_1">Call 1</string>
     <string name="call_2">Call 2</string>
     <string name="go_to">Go To</string>
     <string name="mobile_number">Mobile Number</string>
-    <string name="be_a_part_of_the_largest_indian_traval_community">Be a part of the largest Indian Traval Community</string>
+    <string name="be_a_part_of_the_largest_indian_traval_community">Be a part of the largest Indian Business Dialer Community</string>
     <string name="email">Email</string>
     <string name="login">Login</string>
-    <string name="by_continuing_i_agree_to_cartravals_com_t_amp_c"><![CDATA[By Continuing,I agree to cartravals.com T & C]]></string>
+    <string name="by_continuing_i_agree_to_cartravals_com_t_amp_c"><![CDATA[By Continuing,I agree to cartravels.com T & C]]></string>
     <string name="personal">Personal</string>
-    <string name="bussiness">Bussiness</string>
+    <string name="bussiness">Business</string>
     <string name="signup">Sign Up</string>
     <string name="forgot_password">Forgot Password</string>
     <string name="skip">Skip</string>
+    <string name="EnterEmailid">Enter Email id</string>
+    <string name="EnterMobileNumber">Enter Mobile Number</string>
+    <string name="CheckTermsAndConditions">Check Terms and Conditions</string>
     <string name="next">Next</string>
+    <string name="OutgoingCall">Outgoing Call</string>
+    <string name="IncomingCall">Incoming Call</string>
+    <string name="MissedCall">Missed Call</string>
+    <string name="Please_install_WA_Business_App">"Please install WA Business App"</string>
+    <string name="call_history">Call History</string>
+    <string name="contacts">Contacts</string>
+    <string name="favourite">Favourite</string>
+    <string name="profile">Profile</string>
+    <string name="choose_profile_picture">Choose Profile Picture</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="designation_or_job_title">Designation or Job Title</string>
+    <string name="phonenuber">PhoneNuber</string>
+    <string name="company_name_or_shop_name">Company Name or Shop Name</string>
+    <string name="expand">Expand</string>
+    <string name="create_your_business">Create Your Business</string>
 </resources>

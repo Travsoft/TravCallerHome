@@ -2,11 +2,13 @@ package com.cartravelsdailerapp.ui.fragments
 
 import android.Manifest
 import android.app.Activity
+import android.app.role.RoleManager
 import android.content.*
-import android.content.Context.TELECOM_SERVICE
+import android.content.pm.PackageInstaller.EXTRA_PACKAGE_NAME
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.nfc.cardemulation.CardEmulation.ACTION_CHANGE_DEFAULT
 import android.os.Build
 import android.os.Bundle
 import android.provider.BlockedNumberContract.BlockedNumbers
@@ -20,10 +22,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -64,6 +66,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     lateinit var launcherContactAdd: ActivityResultLauncher<Intent>
     lateinit var launcherContactEdit: ActivityResultLauncher<Intent>
     lateinit var db: CallHistoryDao
+    var packageName: String = ""
     private val onResult: (String, String?, Uri?, String) -> Unit =
         { phone, name, photoUri, simIndex ->
             launch {
@@ -74,6 +77,7 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
+
     }
 
     override fun onCreateView(
@@ -82,7 +86,8 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     ): View? {
         val myViewModelFactory =
             MyViewModelFactory(requireActivity().application)
-
+        packageName = "com.cartravelsdailerapp"
+        checkDefaultDialer()
         viewModel = ViewModelProvider(
             this,
             myViewModelFactory
@@ -315,9 +320,9 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
     }
 
     override fun block_number(number: String) {
-        //blockNumberAlert(number)
-        val telecomManager = context?.getSystemService(TELECOM_SERVICE) as TelecomManager
-        context?.startActivity(telecomManager.createManageBlockedNumbersIntent(), null);
+        blockNumberAlert(number)
+        /*val telecomManager = context?.getSystemService(TELECOM_SERVICE) as TelecomManager
+        context?.startActivity(telecomManager.createManageBlockedNumbersIntent(), null)*/
     }
 
     fun getLookupUri(contactId: Long, lookupKey: String?): Uri? {
@@ -472,5 +477,22 @@ class CallLogsFrag : Fragment(), CoroutineScope, OnClickListeners {
 
 
     }
+
+    private fun checkDefaultDialer() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return
+
+      /*  val telecomManager = context?.getSystemService<TelecomManager>()
+        val isAlreadyDefaultDialer = packageName == telecomManager?.defaultDialerPackage
+        if (isAlreadyDefaultDialer)
+            return
+        val intent = Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
+            .putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, packageName)
+        startActivityForResult(intent, 10001)*/
+        val setSmsAppIntent = Intent(ACTION_CHANGE_DEFAULT)
+        setSmsAppIntent.putExtra(EXTRA_PACKAGE_NAME, packageName)
+        startActivityForResult(setSmsAppIntent, 1001)
+    }
+
 
 }
