@@ -15,8 +15,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
+import com.cartravelsdailerapp.BaseResponse
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
@@ -41,9 +44,12 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     lateinit var listOfContactStore: ContactStore
     var runtimePermission: RunTimePermission = RunTimePermission(this)
     lateinit var db: AppDatabase
+    lateinit var mProgressDialog: ProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
+        mProgressDialog = ProgressDialog(this@LoginActivity)
+        mProgressDialog.setTitle("Loading")
         val myViewModelFactory =
             MyViewModelFactory(this@LoginActivity.application)
         vm = ViewModelProvider(
@@ -84,17 +90,66 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 ).show()
 
             } else {
-                val intent = Intent(
-                    this,
-                    SignUpActivity::class.java
-                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                intent.putExtra(PrefUtils.KeyEmail, email)
-                intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
-                startActivity(intent)
-                val edit = sharedPreferences.edit()
-                edit.putBoolean(PrefUtils.IsLogin, true)
-                edit.apply()
+                mProgressDialog = ProgressDialog(this@LoginActivity)
+                mProgressDialog.setTitle("Loading")
+                mProgressDialog.show()
+                vm.userExist(email!!, mobileNo!!)
+
+                vm.userExistResp.observe(this) {
+                    when (it) {
+                        is BaseResponse.Loading -> {
+                            //  showLoading()
+                            mProgressDialog.show()
+
+                        }
+
+                        is BaseResponse.Success -> {
+                            // stopLoading()
+                            mProgressDialog.dismiss()
+                            if (it.data?.alreadyExists == true) {
+
+                                val intent = Intent(
+                                    this,
+                                    Login2Activity::class.java
+                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                intent.putExtra(PrefUtils.KeyEmail, email)
+                                intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
+                                startActivity(intent)
+                                /*val edit = sharedPreferences.edit()
+                                edit.putBoolean(PrefUtils.IsLogin, true)
+                                edit.apply()*/
+
+
+                            } else {
+                                val intent = Intent(
+                                    this,
+                                    SignUpActivity::class.java
+                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                intent.putExtra(PrefUtils.KeyEmail, email)
+                                intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
+                                startActivity(intent)
+                            }
+                        }
+
+                        is BaseResponse.Error -> {
+                            // processError(it.msg)
+                            it.msg?.let { it1 ->
+                                Snackbar.make(
+                                    binding.root,
+                                    it1, Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
+                            mProgressDialog.dismiss()
+                        }
+                        else -> {
+                            //stopLoading()
+                            mProgressDialog.dismiss()
+                        }
+                    }
+
+                }
 
             }
         }
@@ -125,8 +180,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
                                 )
                         } else {
-                            val mProgressDialog = ProgressDialog(this@LoginActivity)
-                            mProgressDialog.setTitle("Loading")
+
                             mProgressDialog.setMessage("Preparing Call History...")
                             mProgressDialog.setCancelable(false)
                             mProgressDialog.show()

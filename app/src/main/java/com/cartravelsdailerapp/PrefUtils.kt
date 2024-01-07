@@ -5,6 +5,7 @@ import android.preference.PreferenceManager
 
 
 object PrefUtils {
+    const val BaseUrl="https://dailer-backend.onrender.com/api/v1/"
     const val ContactName = "contactName"
     const val SIMIndex = "SimIndex"
     const val PhotoUri = "photoUri"

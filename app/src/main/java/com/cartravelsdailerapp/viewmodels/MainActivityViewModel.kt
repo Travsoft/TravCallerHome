@@ -7,11 +7,15 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.alexstyl.contactstore.ContactStore
 import com.alexstyl.contactstore.thumbnailUri
+import com.cartravelsdailerapp.BaseResponse
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
+import com.cartravelsdailerapp.Repositorys.UserRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
+import com.cartravelsdailerapp.models.UserExistRequest
+import com.cartravelsdailerapp.models.UserExistResponse
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -20,6 +24,11 @@ class MainActivityViewModel(
     var context: Application,
     private val callLogsRepository: CallLogsRepository
 ) : AndroidViewModel(context), CoroutineScope {
+
+    val userExistResp: MutableLiveData<BaseResponse<UserExistResponse>> = MutableLiveData()
+
+    private val userRepo = UserRepository()
+
     private lateinit var job: Job
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main
@@ -176,6 +185,28 @@ class MainActivityViewModel(
         return list
 
     }
+
+    fun userExist(email: String, phoneNum: String) {
+        viewModelScope.launch {
+            try {
+
+                val loginRequest = UserExistRequest(
+                    email = email,
+                    phoneNumber = phoneNum
+                )
+                val response = userRepo.userExist(loginRequest = loginRequest)
+                if (response?.code() == 200) {
+                    userExistResp.value = BaseResponse.Success(response.body())
+                } else {
+                    userExistResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                userExistResp.value = BaseResponse.Error(ex.message)
+            }
+        }
+    }
+
 
 }
 
