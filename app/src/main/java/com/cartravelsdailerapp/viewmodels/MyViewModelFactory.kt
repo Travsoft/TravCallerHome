@@ -32,6 +32,12 @@ class MyViewModelFactory(private val application: Application) :
                 ) as T
 
             }
+            LoginAndSignUpViewModel::class.java -> {
+                LoginAndSignUpViewModel(
+                    application
+                ) as T
+
+            }
             else -> {
                 throw IllegalArgumentException("Unknown ViewModel class")
             }

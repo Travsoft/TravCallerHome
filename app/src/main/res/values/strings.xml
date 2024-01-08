@@ -40,4 +40,16 @@
     <string name="company_name_or_shop_name">Company Name or Shop Name</string>
     <string name="expand">Expand</string>
     <string name="create_your_business">Create Your Business</string>
+    <string name="entername">Enter Name</string>
+    <string name="enter_job_title">Enter Designation or Job Title</string>
+    <string name="enter_company">Enter Company Name</string>
+    <string name="enter_sim_one">Enter Sim One</string>
+    <string name="enter_sim_two">Enter Sim Two</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="enter_state">Enter State</string>
+    <string name="enter_pin_code">Enter Pin Code</string>
+    <string name="enter_city_name">Enter City Name</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="enter_confirm_password">Enter Confirm Password</string>
+    <string name="should_confirm_password_same">Password and Confirm Password Should Same</string>
 </resources>

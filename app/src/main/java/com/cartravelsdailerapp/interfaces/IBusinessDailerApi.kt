@@ -1,8 +1,8 @@
 package com.cartravelsdailerapp.interfaces
 
 import com.cartravelsdailerapp.ApiClient
-import com.cartravelsdailerapp.models.UserExistRequest
-import com.cartravelsdailerapp.models.UserExistResponse
+import com.cartravelsdailerapp.models.*
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -10,6 +10,10 @@ import retrofit2.http.POST
 interface IBusinessDailerApi {
     @POST("/api/v1/auth/userAlreadyExists")
     suspend fun userExist(@Body userExistRequest: UserExistRequest): Response<UserExistResponse>
+    @POST("/api/v1/auth/login")
+    suspend fun userLogin(@Body userLoginRequest: UserLoginRequest): Response<UserLoginResponse>
+    @POST("/api/v1/auth/register")
+    suspend fun userRegister(@Body body: RequestBody): Response<UserRegisterResponse>
 
 
     companion object {

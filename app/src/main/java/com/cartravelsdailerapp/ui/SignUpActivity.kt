@@ -1,6 +1,7 @@
 package com.cartravelsdailerapp.ui
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,8 @@ import android.view.LayoutInflater
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.ViewModelProvider
+import com.cartravelsdailerapp.BaseResponse
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.KeyEmail
@@ -24,12 +27,20 @@ import com.cartravelsdailerapp.PrefUtils.KeyPhoneNumber
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivitySignUpBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
+import com.cartravelsdailerapp.models.UserRegisterRequest
+import com.cartravelsdailerapp.viewmodels.LoginAndSignUpViewModel
+import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
+import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import java.io.FileDescriptor
 import java.io.IOException
 
 class SignUpActivity : AppCompatActivity() {
     lateinit var binding: ActivitySignUpBinding
     var image_uri: Uri? = null
+    lateinit var vm: LoginAndSignUpViewModel
+    var profileFile: String = ""
+    lateinit var mProgressDialog: ProgressDialog
 
     private var galleryActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -40,6 +51,7 @@ class SignUpActivity : AppCompatActivity() {
                 val inputImage = uriToBitmap(image_uri!!)
                 val rotated = rotateBitmap(inputImage!!)
                 binding.imgProfile.setImageBitmap(rotated)
+                profileFile = image_uri.toString()
             }
         }
 
@@ -52,12 +64,23 @@ class SignUpActivity : AppCompatActivity() {
                 val inputImage = uriToBitmap(image_uri!!)
                 val rotated = rotateBitmap(inputImage!!)
                 binding.imgProfile.setImageBitmap(rotated)
+                profileFile = inputImage.toString()
             }
         }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        mProgressDialog = ProgressDialog(this@SignUpActivity)
+        mProgressDialog.setTitle("Loading")
+        val myViewModelFactory =
+            MyViewModelFactory(this@SignUpActivity.application)
+
+        vm = ViewModelProvider(
+            this@SignUpActivity,
+            myViewModelFactory
+        )[LoginAndSignUpViewModel::class.java]
 
         supportActionBar?.title = "Sign Up"
         val d = intent.extras
@@ -66,18 +89,113 @@ class SignUpActivity : AppCompatActivity() {
         binding.etEmail.setText(email)
         binding.etSim1.setText(phoneNumber)
         binding.btSignup.setOnClickListener {
-            val intent = Intent(
+            /*val intent = Intent(
                 this,
                 Login2Activity::class.java
             ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-            startActivity(intent)
+            startActivity(intent)*/
+            val name = binding.etName.text.toString()
+            val jobTitle = binding.etJobtitle.text.toString()
+            val companyName = binding.etCompanyName.text.toString()
+            val sim1Number = binding.etSim1.text.toString()
+            val sim2Number = binding.etSim2.text.toString()
+            val email = binding.etEmail.text.toString()
+            val state = binding.etState.text.toString()
+            val pinCode = binding.etPinCode.text.toString()
+            val cityName = binding.etPinCityname.text.toString()
+            val password = binding.etPassword.text.toString()
+            val confirmpassword = binding.etConfimpassword.text.toString()
+            if (name.isEmpty()) {
+                initErrorMessage(R.string.entername)
+            } else if (jobTitle.isEmpty()) {
+                initErrorMessage(R.string.enter_job_title)
+            } else if (companyName.isEmpty()) {
+                initErrorMessage(R.string.enter_company)
+            } else if (sim1Number.isEmpty()) {
+                initErrorMessage(R.string.enter_sim_one)
+            } else if (sim2Number.isEmpty()) {
+                initErrorMessage(R.string.enter_sim_two)
+
+            } else if (email.isEmpty()) {
+                initErrorMessage(R.string.enter_email)
+            } else if (state.isEmpty()) {
+                initErrorMessage(R.string.enter_state)
+            } else if (pinCode.isEmpty()) {
+                initErrorMessage(R.string.enter_pin_code)
+            } else if (cityName.isEmpty()) {
+                initErrorMessage(R.string.enter_city_name)
+            } else if (password.isEmpty()) {
+                initErrorMessage(R.string.enter_password)
+
+            } else if (confirmpassword.isEmpty()) {
+                initErrorMessage(R.string.enter_confirm_password)
+            } else if (password != confirmpassword) {
+                initErrorMessage(R.string.should_confirm_password_same)
+            } else {
+                mProgressDialog = ProgressDialog(this)
+                mProgressDialog.setTitle("Loading")
+                mProgressDialog.show()
+                val request = UserRegisterRequest(
+                    profileFile,
+                    name,
+                    email,
+                    pinCode,
+                    sim1Number,
+                    password,
+                    state,
+                    "",
+                    cityName,
+                    webLink = "",
+                    sim2Number,
+                    jobTitle,
+                    companyName
+                )
+                vm.userRegister(request)
+            }
+
+
         }
+        vm.userData.observe(this) {
+            when (it) {
+                is BaseResponse.Loading -> {
+                    //  showLoading()
+                    mProgressDialog.show()
+
+                }
+
+                is BaseResponse.Success -> {
+                    // stopLoading()
+                    mProgressDialog.dismiss()
+                   if (it.data?.data?.first()?.id?.isEmpty() != true){
+
+                   }
+                }
+
+                is BaseResponse.Error -> {
+                    // processError(it.msg)
+                    it.msg?.let { it1 ->
+                        Snackbar.make(
+                            binding.root,
+                            it1, Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    mProgressDialog.dismiss()
+                }
+                else -> {
+                    //stopLoading()
+                    mProgressDialog.dismiss()
+                }
+            }
+
+        }
+
         binding.imgProfile.setOnClickListener {
             chooseImage()
         }
     }
+
     private fun chooseImage() {
         val builder: AlertDialog.Builder? = this.let { AlertDialog.Builder(it) }
         val layoutInflater =
@@ -106,6 +224,7 @@ class SignUpActivity : AppCompatActivity() {
 
         }
     }
+
     private fun openCamera() {
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, "New Picture")
@@ -124,6 +243,7 @@ class SignUpActivity : AppCompatActivity() {
         galleryActivityResultLauncher.launch(galleryIntent)
 
     }
+
     //TODO takes URI of the image and returns bitmap
     private fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
         try {
@@ -153,4 +273,12 @@ class SignUpActivity : AppCompatActivity() {
         return Bitmap.createBitmap(input, 0, 0, input.width, input.height, rotationMatrix, true)
     }
 
+    private fun initErrorMessage(msg: Int) {
+        Snackbar.make(
+            binding.root,
+            msg,
+            Snackbar.LENGTH_SHORT
+        ).show()
+
+    }
 }
