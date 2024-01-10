@@ -5,13 +5,17 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.cartravelsdailerapp.BaseResponse
-import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.Repositorys.UserRepository
-import com.cartravelsdailerapp.models.*
+import com.cartravelsdailerapp.models.UserLoginRequest
+import com.cartravelsdailerapp.models.UserLoginResponse
+import com.cartravelsdailerapp.models.UserRegisterRequest
+import com.cartravelsdailerapp.models.UserRegisterResponse
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.io.File
+
 
 class LoginAndSignUpViewModel(
     var context: Application
@@ -41,29 +45,31 @@ class LoginAndSignUpViewModel(
         }
     }
 
-    fun userRegister(userRegister: UserRegisterRequest) {
+    fun userRegister(userRegister: UserRegisterRequest, file: File?) {
         viewModelScope.launch {
             try {
 
-                val requestBody: RequestBody = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("name", userRegister.name)
-                    .addFormDataPart("email", userRegister.email)
-                    .addFormDataPart("pinCode", userRegister.pinCode)
-                    .addFormDataPart("phoneNumber", userRegister.phoneNumber)
-                    .addFormDataPart("password", userRegister.password)
-                    .addFormDataPart("state", userRegister.state)
-                    .addFormDataPart("city", userRegister.city)
-                    .addFormDataPart("webLink", userRegister.webLink)
-                    .addFormDataPart("alternateNumber", userRegister.alternateNumber)
-                    .addFormDataPart("jobTitle", userRegister.jobTitle)
-                    .addFormDataPart("companyName", userRegister.companyName)
-                    .addFormDataPart(
-                        "profilePicture",
-                        userRegister.profilePicture,
-                        RequestBody.create("image/*".toMediaTypeOrNull(), userRegister.profilePicture)
-                    )
-                    .build()
+                val requestBody: RequestBody =
+                    file?.let { RequestBody.create("image/*".toMediaTypeOrNull(), it) }?.let {
+                        MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("name", userRegister.name)
+                            .addFormDataPart("email", userRegister.email)
+                            .addFormDataPart("pinCode", userRegister.pinCode)
+                            .addFormDataPart("phoneNumber", userRegister.phoneNumber)
+                            .addFormDataPart("password", userRegister.password)
+                            .addFormDataPart("state", userRegister.state)
+                            .addFormDataPart("district", userRegister.district)
+                            .addFormDataPart("city", userRegister.city)
+                            .addFormDataPart("webLink", userRegister.webLink)
+                            .addFormDataPart("alternateNumber", userRegister.alternateNumber)
+                            .addFormDataPart("jobTitle", userRegister.jobTitle)
+                            .addFormDataPart("companyName", userRegister.companyName)
+                            .addFormDataPart(
+                                "profilePicture", file.name, it
+                            )
+                            .build()
+                    }!!
 
                 val response = userRepo.userRegister(requestBody)
                 if (response?.code() == 200) {
@@ -76,6 +82,8 @@ class LoginAndSignUpViewModel(
                 userData.value = BaseResponse.Error(ex.message)
             }
         }
+
     }
+
 
 }

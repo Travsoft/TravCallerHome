@@ -1,18 +1,20 @@
 package com.cartravelsdailerapp.models
 
+import com.google.gson.annotations.SerializedName
+
 data class UserData(
-    val id: String,
-    val name: String,
-    val email: String,
-    val pinCode: Int,
-    val phoneNumber: Int,
-    val state: String,
-    val district: String,
-    val city: String,
-    val webLink: String,
-    val alternateNumber: String,
-    val profilePicture: String,
-    val businessDetails: UserBusinessDetails,
-    val createdAt: String,
-    val token: String,
+    @SerializedName("id") var id: String? = null,
+    @SerializedName("name") var name: String? = null,
+    @SerializedName("email") var email: String? = null,
+    @SerializedName("pinCode") var pinCode: String? = null,
+    @SerializedName("phoneNumber") var phoneNumber: Float? = null,
+    @SerializedName("state") var state: String? = null,
+    @SerializedName("district") var district: String? = null,
+    @SerializedName("city") var city: String? = null,
+    @SerializedName("webLink") var webLink: String? = null,
+    @SerializedName("alternateNumber") var alternateNumber: String? = null,
+    @SerializedName("profilePicture") var profilePicture: String? = null,
+    @SerializedName("createdAt") var createdAt: String? = null,
+    @SerializedName("businessRegister") var businessRegister: Boolean? = null,
+    @SerializedName("token") var token: String? = null
 )

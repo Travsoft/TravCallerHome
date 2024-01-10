@@ -29,7 +29,6 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
-
     <uses-permission
         android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
         tools:ignore="ProtectedPermissions" />
@@ -46,6 +45,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CarTravelsDailerApp"
         tools:targetApi="31">
+        <activity
+            android:name=".OtpActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.CallActivity"
             android:exported="false" />
@@ -106,6 +108,7 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DIAL" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

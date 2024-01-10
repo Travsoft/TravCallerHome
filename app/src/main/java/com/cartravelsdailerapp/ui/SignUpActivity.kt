@@ -5,6 +5,7 @@ import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,6 +13,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,7 +22,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.cartravelsdailerapp.BaseResponse
-import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.KeyEmail
 import com.cartravelsdailerapp.PrefUtils.KeyPhoneNumber
@@ -29,17 +30,17 @@ import com.cartravelsdailerapp.databinding.ActivitySignUpBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.models.UserRegisterRequest
 import com.cartravelsdailerapp.viewmodels.LoginAndSignUpViewModel
-import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 import java.io.FileDescriptor
 import java.io.IOException
 
 class SignUpActivity : AppCompatActivity() {
+    lateinit var sharedPreferences: SharedPreferences
     lateinit var binding: ActivitySignUpBinding
     var image_uri: Uri? = null
     lateinit var vm: LoginAndSignUpViewModel
-    var profileFile: String = ""
     lateinit var mProgressDialog: ProgressDialog
 
     private var galleryActivityResultLauncher: ActivityResultLauncher<Intent> =
@@ -51,7 +52,6 @@ class SignUpActivity : AppCompatActivity() {
                 val inputImage = uriToBitmap(image_uri!!)
                 val rotated = rotateBitmap(inputImage!!)
                 binding.imgProfile.setImageBitmap(rotated)
-                profileFile = image_uri.toString()
             }
         }
 
@@ -64,13 +64,15 @@ class SignUpActivity : AppCompatActivity() {
                 val inputImage = uriToBitmap(image_uri!!)
                 val rotated = rotateBitmap(inputImage!!)
                 binding.imgProfile.setImageBitmap(rotated)
-                profileFile = inputImage.toString()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
+        sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
+
+
         setContentView(binding.root)
         mProgressDialog = ProgressDialog(this@SignUpActivity)
         mProgressDialog.setTitle("Loading")
@@ -103,6 +105,7 @@ class SignUpActivity : AppCompatActivity() {
             val sim2Number = binding.etSim2.text.toString()
             val email = binding.etEmail.text.toString()
             val state = binding.etState.text.toString()
+            val district = binding.etDistrict.text.toString()
             val pinCode = binding.etPinCode.text.toString()
             val cityName = binding.etPinCityname.text.toString()
             val password = binding.etPassword.text.toString()
@@ -122,6 +125,8 @@ class SignUpActivity : AppCompatActivity() {
                 initErrorMessage(R.string.enter_email)
             } else if (state.isEmpty()) {
                 initErrorMessage(R.string.enter_state)
+            } else if (district.isEmpty()) {
+                initErrorMessage(R.string.enter_district)
             } else if (pinCode.isEmpty()) {
                 initErrorMessage(R.string.enter_pin_code)
             } else if (cityName.isEmpty()) {
@@ -138,21 +143,22 @@ class SignUpActivity : AppCompatActivity() {
                 mProgressDialog.setTitle("Loading")
                 mProgressDialog.show()
                 val request = UserRegisterRequest(
-                    profileFile,
+                    image_uri.toString(),
                     name,
                     email,
                     pinCode,
                     sim1Number,
                     password,
                     state,
-                    "",
+                    district,
                     cityName,
                     webLink = "",
                     sim2Number,
                     jobTitle,
                     companyName
                 )
-                vm.userRegister(request)
+                val file = image_uri?.let { it1 -> getFileFromUri(this, it1) }
+                vm.userRegister(request,file)
             }
 
 
@@ -168,9 +174,17 @@ class SignUpActivity : AppCompatActivity() {
                 is BaseResponse.Success -> {
                     // stopLoading()
                     mProgressDialog.dismiss()
-                   if (it.data?.data?.first()?.id?.isEmpty() != true){
-
-                   }
+                    if (it.data?.data?.first()?.id?.isEmpty() != true) {
+                        val intent = Intent(
+                            this,
+                            Login2Activity::class.java
+                        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        startActivity(intent)
+                        val edit = sharedPreferences.edit()
+                        edit.putBoolean(PrefUtils.IsLogin, true)
+                        edit.apply()
+                    }
                 }
 
                 is BaseResponse.Error -> {
@@ -281,4 +295,65 @@ class SignUpActivity : AppCompatActivity() {
         ).show()
 
     }
-}
+    fun getFileFromUri(context: Context, uri: Uri): File? {
+        uri ?: return null
+        uri.path ?: return null
+
+        var newUriString = uri.toString()
+        newUriString = newUriString.replace(
+            "content://com.android.providers.downloads.documents/",
+            "content://com.android.providers.media.documents/"
+        )
+        newUriString = newUriString.replace(
+            "/msf%3A", "/image%3A"
+        )
+        val newUri = Uri.parse(newUriString)
+
+        var realPath = String()
+        val databaseUri: Uri
+        val selection: String?
+        val selectionArgs: Array<String>?
+        if (newUri.path?.contains("/document/image:") == true) {
+            databaseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            selection = "_id=?"
+            selectionArgs = arrayOf(DocumentsContract.getDocumentId(newUri).split(":")[1])
+        } else {
+            databaseUri = newUri
+            selection = null
+            selectionArgs = null
+        }
+        try {
+            val column = "_data"
+            val projection = arrayOf(column)
+            val cursor = context.contentResolver.query(
+                databaseUri,
+                projection,
+                selection,
+                selectionArgs,
+                null
+            )
+            cursor?.let {
+                if (it.moveToFirst()) {
+                    val columnIndex = cursor.getColumnIndexOrThrow(column)
+                    realPath = cursor.getString(columnIndex)
+                }
+                cursor.close()
+            }
+        } catch (e: Exception) {
+            Log.i("GetFileUri Exception:", e.message ?: "")
+        }
+        val path = realPath.ifEmpty {
+            when {
+                newUri.path?.contains("/document/raw:") == true -> newUri.path?.replace(
+                    "/document/raw:",
+                    ""
+                )
+                newUri.path?.contains("/document/primary:") == true -> newUri.path?.replace(
+                    "/document/primary:",
+                    "/storage/emulated/0/"
+                )
+                else -> return null
+            }
+        }
+        return if (path.isNullOrEmpty()) null else File(path)
+    }}

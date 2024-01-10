@@ -1,3 +1,8 @@
 package com.cartravelsdailerapp.models
 
-data class UserRegisterResponse(val msg:String,val statusCode:Int,val success:Boolean,val data:List<UserData>)
+data class UserRegisterResponse(
+    val data: List<UserData>,
+    val msg: String,
+    val statusCode: Int,
+    val success: Boolean
+)

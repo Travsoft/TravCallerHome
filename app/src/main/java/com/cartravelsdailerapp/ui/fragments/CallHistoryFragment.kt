@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
 import com.cartravelsdailerapp.db.AppDatabase
@@ -25,6 +27,7 @@ import com.cartravelsdailerapp.ui.SearchActivity
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
+import com.squareup.picasso.Picasso
 
 class CallHistoryFragment : Fragment() {
     lateinit var binding: FragmentCallHistoryBinding
@@ -36,6 +39,7 @@ class CallHistoryFragment : Fragment() {
         "Call History",
         "Contacts"
     )
+    lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +62,21 @@ class CallHistoryFragment : Fragment() {
             var intent = Intent(requireContext(), ProfileActivity::class.java)
             startActivity(intent)
         }
+        sharedPreferences = requireContext().getSharedPreferences(
+            PrefUtils.CallTravelsSharedPref,
+            AppCompatActivity.MODE_PRIVATE
+        )
+
+        val email = sharedPreferences.getString(PrefUtils.KeyEmail, "")
+        val phoneNumber = sharedPreferences.getString(PrefUtils.KeyPhoneNumber, "")
+        val userId = sharedPreferences.getString(PrefUtils.userId, "")
+        val profileUrl = sharedPreferences.getString(PrefUtils.UserProfileUrl, "")
+        val token = sharedPreferences.getString(PrefUtils.userToken, "")
+
+        Picasso.Builder(requireContext()).build().load(profileUrl).fit().centerCrop()
+            .placeholder(R.drawable.userprofile)
+            .error(R.drawable.userprofile)
+            .into(binding.imgProfile);
         return binding.root
     }
 
@@ -86,8 +105,8 @@ class CallHistoryFragment : Fragment() {
         binding.cardDialerBt.setOnClickListener {
             startActivity(
                 Intent(requireContext(), Dialer::class.java)
-                    /*.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),*/
+                /*.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),*/
             )
         }
 

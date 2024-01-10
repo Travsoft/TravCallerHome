@@ -107,6 +107,10 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             // stopLoading()
                             mProgressDialog.dismiss()
                             if (it.data?.alreadyExists == true) {
+                                Snackbar.make(
+                                    binding.root,
+                                    it.data.message, Snackbar.LENGTH_SHORT
+                                ).show()
 
                                 val intent = Intent(
                                     this,
@@ -116,6 +120,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                                 intent.putExtra(PrefUtils.KeyEmail, email)
                                 intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
                                 startActivity(intent)
+                                finish()
                                 /*val edit = sharedPreferences.edit()
                                 edit.putBoolean(PrefUtils.IsLogin, true)
                                 edit.apply()*/
@@ -332,5 +337,12 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             }
         }
     }
+    private fun initErrorMessage(msg: Int) {
+        Snackbar.make(
+            binding.root,
+            msg,
+            Snackbar.LENGTH_SHORT
+        ).show()
 
+    }
 }

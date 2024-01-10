@@ -1,5 +1,6 @@
 package com.cartravelsdailerapp
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -37,9 +38,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             )[MainActivityViewModel::class.java]
             initNavHost()
             setUpBottomNavigation()
+
+
         }
 
     }
+
     private fun setUpBottomNavigation() {
         val bottomNavigationItems = mutableListOf(
             CurvedBottomNavigation.Model(
@@ -83,6 +87,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onBackPressed() {
     }
+
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()

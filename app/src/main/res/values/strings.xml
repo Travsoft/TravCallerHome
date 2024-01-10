@@ -47,6 +47,7 @@
     <string name="enter_sim_two">Enter Sim Two</string>
     <string name="enter_email">Enter Email</string>
     <string name="enter_state">Enter State</string>
+    <string name="enter_district">Enter District</string>
     <string name="enter_pin_code">Enter Pin Code</string>
     <string name="enter_city_name">Enter City Name</string>
     <string name="enter_password">Enter Password</string>
