@@ -17,4 +17,11 @@ class UserRepository {
     suspend fun userRegister(requestBody: RequestBody): Response<UserRegisterResponse>? {
         return IBusinessDailerApi.getApi()?.userRegister(requestBody)
     }
+
+    suspend fun sendOTP(sendOTPRequest: SendOTPRequest): Response<SendOTPResponse>? {
+        return IBusinessDailerApi.getApi()?.sendOTP(sendOTPRequest)
+    }
+    suspend fun verifyOTP(sendOTPRequest: VerifyOTPRequest): Response<VerifyOTPResponse>? {
+        return IBusinessDailerApi.getApi()?.verifyOTP(sendOTPRequest)
+    }
 }

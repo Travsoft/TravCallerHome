@@ -73,10 +73,12 @@ class CallHistoryFragment : Fragment() {
         val profileUrl = sharedPreferences.getString(PrefUtils.UserProfileUrl, "")
         val token = sharedPreferences.getString(PrefUtils.userToken, "")
 
-        Picasso.Builder(requireContext()).build().load(profileUrl).fit().centerCrop()
-            .placeholder(R.drawable.userprofile)
-            .error(R.drawable.userprofile)
-            .into(binding.imgProfile);
+        if (profileUrl?.isNotEmpty() == true) {
+            Picasso.Builder(requireContext()).build().load(profileUrl).fit().centerCrop()
+                .placeholder(R.drawable.userprofile)
+                .error(R.drawable.userprofile)
+                .into(binding.imgProfile)
+        }
         return binding.root
     }
 

@@ -62,7 +62,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
         setContentView(binding.root)
         listOfContactStore = ContactStore.newInstance(this)
         db = DatabaseBuilder.getInstance(this)
-
+        binding.etEmail.setText(sharedPreferences.getString(PrefUtils.UserEmail, ""))
     }
 
     override fun onResume() {
@@ -117,9 +117,13 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                                     Login2Activity::class.java
                                 ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                intent.putExtra(PrefUtils.KeyEmail, email)
+                                intent.putExtra(PrefUtils.UserEmail, email)
                                 intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
                                 startActivity(intent)
+                                val edit = sharedPreferences.edit()
+                                edit.putBoolean(PrefUtils.IsLogin, true)
+                                edit.putString(PrefUtils.UserEmail, email)
+                                edit.apply()
                                 finish()
                                 /*val edit = sharedPreferences.edit()
                                 edit.putBoolean(PrefUtils.IsLogin, true)
@@ -132,9 +136,13 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                                     SignUpActivity::class.java
                                 ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                intent.putExtra(PrefUtils.KeyEmail, email)
+                                intent.putExtra(PrefUtils.UserEmail, email)
                                 intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
                                 startActivity(intent)
+                                val edit = sharedPreferences.edit()
+                                edit.putBoolean(PrefUtils.IsLogin, true)
+                                edit.putString(PrefUtils.UserEmail, email)
+                                edit.apply()
                             }
                         }
 
@@ -337,6 +345,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
             }
         }
     }
+
     private fun initErrorMessage(msg: Int) {
         Snackbar.make(
             binding.root,

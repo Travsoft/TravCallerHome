@@ -57,6 +57,14 @@ class Login2Activity : AppCompatActivity() {
                 vm.userLogin(enteredEmail, pasword)
             }
         }
+        binding.txtForgotpassword.setOnClickListener {
+            val intent = Intent(
+                this,
+                ForgotPassword::class.java
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
+        }
 
         vm.userLoginResp.observe(this) {
             when (it) {
@@ -77,6 +85,7 @@ class Login2Activity : AppCompatActivity() {
                         edit.putString(PrefUtils.UserProfileUrl, userData.first().profilePicture)
                         edit.putString(PrefUtils.userId, userData.first().id)
                         edit.putString(PrefUtils.userToken, userData.first().token)
+                        edit.putString(PrefUtils.UserEmail, userData.first().email)
                         edit.apply()
                         val intent = Intent(
                             this,

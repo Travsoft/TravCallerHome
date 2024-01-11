@@ -6,10 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.cartravelsdailerapp.BaseResponse
 import com.cartravelsdailerapp.Repositorys.UserRepository
-import com.cartravelsdailerapp.models.UserLoginRequest
-import com.cartravelsdailerapp.models.UserLoginResponse
-import com.cartravelsdailerapp.models.UserRegisterRequest
-import com.cartravelsdailerapp.models.UserRegisterResponse
+import com.cartravelsdailerapp.models.*
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -21,8 +18,51 @@ class LoginAndSignUpViewModel(
     var context: Application
 ) : AndroidViewModel(context) {
     private val userRepo = UserRepository()
+    val verifyOTPResp: MutableLiveData<BaseResponse<VerifyOTPResponse>> = MutableLiveData()
+    val sendOTPResp: MutableLiveData<BaseResponse<SendOTPResponse>> = MutableLiveData()
     val userLoginResp: MutableLiveData<BaseResponse<UserLoginResponse>> = MutableLiveData()
     val userData: MutableLiveData<BaseResponse<UserRegisterResponse>> = MutableLiveData()
+
+    fun sendOtp(email: String) {
+        viewModelScope.launch {
+            try {
+
+                val sendOTPRequest = SendOTPRequest(
+                    email = email
+                )
+                val response = userRepo.sendOTP(sendOTPRequest)
+                if (response?.code() == 200 || response?.code() == 400) {
+                    sendOTPResp.value = BaseResponse.Success(response.body())
+                } else {
+                    sendOTPResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                sendOTPResp.value = BaseResponse.Error(ex.message)
+            }
+        }
+    }
+
+    fun verifyOTP(email: String, newPassword: String, otp: String) {
+        viewModelScope.launch {
+            try {
+                val sendOTPRequest = VerifyOTPRequest(
+                    email = email,
+                    newPassword = newPassword,
+                    otp = otp
+                )
+                val response = userRepo.verifyOTP(sendOTPRequest)
+                if (response?.code() == 200) {
+                    verifyOTPResp.value = BaseResponse.Success(response.body())
+                } else {
+                    verifyOTPResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                verifyOTPResp.value = BaseResponse.Error(ex.message)
+            }
+        }
+    }
 
     fun userLogin(email: String, password: String) {
         viewModelScope.launch {

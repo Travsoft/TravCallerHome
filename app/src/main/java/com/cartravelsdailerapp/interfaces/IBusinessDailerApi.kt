@@ -15,6 +15,11 @@ interface IBusinessDailerApi {
     @POST("/api/v1/auth/register")
     suspend fun userRegister(@Body body: RequestBody): Response<UserRegisterResponse>
 
+    @POST("/api/v1/auth/sendOTP")
+    suspend fun sendOTP(@Body body: SendOTPRequest): Response<SendOTPResponse>
+    @POST("/api/v1/auth/verifyOTP")
+    suspend fun verifyOTP(@Body body: VerifyOTPRequest): Response<VerifyOTPResponse>
+
 
     companion object {
         fun getApi(): IBusinessDailerApi? {

@@ -53,4 +53,10 @@
     <string name="enter_password">Enter Password</string>
     <string name="enter_confirm_password">Enter Confirm Password</string>
     <string name="should_confirm_password_same">Password and Confirm Password Should Same</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="otp_verification">OTP Verification</string>
+    <string name="verify">Verify</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>
