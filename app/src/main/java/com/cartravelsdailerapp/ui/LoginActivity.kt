@@ -6,7 +6,6 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SubscriptionManager
@@ -15,10 +14,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.GridLayoutManager
 import com.alexstyl.contactstore.ContactStore
-import com.alexstyl.contactstore.thumbnailUri
 import com.cartravelsdailerapp.BaseResponse
 import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
@@ -26,7 +22,6 @@ import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLoginBinding
 import com.cartravelsdailerapp.db.AppDatabase
 import com.cartravelsdailerapp.db.DatabaseBuilder
-import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.utils.RunTimePermission
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -121,7 +116,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                                 intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
                                 startActivity(intent)
                                 val edit = sharedPreferences.edit()
-                                edit.putBoolean(PrefUtils.IsLogin, true)
+                              //  edit.putBoolean(PrefUtils.IsLogin, true)
                                 edit.putString(PrefUtils.UserEmail, email)
                                 edit.apply()
                                 finish()
@@ -142,6 +137,7 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                                 val edit = sharedPreferences.edit()
                                 edit.putBoolean(PrefUtils.IsLogin, true)
                                 edit.putString(PrefUtils.UserEmail, email)
+                                edit.putString(PrefUtils.KeyPhoneNumber, email)
                                 edit.apply()
                             }
                         }

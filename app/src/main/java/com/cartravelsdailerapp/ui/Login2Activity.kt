@@ -41,20 +41,20 @@ class Login2Activity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
 
         val d = intent.extras
-        val email = d?.getString(PrefUtils.KeyEmail)
+        val email = d?.getString(PrefUtils.UserEmail)
         val phoneNumber = d?.getString(PrefUtils.KeyPhoneNumber)
-        binding.etPhone.setText(email)
+        binding.etPhone.setText(phoneNumber)
 
         binding.btLogin.setOnClickListener {
-            val enteredEmail = binding.etPhone.text.toString()
+            val enteredPhNumber = binding.etPhone.text.toString()
             val pasword = binding.etPassword.text.toString()
-            if (enteredEmail?.isEmpty() == true) {
+            if (enteredPhNumber?.isEmpty() == true) {
                 initErrorMessage(R.string.enter_email)
             } else if (pasword?.isEmpty() == true) {
                 initErrorMessage(R.string.enter_password)
             } else {
                 mProgressDialog.show()
-                vm.userLogin(enteredEmail, pasword)
+                vm.userLogin(enteredPhNumber, pasword)
             }
         }
         binding.txtForgotpassword.setOnClickListener {

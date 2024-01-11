@@ -3,18 +3,15 @@ package com.cartravelsdailerapp.ui
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.cartravelsdailerapp.BaseResponse
-import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityForgotPasswordBinding
-import com.cartravelsdailerapp.databinding.ActivityLogin2Binding
 import com.cartravelsdailerapp.models.SendOTPResponse
-import com.cartravelsdailerapp.models.UserLoginResponse
 import com.cartravelsdailerapp.viewmodels.LoginAndSignUpViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.snackbar.Snackbar
@@ -59,7 +56,6 @@ class ForgotPassword : AppCompatActivity() {
         vm.sendOTPResp.observe(this) {
             when (it) {
                 is BaseResponse.Loading -> {
-                    mProgressDialog.show()
 
                 }
 

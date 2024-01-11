@@ -3,17 +3,14 @@ package com.cartravelsdailerapp.ui
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.cartravelsdailerapp.BaseResponse
-import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.databinding.ActivityForgotPasswordBinding
 import com.cartravelsdailerapp.databinding.ActivityOtpBinding
-import com.cartravelsdailerapp.models.SendOTPResponse
 import com.cartravelsdailerapp.models.VerifyOTPResponse
 import com.cartravelsdailerapp.viewmodels.LoginAndSignUpViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -95,11 +92,11 @@ class OtpActivity : AppCompatActivity() {
                     if (data.statusCode == 200) {
                         val intent = Intent(
                             this,
-                            MainActivity::class.java
+                            Login2Activity::class.java
                         ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         startActivity(intent)
-
+                        finish()
                     } else {
 
                         data.message?.let { it1 ->

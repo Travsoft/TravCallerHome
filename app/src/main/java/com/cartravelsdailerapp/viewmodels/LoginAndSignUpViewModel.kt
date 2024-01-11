@@ -49,10 +49,10 @@ class LoginAndSignUpViewModel(
                 val sendOTPRequest = VerifyOTPRequest(
                     email = email,
                     newPassword = newPassword,
-                    otp = otp
+                    otp = otp.toInt()
                 )
                 val response = userRepo.verifyOTP(sendOTPRequest)
-                if (response?.code() == 200) {
+                if (response?.code() == 200 || response?.code() == 400) {
                     verifyOTPResp.value = BaseResponse.Success(response.body())
                 } else {
                     verifyOTPResp.value = BaseResponse.Error(response?.message())
@@ -69,7 +69,7 @@ class LoginAndSignUpViewModel(
             try {
 
                 val loginRequest = UserLoginRequest(
-                    email = email,
+                    phoneNumber = email,
                     password = password
                 )
                 val response = userRepo.userLogin(loginRequest = loginRequest)
