@@ -76,6 +76,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layout_search"
                 app:tabIconTintMode="multiply"
+                app:tabMode="scrollable"
                 app:tabIndicatorColor="@color/orange"
                 app:tabInlineLabel="true"
                 app:tabSelectedTextColor="@color/orange"

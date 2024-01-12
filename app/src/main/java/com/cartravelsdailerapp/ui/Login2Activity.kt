@@ -76,9 +76,7 @@ class Login2Activity : AppCompatActivity() {
                 is BaseResponse.Success -> {
                     val data = it.data as UserLoginResponse
                     val userData = data.data
-
                     mProgressDialog.dismiss()
-
                     if (data.statusCode == 200) {
                         val edit = sharedPreferences.edit()
                         edit.putBoolean(PrefUtils.IsLogin, true)
@@ -117,7 +115,6 @@ class Login2Activity : AppCompatActivity() {
                     mProgressDialog.dismiss()
                 }
             }
-
         }
 
     }

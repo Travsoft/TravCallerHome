@@ -118,9 +118,8 @@
                         android:inputType="text"
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
-
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layout_phone"
+                    android:id="@+id/layour_company_name"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -135,47 +134,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/layour_jobtitle">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_sim1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:hint="@string/phonenuber"
-                        android:inputType="phone"
-                        android:maxEms="10" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <TextView
-                    android:id="@+id/txt_expand_collaps"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/ripple"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="10dp"
-                    android:text="@string/expand"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_phone" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layour_company_name"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:enabled="false"
-                    android:visibility="gone"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusBottomEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/txt_expand_collaps">
-
-                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_company_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -185,9 +143,8 @@
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layour_email"
+                    android:id="@+id/layout_phone"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -202,12 +159,61 @@
                     app:layout_constraintTop_toBottomOf="@+id/layour_company_name">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_sim1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:hint="@string/phonenuber"
+                        android:inputType="phone"
+                        android:maxEms="10" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layour_email"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:enabled="false"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="10dp"
+                    app:boxCornerRadiusBottomStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_phone">
+
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
                         android:hint="@string/email"
                         android:inputType="textEmailAddress"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layour_alternateNumber"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:enabled="false"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="10dp"
+                    app:boxCornerRadiusBottomStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/layour_email">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_alternateNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:hint="@string/alternate_number"
+                        android:inputType="phone"
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -224,7 +230,7 @@
                     app:boxCornerRadiusTopEnd="10dp"
                     app:boxCornerRadiusTopStart="10dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layour_email">
+                    app:layout_constraintTop_toBottomOf="@+id/layour_alternateNumber">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_state"
@@ -232,6 +238,54 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
                         android:hint="State"
+                        android:inputType="text"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layour_district"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:enabled="false"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="10dp"
+                    app:boxCornerRadiusBottomStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/layour_state">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_district"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:hint="District"
+                        android:inputType="text"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layour_city"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:enabled="false"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="10dp"
+                    app:boxCornerRadiusBottomStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/layour_district">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_city"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:hint="City"
                         android:inputType="text"
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -249,7 +303,7 @@
                     app:boxCornerRadiusTopEnd="10dp"
                     app:boxCornerRadiusTopStart="10dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layour_state">
+                    app:layout_constraintTop_toBottomOf="@+id/layour_city">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_pin_code"
@@ -295,6 +349,7 @@
                     android:text="@string/create_your_business"
                     android:textAllCaps="false"
                     android:textSize="18sp"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/layour_cityname" />
@@ -322,6 +377,7 @@
     </ScrollView>
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/layout_post"
         android:layout_width="match_parent"
         android:layout_height="100dp"

@@ -37,7 +37,8 @@ class CallHistoryFragment : Fragment() {
     val listofPages = mutableListOf<Fragment>(CallLogsFrag(), ContactsFrag())
     val callHistorytabtitle = arrayOf(
         "Call History",
-        "Contacts"
+        "Contacts",
+        "Auto Call"
     )
     lateinit var sharedPreferences: SharedPreferences
 
@@ -99,6 +100,7 @@ class CallHistoryFragment : Fragment() {
                 0 -> tab.icon = resources.getDrawable(R.drawable.ic_history)
 
                 1 -> tab.icon = resources.getDrawable(R.drawable.ic_chat)
+                2 -> tab.icon = resources.getDrawable(R.drawable.ic_call)
 
             }
 
@@ -116,7 +118,7 @@ class CallHistoryFragment : Fragment() {
     }
 
     class CallHistoryFraAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-        val listofPages = mutableListOf<Fragment>(CallLogsFrag(), ContactsFrag())
+        val listofPages = mutableListOf<Fragment>(CallLogsFrag(), ContactsFrag(),AutoCallListFrg())
 
         override fun getItemCount(): Int = listofPages.size
 
@@ -125,6 +127,7 @@ class CallHistoryFragment : Fragment() {
             return when (position) {
                 0 -> CallLogsFrag()
                 1 -> ContactsFrag()
+                2-> AutoCallListFrg()
                 else -> CallLogsFrag()
             }
         }
