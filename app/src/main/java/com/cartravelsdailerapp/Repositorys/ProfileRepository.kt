@@ -12,7 +12,7 @@ class ProfileRepository() {
         return IBusinessDailerApi.getApi()?.getUserByToken(token)
     }
 
-    suspend fun userData(token: String, requestBody: RequestBody): Response<UserUpdateResponse>? {
+    suspend fun updateUser(token: String, requestBody: RequestBody): Response<UserUpdateResponse>? {
         return IBusinessDailerApi.getApi()?.updateUser(token, requestBody)
     }
 }

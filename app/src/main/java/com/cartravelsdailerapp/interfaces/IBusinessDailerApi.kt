@@ -7,6 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 interface IBusinessDailerApi {
@@ -28,7 +29,7 @@ interface IBusinessDailerApi {
     @GET("/api/v1/user/getUser")
     suspend fun getUserByToken(@Header("Authorization") userToken: String): Response<UserResponse>
 
-    @POST("/api/v1/user/updateUser")
+    @PATCH("/api/v1/user/updateUser")
     suspend fun updateUser(@Header("Authorization") userToken: String,@Body body: RequestBody): Response<UserUpdateResponse>
 
     companion object {

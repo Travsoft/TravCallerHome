@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.FragmentCallHistoryBinding
@@ -75,9 +77,13 @@ class CallHistoryFragment : Fragment() {
         val token = sharedPreferences.getString(PrefUtils.userToken, "")
 
         if (profileUrl?.isNotEmpty() == true) {
-            Picasso.Builder(requireContext()).build().load(profileUrl).fit().centerCrop()
+            Glide
+                .with(this)
+                .load(profileUrl)
+                .centerCrop()
+                .centerInside()
+                .transform( RoundedCorners(5))
                 .placeholder(R.drawable.userprofile)
-                .error(R.drawable.userprofile)
                 .into(binding.imgProfile)
         }
         return binding.root

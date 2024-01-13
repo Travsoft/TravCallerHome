@@ -1,6 +1,7 @@
 package com.cartravelsdailerapp.Repositorys.DAO
 
 import androidx.room.*
+import com.cartravelsdailerapp.models.AutoCallContacts
 import com.cartravelsdailerapp.models.CallHistory
 import com.cartravelsdailerapp.models.Contact
 import com.cartravelsdailerapp.models.FavouritesContacts
@@ -50,4 +51,14 @@ interface CallHistoryDao {
 
     @Query("UPDATE CallHistory SET name=:name WHERE id = :id")
     fun updateNameCallHistory(name: String, id: Int)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAutoCallContacts(autoCallContacts: AutoCallContacts)
+
+    @Query("SELECT * FROM AutoCallContacts")
+    fun getAutoCallContacts():List<AutoCallContacts>
+    @Query("UPDATE AutoCallContacts SET isAutoDialer=:isAutoDialer WHERE id = :id")
+    fun updateIsAutoDialerContact(isAutoDialer: Boolean, id: Int)
+    @Query("UPDATE AutoCallContacts SET isAnswerCall=:isAnswerCall WHERE id = :id")
+    fun updateIsAnswerCallAutoCallContacts(isAnswerCall: Boolean, id: Int)
 }

@@ -25,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.cartravelsdailerapp.BaseResponse
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
@@ -148,12 +149,22 @@ class ProfileActivity : AppCompatActivity() {
         binding.etState.setText(data.state)
         binding.etPinCode.setText(data.pinCode)
         binding.etPinCityname.setText(data.city)
+        binding.etDistrict.setText(data.district)
+        binding.etCity.setText(data.city)
         if (data.profilePicture.isNotEmpty()) {
-            Picasso.Builder(this).build().load(data.profilePicture).fit().centerCrop()
-                .placeholder(R.drawable.userprofile)
-                .error(R.drawable.userprofile)
+            Glide
+                .with(this)
+                .load(data.profilePicture)
+                .centerCrop()
+                .centerInside()
+                .transform( RoundedCorners(150))
+            .placeholder(R.drawable.userprofile)
                 .into(binding.imgProfile)
+;
         }
+        val et = sharedPreferences.edit()
+        et.putString(PrefUtils.UserProfileUrl, data.profilePicture)
+        et.apply()
     }
 
     private fun intClickListener() {
@@ -251,10 +262,9 @@ class ProfileActivity : AppCompatActivity() {
         val district = binding.etDistrict.text.toString()
         val city = binding.etCity.text.toString()
         val alternateNumber = binding.etAlternateNumber.text.toString()
-
-
-        if (image_uri == null) {
-            val requestBody: RequestBody =
+        val profile = image_uri?.let { getFileFromUri(this, it) }
+        val requestBody: MultipartBody? =
+            profile?.let { RequestBody.create("image/*".toMediaTypeOrNull(), it) }?.let {
                 MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("name", name)
@@ -267,36 +277,14 @@ class ProfileActivity : AppCompatActivity() {
                     .addFormDataPart("alternateNumber", alternateNumber)
                     .addFormDataPart("jobTitle", jobTitle)
                     .addFormDataPart("companyName", companyName)
+                    .addFormDataPart(
+                        "profilePicture", profile?.name,
+                        it
+                    )
                     .build()
-
-            vm.updateUserDataByToken("Bearer $token", requestBody)
-        } else {
-            val profile = image_uri?.let { getFileFromUri(this, it) }
-            val requestBody: MultipartBody? =
-                profile?.let { RequestBody.create("image/*".toMediaTypeOrNull(), it) }?.let {
-                    MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("name", name)
-                        .addFormDataPart("email", email)
-                        .addFormDataPart("pinCode", pinCode)
-                        .addFormDataPart("phoneNumber", phoneNumber)
-                        .addFormDataPart("state", state)
-                        .addFormDataPart("district", district)
-                        .addFormDataPart("city", city)
-                        .addFormDataPart("alternateNumber", alternateNumber)
-                        .addFormDataPart("jobTitle", jobTitle)
-                        .addFormDataPart("companyName", companyName)
-                        .addFormDataPart(
-                            "profilePicture", profile?.name,
-                            it
-                        )
-                        .build()
-                }
-            if (token != null) {
-                if (requestBody != null) {
-                    vm.updateUserDataByToken("Bearer $token", requestBody)
-                }
             }
+        if (requestBody != null) {
+            vm.updateUserDataByToken("Bearer $token", requestBody)
         }
 
 

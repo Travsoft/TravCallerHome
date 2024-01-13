@@ -41,7 +41,7 @@ class ProfileViewModel(
     fun updateUserDataByToken(token: String, requestBody: RequestBody) {
         viewModelScope.launch {
             try {
-                val response = profileRepository.userData(token, requestBody)
+                val response = profileRepository.updateUser(token, requestBody)
                 if (response?.code() == 200 || response?.code() == 400) {
                     userUpdateDataResp.value = BaseResponse.Success(response.body())
                 } else {
