@@ -51,6 +51,8 @@ class SignUpActivity : AppCompatActivity() {
 
      var selectedState: String? = null
     var selectedDistrict: String? = null
+    var selectedCity: String? = null
+    var selectedMandal: String? = null
     private var galleryActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -254,9 +256,11 @@ class SignUpActivity : AppCompatActivity() {
                 ).toString()
                 Snackbar.make(
                     binding.root,
-                    "Item on position $position : $selectedState Selected",
+                    "Selected State $selectedState",
                     Snackbar.LENGTH_SHORT
                 ).show()
+                mProgressDialog.show()
+
                 selectedState?.let { vm.getDistrict("", it) }
             }
 
@@ -277,9 +281,9 @@ class SignUpActivity : AppCompatActivity() {
                 is BaseResponse.Success -> {
                     // stopLoading()
                     mProgressDialog.dismiss()
-                    val states = it.data?.totalDistricts?.distinct()
-                    if (states?.isNotEmpty() == true) {
-                        adapter = SpinerArrayListAdapter(this, states as ArrayList<String>, states)
+                    val districts = it.data?.totalDistricts?.distinct()
+                    if (districts?.isNotEmpty() == true) {
+                        adapter = SpinerArrayListAdapter(this, districts as ArrayList<String>, districts)
                         binding.spinnerDistrict.setAdapter(adapter)
                     }
                 }
@@ -301,6 +305,142 @@ class SignUpActivity : AppCompatActivity() {
             }
 
         }
+        binding.spinnerDistrict.setOnItemSelectedListener(object : OnItemSelectedListener {
+            override fun onItemSelected(view: View?, position: Int, id: Long) {
+                selectedDistrict = adapter.getItem(
+                    position
+                ).toString()
+                Snackbar.make(
+                    binding.root,
+                    "Item on position $position : $selectedDistrict Selected",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                mProgressDialog.show()
+                selectedDistrict?.let { vm.getCities("", it) }
+            }
+
+            override fun onNothingSelected() {
+                Snackbar.make(binding.root, "Nothing Selected", Snackbar.LENGTH_SHORT)
+                    .show()
+            }
+
+        })
+
+        vm.getCityResp.observe(this){
+            when (it) {
+                is BaseResponse.Loading -> {
+                    //  showLoading()
+                    mProgressDialog.show()
+
+                }
+
+                is BaseResponse.Success -> {
+                    // stopLoading()
+                    mProgressDialog.dismiss()
+                    val citys = it.data?.totalcities?.distinct()
+                    if (citys?.isNotEmpty() == true) {
+                        adapter = SpinerArrayListAdapter(this, citys as ArrayList<String>, citys)
+                        binding.spinnerCity.setAdapter(adapter)
+                    }
+
+                }
+
+                is BaseResponse.Error -> {
+                    // processError(it.msg)
+                    it.msg?.let { it1 ->
+                        Snackbar.make(
+                            binding.root,
+                            it1, Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    mProgressDialog.dismiss()
+                }
+                else -> {
+                    //stopLoading()
+                    mProgressDialog.dismiss()
+                }
+            }
+
+        }
+        binding.spinnerCity.setOnItemSelectedListener(object : OnItemSelectedListener {
+            override fun onItemSelected(view: View?, position: Int, id: Long) {
+                selectedCity = adapter.getItem(
+                    position
+                ).toString()
+                Snackbar.make(
+                    binding.root,
+                    "Selected City $selectedCity",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                mProgressDialog.show()
+                selectedCity?.let { vm.getMandal("", it) }
+            }
+
+            override fun onNothingSelected() {
+                Snackbar.make(binding.root, "Nothing Selected", Snackbar.LENGTH_SHORT)
+                    .show()
+            }
+
+        })
+
+        vm.getMandalResp.observe(this){
+            when (it) {
+                is BaseResponse.Loading -> {
+                    //  showLoading()
+                    mProgressDialog.show()
+
+                }
+
+                is BaseResponse.Success -> {
+                    // stopLoading()
+                    mProgressDialog.dismiss()
+                    val mandels = it.data?.totalMandals?.distinct()
+                    if (mandels?.isNotEmpty() == true) {
+                        adapter = SpinerArrayListAdapter(this, mandels as ArrayList<String>, mandels)
+                        binding.spinnerMandal.setAdapter(adapter)
+                    }
+
+                }
+
+                is BaseResponse.Error -> {
+                    // processError(it.msg)
+                    it.msg?.let { it1 ->
+                        Snackbar.make(
+                            binding.root,
+                            it1, Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    mProgressDialog.dismiss()
+                }
+                else -> {
+                    //stopLoading()
+                    mProgressDialog.dismiss()
+                }
+            }
+
+        }
+        binding.spinnerMandal.setOnItemSelectedListener(object : OnItemSelectedListener {
+            override fun onItemSelected(view: View?, position: Int, id: Long) {
+                selectedMandal = adapter.getItem(
+                    position
+                ).toString()
+                Snackbar.make(
+                    binding.root,
+                    "Selected Mandal $selectedMandal",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                mProgressDialog.show()
+                selectedMandal?.let { vm.getMandal("", it) }
+            }
+
+            override fun onNothingSelected() {
+                Snackbar.make(binding.root, "Nothing Selected", Snackbar.LENGTH_SHORT)
+                    .show()
+            }
+
+        })
+
+
     }
 
     private fun chooseImage() {

@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Name"
+                android:hint="@string/name"
                 android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -65,7 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Designation or Job  Title"
+                android:hint="@string/designation_or_job_title"
                 android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Company Name or Shop Name"
+                android:hint="@string/company_name_or_shop_name"
                 android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -113,7 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Sim1"
+                android:hint="@string/enter_sim_one"
                 android:inputType="phone"
                 android:maxEms="10" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -137,7 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Sim2"
+                android:hint="@string/enter_sim_two"
                 android:inputType="phone"
                 android:maxEms="10" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -161,7 +161,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Email"
+                android:hint="@string/email"
                 android:inputType="textEmailAddress"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -200,6 +200,38 @@
             app:SpinnerExpandHeight="200dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinner_state" />
+        <com.cvaghela.spinner.searchablespinner.SearchableSpinner
+            android:id="@+id/spinner_city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center_horizontal"
+            app:DropDownMainTextColor="@color/black"
+            app:DropDownViewCornerRadius="5dp"
+            app:MainEntryText="City"
+            app:SearchHintText="Search City"
+            app:SearchViewBackgroundColor="@color/white"
+            app:SearchViewHintColor="@color/black"
+            app:SearchViewTextColor="@color/black"
+            app:SpinnerExpandHeight="200dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_district" />
+        <com.cvaghela.spinner.searchablespinner.SearchableSpinner
+            android:id="@+id/spinner_mandal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center_horizontal"
+            app:DropDownMainTextColor="@color/black"
+            app:DropDownViewCornerRadius="5dp"
+            app:MainEntryText="Mandal"
+            app:SearchHintText="Search City"
+            app:SearchViewBackgroundColor="@color/white"
+            app:SearchViewHintColor="@color/black"
+            app:SearchViewTextColor="@color/black"
+            app:SpinnerExpandHeight="200dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_district" />
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -214,14 +246,14 @@
             app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinner_district">
+            app:layout_constraintTop_toBottomOf="@+id/spinner_city">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_pin_code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Pin Code"
+                android:hint="@string/pin_code"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -244,7 +276,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="City Name"
+                android:hint="@string/city_name"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -267,7 +299,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:inputType="textPassword"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -291,7 +323,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Confim Password"
+                android:hint="@string/confirm_password"
                 android:inputType="textPassword"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -304,7 +336,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Sign Up"
+            android:text="@string/sign_up"
             android:textAllCaps="false"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"

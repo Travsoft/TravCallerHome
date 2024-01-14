@@ -61,4 +61,7 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="phone_number">Phone Number</string>
     <string name="alternate_number">Alternate Number</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="city_name">City Name</string>
+    <string name="pin_code">Pin Code</string>
 </resources>

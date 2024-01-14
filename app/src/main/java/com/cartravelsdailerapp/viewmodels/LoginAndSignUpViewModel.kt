@@ -24,6 +24,8 @@ class LoginAndSignUpViewModel(
     val userData: MutableLiveData<BaseResponse<UserRegisterResponse>> = MutableLiveData()
     val getStatusResp: MutableLiveData<BaseResponse<StatesResponse>> = MutableLiveData()
     val getDistrictResp: MutableLiveData<BaseResponse<DistrictsResponse>> = MutableLiveData()
+    val getCityResp: MutableLiveData<BaseResponse<CitiesResponse>> = MutableLiveData()
+    val getMandalResp: MutableLiveData<BaseResponse<MandalResponse>> = MutableLiveData()
 
     fun sendOtp(email: String) {
         viewModelScope.launch {
@@ -155,6 +157,36 @@ class LoginAndSignUpViewModel(
 
             } catch (ex: Exception) {
                 getStatusResp.value = BaseResponse.Error(ex.message)
+            }
+        }
+    }
+    fun getCities(token: String, seletedDistrict: String) {
+        viewModelScope.launch {
+            try {
+                val response = userRepo.getCities(token,seletedDistrict)
+                if (response?.code() == 200) {
+                    getCityResp.value = BaseResponse.Success(response.body())
+                } else {
+                    getCityResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                getCityResp.value = BaseResponse.Error(ex.message)
+            }
+        }
+    }
+    fun getMandal(token: String, seletedCity: String) {
+        viewModelScope.launch {
+            try {
+                val response = userRepo.getMandal(token,seletedCity)
+                if (response?.code() == 200) {
+                    getMandalResp.value = BaseResponse.Success(response.body())
+                } else {
+                    getMandalResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                getMandalResp.value = BaseResponse.Error(ex.message)
             }
         }
     }
