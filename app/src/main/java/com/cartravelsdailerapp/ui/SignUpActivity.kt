@@ -108,7 +108,7 @@ class SignUpActivity : AppCompatActivity() {
             val sim2Number = binding.etSim2.text.toString()
             val email = binding.etEmail.text.toString()
             val state = selectedState
-            val district = selectedState
+            val district = selectedDistrict
             val pinCode = binding.etPinCode.text.toString()
             val cityName = binding.etPinCityname.text.toString()
             val password = binding.etPassword.text.toString()
@@ -126,9 +126,9 @@ class SignUpActivity : AppCompatActivity() {
 
             } else if (email.isEmpty()) {
                 initErrorMessage(R.string.enter_email)
-            } else if (state?.isEmpty() == true) {
+            } else if (selectedState?.isEmpty() == true) {
                 initErrorMessage(R.string.enter_state)
-            } else if (district?.isEmpty() == true) {
+            } else if (selectedDistrict?.isEmpty() == true) {
                 initErrorMessage(R.string.enter_district)
             } else if (pinCode.isEmpty()) {
                 initErrorMessage(R.string.enter_pin_code)
