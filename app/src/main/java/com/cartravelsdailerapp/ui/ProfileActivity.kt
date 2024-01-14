@@ -36,7 +36,6 @@ import com.cartravelsdailerapp.models.UserUpdateResponse
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.cartravelsdailerapp.viewmodels.ProfileViewModel
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Picasso
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

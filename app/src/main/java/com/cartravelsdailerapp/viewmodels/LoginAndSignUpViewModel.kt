@@ -22,6 +22,8 @@ class LoginAndSignUpViewModel(
     val sendOTPResp: MutableLiveData<BaseResponse<SendOTPResponse>> = MutableLiveData()
     val userLoginResp: MutableLiveData<BaseResponse<UserLoginResponse>> = MutableLiveData()
     val userData: MutableLiveData<BaseResponse<UserRegisterResponse>> = MutableLiveData()
+    val getStatusResp: MutableLiveData<BaseResponse<StatesResponse>> = MutableLiveData()
+    val getDistrictResp: MutableLiveData<BaseResponse<DistrictsResponse>> = MutableLiveData()
 
     fun sendOtp(email: String) {
         viewModelScope.launch {
@@ -123,6 +125,38 @@ class LoginAndSignUpViewModel(
             }
         }
 
+    }
+
+    fun getStates(token: String) {
+        viewModelScope.launch {
+            try {
+                val response = userRepo.getStates(token)
+                if (response?.code() == 200) {
+                    getStatusResp.value = BaseResponse.Success(response.body())
+                } else {
+                    getStatusResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                getStatusResp.value = BaseResponse.Error(ex.message)
+            }
+        }
+    }
+
+    fun getDistrict(token: String, selectedState: String) {
+        viewModelScope.launch {
+            try {
+                val response = userRepo.getDistricts(token,selectedState)
+                if (response?.code() == 200) {
+                    getDistrictResp.value = BaseResponse.Success(response.body())
+                } else {
+                    getDistrictResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                getStatusResp.value = BaseResponse.Error(ex.message)
+            }
+        }
     }
 
 

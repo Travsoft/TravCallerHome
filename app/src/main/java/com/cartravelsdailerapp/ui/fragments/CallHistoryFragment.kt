@@ -29,7 +29,6 @@ import com.cartravelsdailerapp.ui.SearchActivity
 import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
-import com.squareup.picasso.Picasso
 
 class CallHistoryFragment : Fragment() {
     lateinit var binding: FragmentCallHistoryBinding

@@ -17,6 +17,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -25,16 +26,20 @@ import com.cartravelsdailerapp.BaseResponse
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.PrefUtils.KeyEmail
 import com.cartravelsdailerapp.PrefUtils.KeyPhoneNumber
+import com.cartravelsdailerapp.PrefUtils.UserEmail
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivitySignUpBinding
 import com.cartravelsdailerapp.databinding.PopupLayoutBinding
 import com.cartravelsdailerapp.models.UserRegisterRequest
+import com.cartravelsdailerapp.ui.adapters.SpinerArrayListAdapter
 import com.cartravelsdailerapp.viewmodels.LoginAndSignUpViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
+import com.cvaghela.spinner.searchablespinner.interfaces.OnItemSelectedListener
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.FileDescriptor
 import java.io.IOException
+import java.util.ArrayList
 
 class SignUpActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
@@ -42,7 +47,10 @@ class SignUpActivity : AppCompatActivity() {
     var image_uri: Uri? = null
     lateinit var vm: LoginAndSignUpViewModel
     lateinit var mProgressDialog: ProgressDialog
+    lateinit var adapter: SpinerArrayListAdapter
 
+     var selectedState: String? = null
+    var selectedDistrict: String? = null
     private var galleryActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -71,8 +79,6 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
-
-
         setContentView(binding.root)
         mProgressDialog = ProgressDialog(this@SignUpActivity)
         mProgressDialog.setTitle("Loading")
@@ -84,28 +90,23 @@ class SignUpActivity : AppCompatActivity() {
             myViewModelFactory
         )[LoginAndSignUpViewModel::class.java]
 
+        vm.getStates("")
+
         supportActionBar?.title = "Sign Up"
         val d = intent.extras
-        val email = d?.getString(KeyEmail)
+        val email = d?.getString(UserEmail)
         val phoneNumber = d?.getString(KeyPhoneNumber)
         binding.etEmail.setText(email)
         binding.etSim1.setText(phoneNumber)
         binding.btSignup.setOnClickListener {
-            /*val intent = Intent(
-                this,
-                Login2Activity::class.java
-            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-
-            startActivity(intent)*/
             val name = binding.etName.text.toString()
             val jobTitle = binding.etJobtitle.text.toString()
             val companyName = binding.etCompanyName.text.toString()
             val sim1Number = binding.etSim1.text.toString()
             val sim2Number = binding.etSim2.text.toString()
             val email = binding.etEmail.text.toString()
-            val state = binding.etState.text.toString()
-            val district = binding.etDistrict.text.toString()
+            val state = selectedState
+            val district = selectedState
             val pinCode = binding.etPinCode.text.toString()
             val cityName = binding.etPinCityname.text.toString()
             val password = binding.etPassword.text.toString()
@@ -123,9 +124,9 @@ class SignUpActivity : AppCompatActivity() {
 
             } else if (email.isEmpty()) {
                 initErrorMessage(R.string.enter_email)
-            } else if (state.isEmpty()) {
+            } else if (state?.isEmpty() == true) {
                 initErrorMessage(R.string.enter_state)
-            } else if (district.isEmpty()) {
+            } else if (district?.isEmpty() == true) {
                 initErrorMessage(R.string.enter_district)
             } else if (pinCode.isEmpty()) {
                 initErrorMessage(R.string.enter_pin_code)
@@ -149,8 +150,8 @@ class SignUpActivity : AppCompatActivity() {
                     pinCode,
                     sim1Number,
                     password,
-                    state,
-                    district,
+                    state!!,
+                    district!!,
                     cityName,
                     webLink = "",
                     sim2Number,
@@ -158,11 +159,12 @@ class SignUpActivity : AppCompatActivity() {
                     companyName
                 )
                 val file = image_uri?.let { it1 -> getFileFromUri(this, it1) }
-                vm.userRegister(request,file)
+                vm.userRegister(request, file)
             }
 
 
         }
+        initObserve()
         vm.userData.observe(this) {
             when (it) {
                 is BaseResponse.Loading -> {
@@ -204,9 +206,100 @@ class SignUpActivity : AppCompatActivity() {
             }
 
         }
-
         binding.imgProfile.setOnClickListener {
             chooseImage()
+        }
+    }
+
+    private fun initObserve() {
+        vm.getStatusResp.observe(this) {
+            when (it) {
+                is BaseResponse.Loading -> {
+                    //  showLoading()
+                    mProgressDialog.show()
+
+                }
+
+                is BaseResponse.Success -> {
+                    // stopLoading()
+                    mProgressDialog.dismiss()
+                    val states = it.data?.totalStates?.distinct()
+                    if (states?.isNotEmpty() == true) {
+                        adapter = SpinerArrayListAdapter(this, states as ArrayList<String>, states)
+                        binding.spinnerState.setAdapter(adapter)
+                    }
+                }
+
+                is BaseResponse.Error -> {
+                    // processError(it.msg)
+                    it.msg?.let { it1 ->
+                        Snackbar.make(
+                            binding.root,
+                            it1, Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    mProgressDialog.dismiss()
+                }
+                else -> {
+                    //stopLoading()
+                    mProgressDialog.dismiss()
+                }
+            }
+
+        }
+        binding.spinnerState.setOnItemSelectedListener(object : OnItemSelectedListener {
+            override fun onItemSelected(view: View?, position: Int, id: Long) {
+                selectedState = adapter.getItem(
+                    position
+                ).toString()
+                Snackbar.make(
+                    binding.root,
+                    "Item on position $position : $selectedState Selected",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                selectedState?.let { vm.getDistrict("", it) }
+            }
+
+            override fun onNothingSelected() {
+                Snackbar.make(binding.root, "Nothing Selected", Snackbar.LENGTH_SHORT)
+                    .show()
+            }
+
+        })
+        vm.getDistrictResp.observe(this) {
+            when (it) {
+                is BaseResponse.Loading -> {
+                    //  showLoading()
+                    mProgressDialog.show()
+
+                }
+
+                is BaseResponse.Success -> {
+                    // stopLoading()
+                    mProgressDialog.dismiss()
+                    val states = it.data?.totalDistricts?.distinct()
+                    if (states?.isNotEmpty() == true) {
+                        adapter = SpinerArrayListAdapter(this, states as ArrayList<String>, states)
+                        binding.spinnerDistrict.setAdapter(adapter)
+                    }
+                }
+
+                is BaseResponse.Error -> {
+                    // processError(it.msg)
+                    it.msg?.let { it1 ->
+                        Snackbar.make(
+                            binding.root,
+                            it1, Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    mProgressDialog.dismiss()
+                }
+                else -> {
+                    //stopLoading()
+                    mProgressDialog.dismiss()
+                }
+            }
+
         }
     }
 
@@ -295,6 +388,7 @@ class SignUpActivity : AppCompatActivity() {
         ).show()
 
     }
+
     fun getFileFromUri(context: Context, uri: Uri): File? {
         uri ?: return null
         uri.path ?: return null
@@ -356,4 +450,5 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
         return if (path.isNullOrEmpty()) null else File(path)
-    }}
+    }
+}

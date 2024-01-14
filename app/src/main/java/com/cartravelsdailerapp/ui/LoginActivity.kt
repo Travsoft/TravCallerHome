@@ -116,13 +116,9 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                                 intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
                                 startActivity(intent)
                                 val edit = sharedPreferences.edit()
-                              //  edit.putBoolean(PrefUtils.IsLogin, true)
                                 edit.putString(PrefUtils.UserEmail, email)
                                 edit.apply()
                                 finish()
-                                /*val edit = sharedPreferences.edit()
-                                edit.putBoolean(PrefUtils.IsLogin, true)
-                                edit.apply()*/
 
 
                             } else {
@@ -135,9 +131,8 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                                 intent.putExtra(PrefUtils.KeyPhoneNumber, mobileNo)
                                 startActivity(intent)
                                 val edit = sharedPreferences.edit()
-                                edit.putBoolean(PrefUtils.IsLogin, true)
                                 edit.putString(PrefUtils.UserEmail, email)
-                                edit.putString(PrefUtils.KeyPhoneNumber, email)
+                                edit.putString(PrefUtils.KeyPhoneNumber, mobileNo)
                                 edit.apply()
                             }
                         }

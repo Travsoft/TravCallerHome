@@ -12,10 +12,7 @@ import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.Repositorys.UserRepository
 import com.cartravelsdailerapp.db.DatabaseBuilder
-import com.cartravelsdailerapp.models.CallHistory
-import com.cartravelsdailerapp.models.Contact
-import com.cartravelsdailerapp.models.UserExistRequest
-import com.cartravelsdailerapp.models.UserExistResponse
+import com.cartravelsdailerapp.models.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
