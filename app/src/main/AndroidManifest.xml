@@ -49,26 +49,10 @@
             android:name=".ui.OtpActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.CallActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.SearchActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
-            android:name=".ui.PostYouBusinessActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ui.Login2Activity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.CallHistroyActivity"
             android:exported="false" />
         <activity
             android:name=".ui.ForgotPassword"
@@ -85,15 +69,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.VisitingCardActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.InCallActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.Dialer"
-            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -113,15 +89,6 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".broadcastreceivers.CallEndReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

@@ -26,6 +26,7 @@ class LoginAndSignUpViewModel(
     val getDistrictResp: MutableLiveData<BaseResponse<DistrictsResponse>> = MutableLiveData()
     val getCityResp: MutableLiveData<BaseResponse<CitiesResponse>> = MutableLiveData()
     val getMandalResp: MutableLiveData<BaseResponse<MandalResponse>> = MutableLiveData()
+    val userExistResp: MutableLiveData<BaseResponse<UserExistResponse>> = MutableLiveData()
 
     fun sendOtp(email: String) {
         viewModelScope.launch {
@@ -190,6 +191,25 @@ class LoginAndSignUpViewModel(
             }
         }
     }
+    fun userExist(email: String, phoneNum: String) {
+        viewModelScope.launch {
+            try {
 
+                val loginRequest = UserExistRequest(
+                    email = email,
+                    phoneNumber = phoneNum
+                )
+                val response = userRepo.userExist(loginRequest = loginRequest)
+                if (response?.code() == 200) {
+                    userExistResp.value = BaseResponse.Success(response.body())
+                } else {
+                    userExistResp.value = BaseResponse.Error(response?.message())
+                }
+
+            } catch (ex: Exception) {
+                userExistResp.value = BaseResponse.Error(ex.message)
+            }
+        }
+    }
 
 }

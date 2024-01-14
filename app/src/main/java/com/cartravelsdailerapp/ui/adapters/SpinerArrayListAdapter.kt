@@ -9,7 +9,6 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
 import com.cartravelsdailerapp.R
-import com.cartravelsdailerapp.models.StatesResponse
 import com.cvaghela.spinner.searchablespinner.interfaces.ISpinnerSelectedView
 import java.util.*
 
@@ -61,7 +60,7 @@ class SpinerArrayListAdapter(
         return mStringFilter
     }
 
-   inner class StringFilter : Filter() {
+    inner class StringFilter : Filter() {
         override fun performFiltering(constraint: CharSequence): FilterResults {
             val filterResults = FilterResults()
             if (TextUtils.isEmpty(constraint)) {

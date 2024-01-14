@@ -8,11 +8,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.cartravelsdailerapp.BaseResponse
-import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLogin2Binding
-import com.cartravelsdailerapp.models.UserData
 import com.cartravelsdailerapp.models.UserLoginResponse
 import com.cartravelsdailerapp.viewmodels.LoginAndSignUpViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
@@ -85,12 +83,6 @@ class Login2Activity : AppCompatActivity() {
                         edit.putString(PrefUtils.userToken, userData.first().token)
                         edit.putString(PrefUtils.UserEmail, userData.first().email)
                         edit.apply()
-                        val intent = Intent(
-                            this,
-                            MainActivity::class.java
-                        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        startActivity(intent)
 
                     }
 
@@ -115,6 +107,16 @@ class Login2Activity : AppCompatActivity() {
                     mProgressDialog.dismiss()
                 }
             }
+        }
+
+        binding.txtSignUp.setOnClickListener {
+            val intent = Intent(
+                this,
+                SignUpActivity::class.java
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
+
         }
 
     }

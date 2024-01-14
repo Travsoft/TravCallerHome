@@ -5,12 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.cartravelsdailerapp.BaseResponse
-import com.cartravelsdailerapp.Repositorys.CallLogsRepository
 import com.cartravelsdailerapp.Repositorys.ProfileRepository
-import com.cartravelsdailerapp.models.SendOTPRequest
 import com.cartravelsdailerapp.models.UserResponse
 import com.cartravelsdailerapp.models.UserUpdateResponse
-import com.cartravelsdailerapp.models.VerifyOTPResponse
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
 

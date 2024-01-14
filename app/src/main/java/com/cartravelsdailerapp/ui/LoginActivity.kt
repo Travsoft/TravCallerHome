@@ -16,14 +16,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.alexstyl.contactstore.ContactStore
 import com.cartravelsdailerapp.BaseResponse
-import com.cartravelsdailerapp.MainActivity
 import com.cartravelsdailerapp.PrefUtils
 import com.cartravelsdailerapp.R
 import com.cartravelsdailerapp.databinding.ActivityLoginBinding
-import com.cartravelsdailerapp.db.AppDatabase
-import com.cartravelsdailerapp.db.DatabaseBuilder
 import com.cartravelsdailerapp.utils.RunTimePermission
-import com.cartravelsdailerapp.viewmodels.MainActivityViewModel
+import com.cartravelsdailerapp.viewmodels.LoginAndSignUpViewModel
 import com.cartravelsdailerapp.viewmodels.MyViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
@@ -31,14 +28,13 @@ import kotlin.coroutines.CoroutineContext
 
 class LoginActivity : AppCompatActivity(), CoroutineScope {
     lateinit var sharedPreferences: SharedPreferences
-    lateinit var vm: MainActivityViewModel
+    lateinit var vm: LoginAndSignUpViewModel
     private lateinit var binding: ActivityLoginBinding
     var email: String? = null
     var mobileNo: String? = null
     private lateinit var job: Job
     lateinit var listOfContactStore: ContactStore
     var runtimePermission: RunTimePermission = RunTimePermission(this)
-    lateinit var db: AppDatabase
     lateinit var mProgressDialog: ProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,13 +46,12 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
         vm = ViewModelProvider(
             this@LoginActivity,
             myViewModelFactory
-        )[MainActivityViewModel::class.java]
+        )[LoginAndSignUpViewModel::class.java]
         job = Job()
         binding = ActivityLoginBinding.inflate(layoutInflater)
         sharedPreferences = getSharedPreferences(PrefUtils.CallTravelsSharedPref, MODE_PRIVATE)
         setContentView(binding.root)
         listOfContactStore = ContactStore.newInstance(this)
-        db = DatabaseBuilder.getInstance(this)
         binding.etEmail.setText(sharedPreferences.getString(PrefUtils.UserEmail, ""))
     }
 
@@ -175,14 +170,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 object : RunTimePermission.PermissionCallback {
                     override fun onGranted() {
                         if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
-                            startActivity(
-                                Intent(
-                                    this@LoginActivity,
-                                    MainActivity::class.java
-                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
-
-                                )
                         } else {
 
                             mProgressDialog.setMessage("Preparing Call History...")
@@ -200,15 +187,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                             }
                             binding.etEmail.setText(GetEmailId())
 
-                            launch(Dispatchers.IO) {
-                                freezePleaseIAmDoingHeavyWork()
-                            }
-
-                            vm.callLogsdb.observe(this@LoginActivity) {
-                                Thread.sleep(5000)
-                                mProgressDialog.dismiss()
-                                Log.d("Login activity", "call history completed")
-                            }
                         }
 
                     }
@@ -220,11 +198,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 })
 
         } else {
-            /*PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS
-        ).then(async (response) => {
-            await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
-        })*/
 
             runtimePermission.requestPermission(
                 listOf(
@@ -242,20 +215,8 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
                 object : RunTimePermission.PermissionCallback {
                     override fun onGranted() {
                         if (sharedPreferences.getBoolean(PrefUtils.IsLogin, false)) {
-                            startActivity(
-                                Intent(
-                                    this@LoginActivity,
-                                    MainActivity::class.java
-                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
-
-                                )
                         } else {
-                            val mProgressDialog = ProgressDialog(this@LoginActivity)
-                            mProgressDialog.setTitle("Loading")
-                            mProgressDialog.setMessage("Preparing Call History...")
-                            mProgressDialog.setCancelable(false)
-                            mProgressDialog.show()
+
                             binding.etEmail.text?.clear()
                             binding.etMobile.text?.clear()
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -267,16 +228,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
 
                             }
                             binding.etEmail.setText(GetEmailId())
-
-                            launch(Dispatchers.IO) {
-                                freezePleaseIAmDoingHeavyWork()
-                            }
-                            vm.IsCallLogsdb.observe(this@LoginActivity) {
-                                if (it) {
-                                    mProgressDialog.dismiss()
-                                    Log.d("Login activity", "call history completed")
-                                }
-                            }
 
                         }
 
@@ -327,22 +278,4 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     private fun isFromAPI(apiLevel: Int) = Build.VERSION.SDK_INT >= apiLevel
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
-
-    suspend fun freezePleaseIAmDoingHeavyWork() { // function B in image
-        withContext(Dispatchers.Default) {
-            async {
-                //pretend this is a big network call
-                vm.getCallLogsHistory()
-            }
-        }
-    }
-
-    private fun initErrorMessage(msg: Int) {
-        Snackbar.make(
-            binding.root,
-            msg,
-            Snackbar.LENGTH_SHORT
-        ).show()
-
-    }
 }
